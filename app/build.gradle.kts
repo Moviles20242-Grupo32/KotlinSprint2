@@ -79,5 +79,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore.ktx)
 
+    implementation(libs.androidx.hilt.navigation.compose)
+
 }
 

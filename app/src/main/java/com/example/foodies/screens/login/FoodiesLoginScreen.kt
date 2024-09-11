@@ -1,4 +1,4 @@
-package foodies.screens
+package com.example.foodies.screens.login
 
 import android.util.Log
 import androidx.compose.foundation.clickable
@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.foodies.navigation.FoodiesScreens
 
 @Composable
 fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()){
@@ -56,7 +57,7 @@ fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewM
                     email, password ->
                     Log.d("Foodies", "Logueando con $email y $password")
                     viewModel.signInWithEmailAndPassword(email, password){
-                        //navController.navigate()
+                        navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                     }
                 }
             }
@@ -67,6 +68,9 @@ fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewM
                 ){
                         email, password ->
                         Log.d("Foodies", "Creando cuenta con $email y $password")
+                    viewModel.createUserWithEmailAndPassword(email, password){
+                        navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
+                    }
                 }
 
             }

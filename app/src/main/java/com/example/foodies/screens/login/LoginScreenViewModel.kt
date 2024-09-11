@@ -1,11 +1,10 @@
-package foodies.screens
+package com.example.foodies.screens.login
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
@@ -35,5 +34,21 @@ class LoginScreenViewModel: ViewModel() {
         }
 
 
+    }
+
+    fun createUserWithEmailAndPassword(email: String, password: String, home: () -> Unit){
+        if(_loading.value == false){
+            _loading.value = true
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        home()
+                    }
+                    else{
+                        Log.d("Foodies", "createUserWithEmailAndPassword: ${task.result.toString()}")
+                    }
+                    _loading.value = false
+                }
+        }
     }
 }

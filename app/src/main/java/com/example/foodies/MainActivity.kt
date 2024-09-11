@@ -4,28 +4,51 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.foodies.navigation.FoodiesNavigation
+import com.example.foodies.navigation.FoodiesScreens
 import com.example.foodies.ui.theme.FoodiesTheme
 
-import foodies.screens.FoodiesLoginScreen
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            // Configuración inicial del NavController
-            val navController = rememberNavController()
-            // Pantalla principal
-            MyApp(navController)
+            FoodiesTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    FoodiesApp()
+                }
+            }
         }
+    }
+}
+
+@Composable
+fun FoodiesApp(){
+    Surface (modifier = Modifier
+        .fillMaxSize()
+        .padding(top = 46.dp)){
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally)
+        {
+            FoodiesNavigation()
+
+        }
+
     }
 }
 
@@ -35,17 +58,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         text = "Hello $name!",
         modifier = modifier
     )
-}
-
-@Composable
-fun MyApp(navController: androidx.navigation.NavHostController) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        // Llama a la pantalla de login
-        FoodiesLoginScreen(navController = navController)
-    }
 }
 
 @Preview(showBackground = true)
