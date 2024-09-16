@@ -35,6 +35,23 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.foodies.navigation.FoodiesScreens
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.layout.Box
+
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.TextField
+import androidx.compose.ui.Alignment.Companion.TopCenter
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import com.example.foodies.R
 
 @Composable
 fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()){
@@ -47,14 +64,34 @@ fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewM
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            //verticalArrangement = Arrangement.spacedBy(30.dp),
+            modifier = Modifier
+                .fillMaxSize()
+
         ){
+                Image(
+                    painterResource(id = R.drawable.tipografia),
+                    contentDescription = "Foodies",
+                    modifier = Modifier
+
+                )
+
+                //Spacer(modifier = Modifier.height(10.dp))
+
+                Image(
+                    painterResource(id = R.drawable.logo),
+                    contentDescription = "Foodies",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .size(80.dp)
+                )
+
+
             if(showLoginForm.value){
-                Text(text="Inicia Sesión")
                 UserForm(
                     isCreateAccount = false
                 ){
-                    email, password ->
+                    email, password, name->
                     Log.d("Foodies", "Logueando con $email y $password")
                     viewModel.signInWithEmailAndPassword(email, password){
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
@@ -62,19 +99,18 @@ fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewM
                 }
             }
             else{
-                Text(text="Crea una cuenta")
                 UserForm(
                     isCreateAccount = true
                 ){
-                        email, password ->
+                        email, password, name->
                         Log.d("Foodies", "Creando cuenta con $email y $password")
-                    viewModel.createUserWithEmailAndPassword(email, password){
+                    viewModel.createUserWithEmailAndPassword(email, password, name){
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                     }
                 }
 
             }
-            Spacer(modifier = Modifier.height(15.dp))
+
             Row (
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
@@ -90,6 +126,7 @@ fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewM
                     modifier = Modifier
                         .clickable { showLoginForm.value = !showLoginForm.value }
                         .padding(start = 5.dp),
+                    fontWeight = FontWeight.Bold
 
                 )
 
@@ -100,9 +137,13 @@ fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewM
 }
 
 @Composable
-fun UserForm(isCreateAccount: Boolean = false,onDone: (String, String) -> Unit = {email, pwd ->})
+fun UserForm(isCreateAccount: Boolean = false,onDone: (String, String, String) -> Unit = {email, pwd, name ->})
 {
     val email = rememberSaveable {
+        mutableStateOf("")
+    }
+
+    val name = rememberSaveable {
         mutableStateOf("")
     }
     val password = rememberSaveable {
@@ -116,23 +157,42 @@ fun UserForm(isCreateAccount: Boolean = false,onDone: (String, String) -> Unit =
     }
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(horizontalAlignment = Alignment.CenterHorizontally){
+        if(isCreateAccount){
+            NameInput(
+                nameState = name,
+            )
+        }
         EmailInput(
-            emailState = email
+            emailState = email,
+
         )
         PasswordInput(
             passwordState = password,
-            labelId = "Password",
+            labelId = "Ingrese su contraseña",
             passwordVisible = passwordVisible
         )
+        Spacer(modifier = Modifier.height(15.dp))
         SubmitButton(
-            textId = if(isCreateAccount) "Crear cuenta" else "Login",
+            textId = if(isCreateAccount) "Registrar" else "Iniciar sesión →",
             inputValido = valido
         )
         {
-            onDone(email.value.trim(), password.value.trim())
+            onDone(email.value.trim(), password.value.trim(), name.value.trim())
             keyboardController?.hide()
         }
     }
+
+}
+
+@Composable
+fun NameInput(nameState: MutableState<String>, labelId: String = "Enter your name") {
+    Text(text = "Name", fontWeight = FontWeight.Bold, textAlign = TextAlign.Left)
+    InputField(
+        valueState = nameState,
+        labelId = labelId,
+        keyboardType = KeyboardType.Text,
+        placeholder = "Enter name"
+    )
 
 }
 
@@ -154,17 +214,18 @@ fun SubmitButton(textId: String, inputValido: Boolean, onClic: ()->Unit) {
 }
 
 @Composable
-fun PasswordInput(passwordState: MutableState<String>, labelId: String, passwordVisible: MutableState<Boolean>) {
+fun PasswordInput(passwordState: MutableState<String>, labelId: String, passwordVisible: MutableState<Boolean>, placeholder: String = "Ingrese su contraseña") {
     val visualTransformation = if(passwordVisible.value){
         VisualTransformation.None
     }
     else{
         PasswordVisualTransformation()
     }
+    Text(text = "Contraseña", fontWeight = FontWeight.Bold, textAlign = TextAlign.Left)
     OutlinedTextField(
         value =  passwordState.value,
         onValueChange = {passwordState.value = it},
-        label = {Text(text = labelId)},
+        label = {Text(text = labelId, color = Color.Gray)},
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password
@@ -203,28 +264,34 @@ fun PasswordVisibleIcon(passwordVisible: MutableState<Boolean>) {
 }
 
 @Composable
-fun EmailInput(emailState: MutableState<String>,labelId: String = "Email") {
+fun EmailInput(emailState: MutableState<String>,labelId: String = "nombre@ejemplo.com") {
+    Text(text = "Email", fontWeight = FontWeight.Bold, textAlign = TextAlign.Left)
     InputField(
         valueState = emailState,
         labelId = labelId,
-        keyboardType = KeyboardType.Email
+        keyboardType = KeyboardType.Email,
+        placeholder = "nombre@ejemplo.com"
     )
 
 }
 
 @Composable
-fun InputField(valueState: MutableState<String>, labelId: String, isSingleLine: Boolean = true,keyboardType: KeyboardType) {
+fun InputField(valueState: MutableState<String>, labelId: String, isSingleLine: Boolean = true,keyboardType: KeyboardType, placeholder: String) {
     OutlinedTextField(
         value = valueState.value,
         onValueChange = {valueState.value = it},
-        label = { Text(text = labelId)},
+        label = { Text(text = labelId, color = Color.Gray)},
+        placeholder = { Text(text = placeholder, color = Color.Gray) },
         singleLine = isSingleLine,
         modifier = Modifier
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             .fillMaxWidth(),
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType
-        )
+        ),
+        //textStyle = TextStyle(fontSize = 3.sp)
+
+
     )
 
 
