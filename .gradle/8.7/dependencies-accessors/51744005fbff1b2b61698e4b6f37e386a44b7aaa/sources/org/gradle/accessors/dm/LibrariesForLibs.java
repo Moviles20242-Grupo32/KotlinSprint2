@@ -76,6 +76,8 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         private final AndroidxCoreLibraryAccessors laccForAndroidxCoreLibraryAccessors = new AndroidxCoreLibraryAccessors(owner);
         private final AndroidxEspressoLibraryAccessors laccForAndroidxEspressoLibraryAccessors = new AndroidxEspressoLibraryAccessors(owner);
         private final AndroidxLifecycleLibraryAccessors laccForAndroidxLifecycleLibraryAccessors = new AndroidxLifecycleLibraryAccessors(owner);
+        private final AndroidxMaterialLibraryAccessors laccForAndroidxMaterialLibraryAccessors = new AndroidxMaterialLibraryAccessors(owner);
+        private final AndroidxNavigationLibraryAccessors laccForAndroidxNavigationLibraryAccessors = new AndroidxNavigationLibraryAccessors(owner);
         private final AndroidxUiLibraryAccessors laccForAndroidxUiLibraryAccessors = new AndroidxUiLibraryAccessors(owner);
 
         public AndroidxLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
@@ -133,6 +135,20 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          */
         public AndroidxLifecycleLibraryAccessors getLifecycle() {
             return laccForAndroidxLifecycleLibraryAccessors;
+        }
+
+        /**
+         * Group of libraries at <b>androidx.material</b>
+         */
+        public AndroidxMaterialLibraryAccessors getMaterial() {
+            return laccForAndroidxMaterialLibraryAccessors;
+        }
+
+        /**
+         * Group of libraries at <b>androidx.navigation</b>
+         */
+        public AndroidxNavigationLibraryAccessors getNavigation() {
+            return laccForAndroidxNavigationLibraryAccessors;
         }
 
         /**
@@ -234,6 +250,100 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          */
         public Provider<MinimalExternalModuleDependency> getKtx() {
             return create("androidx.lifecycle.runtime.ktx");
+        }
+
+    }
+
+    public static class AndroidxMaterialLibraryAccessors extends SubDependencyFactory implements DependencyNotationSupplier {
+        private final AndroidxMaterialIconsLibraryAccessors laccForAndroidxMaterialIconsLibraryAccessors = new AndroidxMaterialIconsLibraryAccessors(owner);
+
+        public AndroidxMaterialLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>material</b> with <b>androidx.compose.material:material</b> coordinates and
+         * with version reference <b>material</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> asProvider() {
+            return create("androidx.material");
+        }
+
+        /**
+         * Group of libraries at <b>androidx.material.icons</b>
+         */
+        public AndroidxMaterialIconsLibraryAccessors getIcons() {
+            return laccForAndroidxMaterialIconsLibraryAccessors;
+        }
+
+    }
+
+    public static class AndroidxMaterialIconsLibraryAccessors extends SubDependencyFactory {
+        private final AndroidxMaterialIconsExtendedLibraryAccessors laccForAndroidxMaterialIconsExtendedLibraryAccessors = new AndroidxMaterialIconsExtendedLibraryAccessors(owner);
+
+        public AndroidxMaterialIconsLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Group of libraries at <b>androidx.material.icons.extended</b>
+         */
+        public AndroidxMaterialIconsExtendedLibraryAccessors getExtended() {
+            return laccForAndroidxMaterialIconsExtendedLibraryAccessors;
+        }
+
+    }
+
+    public static class AndroidxMaterialIconsExtendedLibraryAccessors extends SubDependencyFactory {
+
+        public AndroidxMaterialIconsExtendedLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>android</b> with <b>androidx.compose.material:material-icons-extended-android</b> coordinates and
+         * with version reference <b>material</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getAndroid() {
+            return create("androidx.material.icons.extended.android");
+        }
+
+    }
+
+    public static class AndroidxNavigationLibraryAccessors extends SubDependencyFactory {
+        private final AndroidxNavigationRuntimeLibraryAccessors laccForAndroidxNavigationRuntimeLibraryAccessors = new AndroidxNavigationRuntimeLibraryAccessors(owner);
+
+        public AndroidxNavigationLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>compose</b> with <b>androidx.navigation:navigation-compose</b> coordinates and
+         * with version reference <b>navigationCompose</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getCompose() {
+            return create("androidx.navigation.compose");
+        }
+
+        /**
+         * Group of libraries at <b>androidx.navigation.runtime</b>
+         */
+        public AndroidxNavigationRuntimeLibraryAccessors getRuntime() {
+            return laccForAndroidxNavigationRuntimeLibraryAccessors;
+        }
+
+    }
+
+    public static class AndroidxNavigationRuntimeLibraryAccessors extends SubDependencyFactory {
+
+        public AndroidxNavigationRuntimeLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>ktx</b> with <b>androidx.navigation:navigation-runtime-ktx</b> coordinates and
+         * with version reference <b>navigationRuntimeKtx</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getKtx() {
+            return create("androidx.navigation.runtime.ktx");
         }
 
     }
@@ -425,6 +535,36 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          * This version was declared in catalog libs.versions.toml
          */
         public Provider<String> getLifecycleRuntimeKtx() { return getVersion("lifecycleRuntimeKtx"); }
+
+        /**
+         * Version alias <b>material</b> with value <b>1.7.0</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getMaterial() { return getVersion("material"); }
+
+        /**
+         * Version alias <b>navigationCompose</b> with value <b>2.8.0</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getNavigationCompose() { return getVersion("navigationCompose"); }
+
+        /**
+         * Version alias <b>navigationRuntimeKtx</b> with value <b>2.8.0</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getNavigationRuntimeKtx() { return getVersion("navigationRuntimeKtx"); }
 
     }
 
