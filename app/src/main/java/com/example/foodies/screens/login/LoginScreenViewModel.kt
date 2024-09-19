@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodies.model.ServiceAdapter
 import com.example.foodies.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -12,6 +13,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 class LoginScreenViewModel: ViewModel() {
+    private val serviceAdapter = ServiceAdapter()
 
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
@@ -29,7 +31,6 @@ class LoginScreenViewModel: ViewModel() {
                         Log.d("Foodies", "signInWithEmailAndPassword ${task.result.toString()}")
                     }
                 }
-
         }
         catch(ex: Exception){
             Log.d("Foodies", "signInWithEmailAndPassword ${ex.message}")
@@ -72,10 +73,6 @@ class LoginScreenViewModel: ViewModel() {
                 }.addOnFailureListener {
                     Log.d("Foodies", "Ocurrio error")
                 }
-
         }
-
-
-
     }
 }
