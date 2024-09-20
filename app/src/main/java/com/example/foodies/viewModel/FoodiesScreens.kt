@@ -1,4 +1,4 @@
-package com.example.foodies.navigation
+package com.example.foodies.viewModel
 
 enum class FoodiesScreens {
     FoodiesLoginScreen,

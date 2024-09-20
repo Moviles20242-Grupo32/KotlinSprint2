@@ -1,12 +1,12 @@
-package com.example.foodies.navigation
+package com.example.foodies.viewModel
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.foodies.screens.home.FoodiesHomeScreen
-import com.example.foodies.screens.login.FoodiesLoginScreen
-import com.example.foodies.screens.shoppingCart.FoodiesShoppingCartScreen
+import com.example.foodies.view.home.FoodiesHomeScreen
+import com.example.foodies.view.login.FoodiesLoginScreen
+import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
 
 @Composable
 fun FoodiesNavigation(){

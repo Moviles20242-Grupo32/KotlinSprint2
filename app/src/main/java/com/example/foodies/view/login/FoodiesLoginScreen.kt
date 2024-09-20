@@ -1,4 +1,4 @@
-package com.example.foodies.screens.login
+package com.example.foodies.view.login
 
 import android.util.Log
 import androidx.compose.foundation.clickable
@@ -34,27 +34,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.foodies.navigation.FoodiesScreens
+import com.example.foodies.viewModel.FoodiesScreens
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.snapping.SnapPosition
-import androidx.compose.foundation.layout.Box
 
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.TextField
-import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodies.R
+import com.example.foodies.viewModel.LoginViewModel
 
 @Composable
-fun FoodiesLoginScreen(navController: NavController, viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()){
+fun FoodiesLoginScreen(navController: NavController,
+                       viewModel: LoginViewModel = viewModel(),
+                       ){
     val showLoginForm = rememberSaveable {
         mutableStateOf(true)
     }

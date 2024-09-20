@@ -1,4 +1,4 @@
-package com.example.foodies.navigation
+package com.example.foodies.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

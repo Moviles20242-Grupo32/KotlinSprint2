@@ -1,4 +1,4 @@
-package com.example.foodies.screens.shoppingCart
+package com.example.foodies.view.shoppingCart
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
