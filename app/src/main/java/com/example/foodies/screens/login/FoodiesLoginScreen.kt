@@ -290,10 +290,7 @@ fun InputField(valueState: MutableState<String>, labelId: String, isSingleLine: 
             keyboardType = keyboardType
         ),
         //textStyle = TextStyle(fontSize = 3.sp)
-
-
     )
-
 
 
 
