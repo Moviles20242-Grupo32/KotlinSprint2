@@ -31,4 +31,22 @@ class ServiceAdapter {
                 onFailure(exception)
             }
     }
+
+    // Función para obtener el producto más vendido
+    fun mostSellItem(onSuccess: (Item) -> Unit, onFailure: (Exception) -> Unit) {
+        getAllItems(
+            onSuccess = { itemsList ->
+                // Encontrar el ítem con el mayor valor en times_ordered
+                val mostSoldItem = itemsList.maxByOrNull { it.times_ordered }
+                if (mostSoldItem != null) {
+                    onSuccess(mostSoldItem)
+                } else {
+                    onFailure(Exception("No items found"))
+                }
+            },
+            onFailure = { exception ->
+                onFailure(exception)
+            }
+        )
+    }
 }

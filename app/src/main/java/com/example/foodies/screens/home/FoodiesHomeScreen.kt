@@ -1,5 +1,6 @@
 package com.example.foodies.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,15 +61,20 @@ import com.example.foodies.navigation.ShoppingViewModel
 @Composable
 fun FoodiesHomeScreen(
     navController: NavController,
-    viewModel: ShoppingViewModel = viewModel()
+    viewModel: ShoppingViewModel
 ) {
     // Obtener el estado de los items desde el ViewModel
     val items by viewModel.items.observeAsState(emptyList())
+    val msitem by viewModel.msitem.observeAsState(null)
+    val isLoaded by viewModel.isLoaded.observeAsState(false)
     val error by viewModel.error.observeAsState()
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
-        viewModel.fetchItems()
+        if (!isLoaded) {
+            viewModel.mostSellItem()
+            viewModel.fetchItems()
+        }
     }
 
     // Manejar posibles errores
@@ -93,6 +99,9 @@ fun FoodiesHomeScreen(
             FilterBar(onFilter = { query ->
                 viewModel.filterItemsByName(query)
             })
+
+            //Most Sell box
+            msitem?.let { MostSellItem(it, viewModel) }
 
             // Lista de ítems usando la función modularizada
             ItemsList(items,viewModel)
@@ -221,10 +230,40 @@ fun FilterBar(onFilter: (String) -> Unit) {
 }
 
 @Composable
+fun MostSellItem(item: Item, viewModel: ShoppingViewModel){
+    Column {
+        Text(
+            text = "Most Ordered Box",
+            style = TextStyle(
+                fontSize = 15.sp, // Tamaño de fuente fijo
+                fontWeight = FontWeight.Bold // Negrita
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = Color(0.352f, 0.196f, 0.070f, 1.0f)
+        )
+        ItemCard(item,viewModel)
+    }
+}
+
+@Composable
 fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
+        item {
+            Text(
+                text = "Mistery boxes",
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color(0.352f, 0.196f, 0.070f, 1.0f)
+            )
+        }
+
         val filteredItems = items.filter { it.show }
         items(filteredItems) { item ->
             ItemCard(item,viewModel)
