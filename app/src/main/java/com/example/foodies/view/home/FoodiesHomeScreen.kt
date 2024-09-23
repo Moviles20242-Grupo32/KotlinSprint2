@@ -1,5 +1,6 @@
 package com.example.foodies.view.home
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -41,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -58,15 +61,20 @@ import com.example.foodies.viewModel.ShoppingViewModel
 @Composable
 fun FoodiesHomeScreen(
     navController: NavController,
-    viewModel: ShoppingViewModel = viewModel()
+    viewModel: ShoppingViewModel
 ) {
     // Obtener el estado de los items desde el ViewModel
     val items by viewModel.items.observeAsState(emptyList())
+    val msitem by viewModel.msitem.observeAsState(null)
+    val isLoaded by viewModel.isLoaded.observeAsState(false)
     val error by viewModel.error.observeAsState()
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
-        viewModel.fetchItems()
+        if (!isLoaded) {
+            viewModel.mostSellItem()
+            viewModel.fetchItems()
+        }
     }
 
     // Manejar posibles errores
@@ -85,17 +93,18 @@ fun FoodiesHomeScreen(
             ActionButtons(navController)
 
             // Fila 2: Texto "Locación"
-            Text(
-                text = "Locación",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Location()
 
             // Fila 3: Barra de busqueda
-            FilterBar()
+            FilterBar(onFilter = { query ->
+                viewModel.filterItemsByName(query)
+            })
+
+            //Most Sell box
+            msitem?.let { MostSellItem(it, viewModel) }
 
             // Lista de ítems usando la función modularizada
-            ItemsList(items)
+            ItemsList(items,viewModel)
         }
     }
 }
@@ -117,25 +126,71 @@ fun ActionButtons(navController: NavController) {
                 .size(45.dp)
                 .clickable { navController.navigate(FoodiesScreens.FoodiesShoppingCartScreen.name) }
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(10.dp))
+        var textSpeech by rememberSaveable { mutableStateOf(false) }
         Icon(
             imageVector = Icons.AutoMirrored.Filled.VolumeUp, // Megáfono
             contentDescription = "Megáfono",
-            tint = Color(0.968f, 0.588f, 0.066f, 1.0f), // Color del icono
-            modifier = Modifier.size(45.dp) // Tamaño del icono
+            tint = Color.White, // Tinte blanco del ícono
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(
+                    if (textSpeech) Color(0.192f, 0.262f, 0.254f) else Color(
+                        0.968f,
+                        0.588f,
+                        0.066f,
+                        1.0f
+                    )
+                )
+                .padding(8.dp)
+                .clickable { textSpeech = !textSpeech }
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(10.dp))
         Icon(
             imageVector = Icons.Filled.Person, // Usuario
             contentDescription = "Usuario",
-            tint = Color(0.968f, 0.588f, 0.066f, 1.0f), // Color del icono
-            modifier = Modifier.size(45.dp) // Tamaño del icono
+            tint = Color(0.968f, 0.588f, 0.066f, 1.0f),
+            modifier = Modifier
+                .size(45.dp)
+                .clip(CircleShape)
+                .border(
+                    width = 2.dp,
+                    color = Color(0.968f, 0.588f, 0.066f, 1.0f),
+                    shape = CircleShape
+                )
         )
     }
 }
 
 @Composable
-fun FilterBar() {
+fun Location() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.LocationOn,
+            contentDescription = "Localización",
+            tint = Color(0.192f, 0.262f, 0.254f) ,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "Powell St, San Francisco",
+            color = Color(0.352f, 0.196f, 0.070f, 1.0f),
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+
+@Composable
+fun FilterBar(onFilter: (String) -> Unit) {
     // Definir el estado localmente dentro de la función
     var searchText by rememberSaveable { mutableStateOf("") }
 
@@ -143,8 +198,9 @@ fun FilterBar() {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(19.dp))
-            .background(Color(0.925f, 0.925f, 0.925f, 1.0f))
-            .padding(10.dp)
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(19.dp))
+            .background(Color(0.952f, 0.952f, 0.949f, 1.0f))
+            .padding(8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -154,13 +210,19 @@ fun FilterBar() {
                 imageVector = Icons.Default.Search,
                 contentDescription = "Buscar",
                 tint = Color.Gray, // Color de la lupa
-                modifier = Modifier.padding(end = 8.dp) // Espacio entre la lupa y el campo de texto
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(end = 8.dp)
             )
 
             BasicTextField(
                 value = searchText,
-                onValueChange = { newText -> searchText = newText },
-                modifier = Modifier.fillMaxWidth(),
+                onValueChange = { newText ->
+                    searchText = newText
+                    onFilter(newText) // Llama al método de filtrado en el ViewModel
+                },
+                modifier = Modifier
+                    .fillMaxWidth(),
                 textStyle = TextStyle(color = Color.Black) // Estilo de texto
             )
         }
@@ -168,18 +230,49 @@ fun FilterBar() {
 }
 
 @Composable
-fun ItemsList(items: List<Item>) {
+fun MostSellItem(item: Item, viewModel: ShoppingViewModel){
+    Column {
+        Text(
+            text = "Most Ordered Box",
+            style = TextStyle(
+                fontSize = 15.sp, // Tamaño de fuente fijo
+                fontWeight = FontWeight.Bold // Negrita
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = Color(0.352f, 0.196f, 0.070f, 1.0f)
+        )
+        ItemCard(item,viewModel)
+    }
+}
+
+@Composable
+fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        items(items) { item ->
-            ItemCard(item)
+        item {
+            Text(
+                text = "Mistery boxes",
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color(0.352f, 0.196f, 0.070f, 1.0f)
+            )
+        }
+
+        val filteredItems = items.filter { it.show }
+        items(filteredItems) { item ->
+            ItemCard(item,viewModel)
         }
     }
 }
 
 @Composable
-fun ItemCard(item: Item) {
+fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
     val rating = item.item_ratings.toFloatOrNull() ?: 0f
     Row(
         modifier = Modifier
@@ -237,22 +330,23 @@ fun ItemCard(item: Item) {
         Spacer(modifier = Modifier.width(20.dp))
 
         //Columna 3: Agregar a carrito
-        var isAdded by rememberSaveable { mutableStateOf(false) }
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .size(40.dp) // Tamaño total del Box
                 .clip(CircleShape) // Aplica el recorte circular al Box
-                .background(if (isAdded) Color(0.192f, 0.262f, 0.254f) else Color(0.968f, 0.588f, 0.066f, 1.0f))
+                .background(
+                    if (item.isAdded) Color(0.192f, 0.262f, 0.254f) else Color(0.968f, 0.588f,0.066f, 1.0f)
+                )
                 .border(
                     width = 1.dp, // Ancho del borde
                     color = Color.Transparent, // Color del borde
                     shape = CircleShape // Esquinas redondeadas completamente
                 )
-                .clickable {isAdded = !isAdded  }
+                .clickable {viewModel.addItemToCart(item.id)}
         ) {
             Icon(
-                imageVector = if (isAdded) Icons.Filled.Check else Icons.Filled.Add,
+                imageVector = if (item.isAdded) Icons.Filled.Check else Icons.Filled.Add,
                 contentDescription = "Agregar al carrito",
                 tint = Color.White,
                 modifier = Modifier

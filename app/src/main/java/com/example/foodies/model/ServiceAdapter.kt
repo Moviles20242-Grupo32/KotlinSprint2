@@ -86,8 +86,9 @@ class ServiceAdapter {
                 // Lista para almacenar los ítems
                 val itemsList = mutableListOf<Item>()
                 for (document in documents) {
-                    // Mapear cada documento a un objeto Item
-                    val item = document.toObject(Item::class.java)
+                    val id = document.id
+                    // Mapear cada documento a un objeto Item y agregar el ID
+                    val item = document.toObject(Item::class.java).copy(id = id)
                     itemsList.add(item)
                 }
                 Log.d("ServiceAdapter", "Items obtenidos correctamente")
@@ -99,5 +100,23 @@ class ServiceAdapter {
                 // Manejar el error
                 onFailure(exception)
             }
+    }
+
+    // Función para obtener el producto más vendido
+    fun mostSellItem(onSuccess: (Item) -> Unit, onFailure: (Exception) -> Unit) {
+        getAllItems(
+            onSuccess = { itemsList ->
+                // Encontrar el ítem con el mayor valor en times_ordered
+                val mostSoldItem = itemsList.maxByOrNull { it.times_ordered }
+                if (mostSoldItem != null) {
+                    onSuccess(mostSoldItem)
+                } else {
+                    onFailure(Exception("No items found"))
+                }
+            },
+            onFailure = { exception ->
+                onFailure(exception)
+            }
+        )
     }
 }
