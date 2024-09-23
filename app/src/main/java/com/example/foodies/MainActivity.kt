@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.foodies.navigation.FoodiesNavigation
+import com.example.foodies.viewModel.FoodiesNavigation
 import com.example.foodies.ui.theme.FoodiesTheme
 
 
