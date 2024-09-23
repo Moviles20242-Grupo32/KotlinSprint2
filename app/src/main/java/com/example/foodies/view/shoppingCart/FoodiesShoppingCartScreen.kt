@@ -49,17 +49,20 @@ import coil.compose.AsyncImage
 import com.example.foodies.model.Cart
 import com.example.foodies.model.Item
 import androidx.compose.material.icons.filled.ArrowBack
-
-// Ejemplo de productos en el carrito
-val cart = Cart().apply {
-    addItem(Item(id = "1", item_name = "Pizza", item_cost = 25000, item_details = "Creps, waffles, postres, helados...",item_image = "https://raw.githubusercontent.com/Moviles20242-Grupo32/MovilesSprint1/main/Imagen_Creps.jpg"))
-    addItem(Item(id = "2", item_name = "Burger", item_cost = 15000,item_details = "Pizza hawaina, pepperoni, toscana seis quesos...",item_image = "https://raw.githubusercontent.com/Moviles20242-Grupo32/MovilesSprint1/main/Imagen_PapaJohns.jpg"))
-}
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.foodies.viewModel.FoodiesScreens
+import com.example.foodies.viewModel.ShoppingViewModel
 
 @Composable
 fun FoodiesShoppingCartScreen(
     navController: NavController,
+    viewModel: ShoppingViewModel
 ) {
+    //Estados
+    val cart by viewModel.cart.observeAsState()
+
+    //Surface
     Column(
         modifier = Modifier
             .fillMaxSize() //
@@ -74,7 +77,9 @@ fun FoodiesShoppingCartScreen(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,  // Usa el ícono AutoMirrored ArrowBack
                 contentDescription = "Back",
                 tint = Color(0xFFEC9A31), // Cambia el color de la flecha si lo necesitas
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) }
             )
             Text(
                 text = "Carrito",
@@ -91,8 +96,10 @@ fun FoodiesShoppingCartScreen(
             modifier = Modifier
                 .weight(1f) // Ocupa el espacio restante
         ) {
-            items(cart.getItems()) { item ->
-                ItemCard(item)
+            cart?.let {
+                items(it.getItems()) { item ->
+                    ItemCard(item)
+                }
             }
         }
 
@@ -133,7 +140,6 @@ fun CheckoutSection() {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-
         // Botón de Check Out sin funcionalidad
         Box(
             modifier = Modifier
