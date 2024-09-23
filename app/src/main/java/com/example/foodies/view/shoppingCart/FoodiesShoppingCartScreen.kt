@@ -51,8 +51,8 @@ import com.example.foodies.model.Item
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.foodies.navigation.FoodiesScreens
-import com.example.foodies.navigation.ShoppingViewModel
+import com.example.foodies.viewModel.FoodiesScreens
+import com.example.foodies.viewModel.ShoppingViewModel
 
 @Composable
 fun FoodiesShoppingCartScreen(
