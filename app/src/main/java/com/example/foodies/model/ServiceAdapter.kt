@@ -16,8 +16,9 @@ class ServiceAdapter {
                 // Lista para almacenar los ítems
                 val itemsList = mutableListOf<Item>()
                 for (document in documents) {
-                    // Mapear cada documento a un objeto Item
-                    val item = document.toObject(Item::class.java)
+                    val id = document.id
+                    // Mapear cada documento a un objeto Item y agregar el ID
+                    val item = document.toObject(Item::class.java).copy(id = id)
                     itemsList.add(item)
                 }
                 Log.d("ServiceAdapter", "Items obtenidos correctamente")

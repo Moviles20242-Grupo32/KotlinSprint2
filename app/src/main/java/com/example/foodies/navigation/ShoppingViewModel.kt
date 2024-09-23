@@ -33,4 +33,31 @@ class ShoppingViewModel : ViewModel() {
             )
         }
     }
+
+    // Función para filtrar los items por el nombre
+    fun filterItemsByName(query: String) {
+        val itemList = _items.value ?: emptyList()
+
+        // Filtrar y actualizar el valor de `show` según el nombre que contenga `query`
+        val updatedList = itemList.map { item ->
+            item.copy(show = item.item_name.contains(query, ignoreCase = true))
+        }
+
+        // Publicar la lista actualizada con el atributo `show` modificado
+        _items.postValue(updatedList)
+    }
+
+    // Función para cambiar el valor de isAdded y republicar la lista
+    fun addItemToCart(itemId: String?) {
+        val updatedList = _items.value?.map {
+            if (it.id == itemId) {
+                it.copy(isAdded = !it.isAdded)
+            } else {
+                it
+            }
+        } ?: emptyList()
+
+        // Publicar la lista actualizada
+        _items.postValue(updatedList)
+    }
 }

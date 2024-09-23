@@ -18,7 +18,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=RF8N80B7Y9A)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=/Users/sandrilla/.android/avd/Small_Phone_API_35.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -119,7 +119,11 @@
     "com.google.services.firebase.aqiPopupShown": "true",
     "kotlin-language-version-configured": "true",
     "last_directory_selection": "C:/Users/villo/Documents/App/KotlinSprint2/app/src/main/java",
-    "last_opened_file_path": "/Users/sandrilla/Desktop/KotlinSprint2/app/src/main/res/drawable-nodpi"
+    "last_opened_file_path": "/Users/sandrilla/Desktop/KotlinSprint2/app/src/main/res/drawable-nodpi",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.17",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.keymap"
   },
   "keyToStringList": {
     "kotlin-gradle-user-dirs": [
