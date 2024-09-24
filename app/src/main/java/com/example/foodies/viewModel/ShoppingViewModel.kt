@@ -122,4 +122,12 @@ class ShoppingViewModel : ViewModel() {
         _cart.postValue(currentCart)
     }
 
+    // Función para agregar cantidad
+    fun updateItemQuantity(item: Item, change: Int) {
+        val currentCart = _cart.value ?: Cart()
+        currentCart.updateItemQuantity(item,change)
+        _cart.postValue(currentCart)
+    }
+
+
 }

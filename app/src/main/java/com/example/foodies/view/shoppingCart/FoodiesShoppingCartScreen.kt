@@ -49,6 +49,7 @@ import coil.compose.AsyncImage
 import com.example.foodies.model.Cart
 import com.example.foodies.model.Item
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ListItem
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodies.viewModel.FoodiesScreens
@@ -98,7 +99,7 @@ fun FoodiesShoppingCartScreen(
         ) {
             cart?.let {
                 items(it.getItems()) { item ->
-                    ItemCard(item)
+                    ItemCard(item,viewModel)
                 }
             }
         }
@@ -106,12 +107,12 @@ fun FoodiesShoppingCartScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Sección de total y botón de Check Out en la parte inferior
-        CheckoutSection()
+        cart?.let { CheckoutSection(it) }
     }
 }
 
 @Composable
-fun CheckoutSection() {
+fun CheckoutSection(cart: Cart) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +133,7 @@ fun CheckoutSection() {
                 color = Color(0xFF5A3918) // Color marrón
             )
             Text(
-                text = "$15.000",
+                text = cart.getTotalCost().toString(),
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 30.sp),
                 color = Color(0xFF5A3918),
                 fontWeight = FontWeight.Bold
@@ -160,19 +161,9 @@ fun CheckoutSection() {
     }
 }
 
-@Composable
-fun ItemsList(items: List<Item>) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(items) { item ->
-            ItemCard(item)
-        }
-    }
-}
 
 @Composable
-fun ItemCard(item: Item) {
+fun ItemCard(item: Item,viewModel: ShoppingViewModel) {
     val rating = item.item_ratings.toFloatOrNull() ?: 0f
     Row(
         modifier = Modifier
@@ -223,7 +214,7 @@ fun ItemCard(item: Item) {
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Text(
-                    text = "$${item.item_cost}",
+                    text = "$${item.item_cost*item.cart_quantity}",
                     style = TextStyle(
                         fontSize = 20.sp, // Tamaño de fuente fijo
                         fontWeight = FontWeight.Bold // Negrita
@@ -232,16 +223,14 @@ fun ItemCard(item: Item) {
                     overflow = TextOverflow.Ellipsis,
                     color = Color(0.352f, 0.196f, 0.070f, 1.0f)
                 )
-                ItemQuantityControl(item)
+                ItemQuantityControl(item, viewModel)
             }
         }
     }
 }
 
 @Composable
-fun ItemQuantityControl(item: Item) {
-    var quantity by remember { mutableStateOf(item.cart_quantity) }
-
+fun ItemQuantityControl(item: Item, viewModel:ShoppingViewModel) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         // Botón de restar
         Icon(
@@ -250,15 +239,13 @@ fun ItemQuantityControl(item: Item) {
             tint = Color(0.352f, 0.196f, 0.070f, 1.0f),
             modifier = Modifier
                 .clickable {
-                    if (quantity > 1) {
-                        quantity--
-                    }
+                    viewModel.updateItemQuantity(item,-1)
                 }
         )
 
         // Mostrar cantidad actual
         Text(
-            text = quantity.toString(),
+            text = item.cart_quantity.toString(),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -269,7 +256,7 @@ fun ItemQuantityControl(item: Item) {
             tint = Color(0.352f, 0.196f, 0.070f, 1.0f),
             modifier = Modifier
                 .clickable {
-                    quantity++
+                    viewModel.updateItemQuantity(item,1)
                 }
         )
     }
