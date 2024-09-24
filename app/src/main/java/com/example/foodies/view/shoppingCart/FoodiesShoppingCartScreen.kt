@@ -230,7 +230,10 @@ fun ItemCard(item: Item,viewModel: ShoppingViewModel) {
 }
 
 @Composable
-fun ItemQuantityControl(item: Item, viewModel:ShoppingViewModel) {
+fun ItemQuantityControl(item: Item, viewModel: ShoppingViewModel) {
+    // Estado mutable que representa la cantidad actual del item
+    var itemCartQuantity by remember { mutableStateOf(item.cart_quantity) }
+
     Row(verticalAlignment = Alignment.CenterVertically) {
         // Botón de restar
         Icon(
@@ -239,13 +242,16 @@ fun ItemQuantityControl(item: Item, viewModel:ShoppingViewModel) {
             tint = Color(0.352f, 0.196f, 0.070f, 1.0f),
             modifier = Modifier
                 .clickable {
-                    viewModel.updateItemQuantity(item,-1)
+                    if (itemCartQuantity > 0) { // Evitar valores negativos
+                        itemCartQuantity -= 1
+                        viewModel.updateItemQuantity(item, -1)
+                    }
                 }
         )
 
         // Mostrar cantidad actual
         Text(
-            text = item.cart_quantity.toString(),
+            text = itemCartQuantity.toString(),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
@@ -256,7 +262,8 @@ fun ItemQuantityControl(item: Item, viewModel:ShoppingViewModel) {
             tint = Color(0.352f, 0.196f, 0.070f, 1.0f),
             modifier = Modifier
                 .clickable {
-                    viewModel.updateItemQuantity(item,1)
+                    itemCartQuantity += 1
+                    viewModel.updateItemQuantity(item, 1)
                 }
         )
     }
