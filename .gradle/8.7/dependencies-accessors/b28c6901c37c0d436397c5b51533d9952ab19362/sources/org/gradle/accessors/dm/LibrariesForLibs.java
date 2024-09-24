@@ -23,7 +23,9 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
 
     private final AbstractExternalDependencyFactory owner = this;
     private final AndroidxLibraryAccessors laccForAndroidxLibraryAccessors = new AndroidxLibraryAccessors(owner);
+    private final EngageLibraryAccessors laccForEngageLibraryAccessors = new EngageLibraryAccessors(owner);
     private final FirebaseLibraryAccessors laccForFirebaseLibraryAccessors = new FirebaseLibraryAccessors(owner);
+    private final PlayLibraryAccessors laccForPlayLibraryAccessors = new PlayLibraryAccessors(owner);
     private final VersionAccessors vaccForVersionAccessors = new VersionAccessors(providers, config);
     private final BundleAccessors baccForBundleAccessors = new BundleAccessors(objects, providers, config, attributesFactory, capabilityNotationParser);
     private final PluginAccessors paccForPluginAccessors = new PluginAccessors(providers, config);
@@ -51,10 +53,24 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
     }
 
     /**
+     * Group of libraries at <b>engage</b>
+     */
+    public EngageLibraryAccessors getEngage() {
+        return laccForEngageLibraryAccessors;
+    }
+
+    /**
      * Group of libraries at <b>firebase</b>
      */
     public FirebaseLibraryAccessors getFirebase() {
         return laccForFirebaseLibraryAccessors;
+    }
+
+    /**
+     * Group of libraries at <b>play</b>
+     */
+    public PlayLibraryAccessors getPlay() {
+        return laccForPlayLibraryAccessors;
     }
 
     /**
@@ -83,9 +99,11 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         private final AndroidxComposeLibraryAccessors laccForAndroidxComposeLibraryAccessors = new AndroidxComposeLibraryAccessors(owner);
         private final AndroidxCoreLibraryAccessors laccForAndroidxCoreLibraryAccessors = new AndroidxCoreLibraryAccessors(owner);
         private final AndroidxEspressoLibraryAccessors laccForAndroidxEspressoLibraryAccessors = new AndroidxEspressoLibraryAccessors(owner);
+        private final AndroidxHiltLibraryAccessors laccForAndroidxHiltLibraryAccessors = new AndroidxHiltLibraryAccessors(owner);
         private final AndroidxLifecycleLibraryAccessors laccForAndroidxLifecycleLibraryAccessors = new AndroidxLifecycleLibraryAccessors(owner);
         private final AndroidxMaterialLibraryAccessors laccForAndroidxMaterialLibraryAccessors = new AndroidxMaterialLibraryAccessors(owner);
         private final AndroidxNavigationLibraryAccessors laccForAndroidxNavigationLibraryAccessors = new AndroidxNavigationLibraryAccessors(owner);
+        private final AndroidxRuntimeLibraryAccessors laccForAndroidxRuntimeLibraryAccessors = new AndroidxRuntimeLibraryAccessors(owner);
         private final AndroidxUiLibraryAccessors laccForAndroidxUiLibraryAccessors = new AndroidxUiLibraryAccessors(owner);
 
         public AndroidxLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
@@ -139,6 +157,13 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         }
 
         /**
+         * Group of libraries at <b>androidx.hilt</b>
+         */
+        public AndroidxHiltLibraryAccessors getHilt() {
+            return laccForAndroidxHiltLibraryAccessors;
+        }
+
+        /**
          * Group of libraries at <b>androidx.lifecycle</b>
          */
         public AndroidxLifecycleLibraryAccessors getLifecycle() {
@@ -157,6 +182,13 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          */
         public AndroidxNavigationLibraryAccessors getNavigation() {
             return laccForAndroidxNavigationLibraryAccessors;
+        }
+
+        /**
+         * Group of libraries at <b>androidx.runtime</b>
+         */
+        public AndroidxRuntimeLibraryAccessors getRuntime() {
+            return laccForAndroidxRuntimeLibraryAccessors;
         }
 
         /**
@@ -232,10 +264,49 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
 
     }
 
+    public static class AndroidxHiltLibraryAccessors extends SubDependencyFactory {
+        private final AndroidxHiltNavigationLibraryAccessors laccForAndroidxHiltNavigationLibraryAccessors = new AndroidxHiltNavigationLibraryAccessors(owner);
+
+        public AndroidxHiltLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Group of libraries at <b>androidx.hilt.navigation</b>
+         */
+        public AndroidxHiltNavigationLibraryAccessors getNavigation() {
+            return laccForAndroidxHiltNavigationLibraryAccessors;
+        }
+
+    }
+
+    public static class AndroidxHiltNavigationLibraryAccessors extends SubDependencyFactory {
+
+        public AndroidxHiltNavigationLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>compose</b> with <b>androidx.hilt:hilt-navigation-compose</b> coordinates and
+         * with version reference <b>hiltNavigationCompose</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getCompose() {
+            return create("androidx.hilt.navigation.compose");
+        }
+
+    }
+
     public static class AndroidxLifecycleLibraryAccessors extends SubDependencyFactory {
+        private final AndroidxLifecycleLivedataLibraryAccessors laccForAndroidxLifecycleLivedataLibraryAccessors = new AndroidxLifecycleLivedataLibraryAccessors(owner);
         private final AndroidxLifecycleRuntimeLibraryAccessors laccForAndroidxLifecycleRuntimeLibraryAccessors = new AndroidxLifecycleRuntimeLibraryAccessors(owner);
+        private final AndroidxLifecycleViewmodelLibraryAccessors laccForAndroidxLifecycleViewmodelLibraryAccessors = new AndroidxLifecycleViewmodelLibraryAccessors(owner);
 
         public AndroidxLifecycleLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Group of libraries at <b>androidx.lifecycle.livedata</b>
+         */
+        public AndroidxLifecycleLivedataLibraryAccessors getLivedata() {
+            return laccForAndroidxLifecycleLivedataLibraryAccessors;
+        }
 
         /**
          * Group of libraries at <b>androidx.lifecycle.runtime</b>
@@ -244,11 +315,48 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
             return laccForAndroidxLifecycleRuntimeLibraryAccessors;
         }
 
+        /**
+         * Group of libraries at <b>androidx.lifecycle.viewmodel</b>
+         */
+        public AndroidxLifecycleViewmodelLibraryAccessors getViewmodel() {
+            return laccForAndroidxLifecycleViewmodelLibraryAccessors;
+        }
+
+    }
+
+    public static class AndroidxLifecycleLivedataLibraryAccessors extends SubDependencyFactory {
+
+        public AndroidxLifecycleLivedataLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>ktx</b> with <b>androidx.lifecycle:lifecycle-livedata-ktx</b> coordinates and
+         * with version reference <b>lifecycleRuntimeKtxVersion</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getKtx() {
+            return create("androidx.lifecycle.livedata.ktx");
+        }
+
     }
 
     public static class AndroidxLifecycleRuntimeLibraryAccessors extends SubDependencyFactory {
+        private final AndroidxLifecycleRuntimeKtxLibraryAccessors laccForAndroidxLifecycleRuntimeKtxLibraryAccessors = new AndroidxLifecycleRuntimeKtxLibraryAccessors(owner);
 
         public AndroidxLifecycleRuntimeLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Group of libraries at <b>androidx.lifecycle.runtime.ktx</b>
+         */
+        public AndroidxLifecycleRuntimeKtxLibraryAccessors getKtx() {
+            return laccForAndroidxLifecycleRuntimeKtxLibraryAccessors;
+        }
+
+    }
+
+    public static class AndroidxLifecycleRuntimeKtxLibraryAccessors extends SubDependencyFactory implements DependencyNotationSupplier {
+
+        public AndroidxLifecycleRuntimeKtxLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
 
         /**
          * Dependency provider for <b>ktx</b> with <b>androidx.lifecycle:lifecycle-runtime-ktx</b> coordinates and
@@ -256,8 +364,34 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          * <p>
          * This dependency was declared in catalog libs.versions.toml
          */
-        public Provider<MinimalExternalModuleDependency> getKtx() {
+        public Provider<MinimalExternalModuleDependency> asProvider() {
             return create("androidx.lifecycle.runtime.ktx");
+        }
+
+        /**
+         * Dependency provider for <b>v286</b> with <b>androidx.lifecycle:lifecycle-runtime-ktx</b> coordinates and
+         * with version reference <b>lifecycleRuntimeKtxVersion</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getV286() {
+            return create("androidx.lifecycle.runtime.ktx.v286");
+        }
+
+    }
+
+    public static class AndroidxLifecycleViewmodelLibraryAccessors extends SubDependencyFactory {
+
+        public AndroidxLifecycleViewmodelLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>ktx</b> with <b>androidx.lifecycle:lifecycle-viewmodel-ktx</b> coordinates and
+         * with version reference <b>lifecycleRuntimeKtxVersion</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getKtx() {
+            return create("androidx.lifecycle.viewmodel.ktx");
         }
 
     }
@@ -356,6 +490,22 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
 
     }
 
+    public static class AndroidxRuntimeLibraryAccessors extends SubDependencyFactory {
+
+        public AndroidxRuntimeLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>livedata</b> with <b>androidx.compose.runtime:runtime-livedata</b> coordinates and
+         * with version reference <b>runtimeLivedata</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getLivedata() {
+            return create("androidx.runtime.livedata");
+        }
+
+    }
+
     public static class AndroidxUiLibraryAccessors extends SubDependencyFactory implements DependencyNotationSupplier {
         private final AndroidxUiTestLibraryAccessors laccForAndroidxUiTestLibraryAccessors = new AndroidxUiTestLibraryAccessors(owner);
         private final AndroidxUiToolingLibraryAccessors laccForAndroidxUiToolingLibraryAccessors = new AndroidxUiToolingLibraryAccessors(owner);
@@ -450,6 +600,22 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
 
     }
 
+    public static class EngageLibraryAccessors extends SubDependencyFactory {
+
+        public EngageLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>core</b> with <b>com.google.android.engage:engage-core</b> coordinates and
+         * with version reference <b>engageCore</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getCore() {
+            return create("engage.core");
+        }
+
+    }
+
     public static class FirebaseLibraryAccessors extends SubDependencyFactory {
         private final FirebaseFirestoreLibraryAccessors laccForFirebaseFirestoreLibraryAccessors = new FirebaseFirestoreLibraryAccessors(owner);
 
@@ -510,6 +676,36 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
 
     }
 
+    public static class PlayLibraryAccessors extends SubDependencyFactory {
+        private final PlayServicesLibraryAccessors laccForPlayServicesLibraryAccessors = new PlayServicesLibraryAccessors(owner);
+
+        public PlayLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Group of libraries at <b>play.services</b>
+         */
+        public PlayServicesLibraryAccessors getServices() {
+            return laccForPlayServicesLibraryAccessors;
+        }
+
+    }
+
+    public static class PlayServicesLibraryAccessors extends SubDependencyFactory {
+
+        public PlayServicesLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>location</b> with <b>com.google.android.gms:play-services-location</b> coordinates and
+         * with version reference <b>playServicesLocation</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getLocation() {
+            return create("play.services.location");
+        }
+
+    }
+
     public static class VersionAccessors extends VersionFactory  {
 
         public VersionAccessors(ProviderFactory providers, DefaultVersionCatalog config) { super(providers, config); }
@@ -525,7 +721,7 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         public Provider<String> getActivityCompose() { return getVersion("activityCompose"); }
 
         /**
-         * Version alias <b>agp</b> with value <b>8.5.2</b>
+         * Version alias <b>agp</b> with value <b>8.6.0</b>
          * <p>
          * If the version is a rich version and cannot be represented as a
          * single version string, an empty string is returned.
@@ -553,6 +749,16 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          * This version was declared in catalog libs.versions.toml
          */
         public Provider<String> getCoreKtx() { return getVersion("coreKtx"); }
+
+        /**
+         * Version alias <b>engageCore</b> with value <b>1.5.5</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getEngageCore() { return getVersion("engageCore"); }
 
         /**
          * Version alias <b>espressoCore</b> with value <b>3.6.1</b>
@@ -595,6 +801,16 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         public Provider<String> getFirebaseFirestoreKtx() { return getVersion("firebaseFirestoreKtx"); }
 
         /**
+         * Version alias <b>hiltNavigationCompose</b> with value <b>1.2.0</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getHiltNavigationCompose() { return getVersion("hiltNavigationCompose"); }
+
+        /**
          * Version alias <b>junit</b> with value <b>4.13.2</b>
          * <p>
          * If the version is a rich version and cannot be represented as a
@@ -635,6 +851,16 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         public Provider<String> getLifecycleRuntimeKtx() { return getVersion("lifecycleRuntimeKtx"); }
 
         /**
+         * Version alias <b>lifecycleRuntimeKtxVersion</b> with value <b>2.8.6</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getLifecycleRuntimeKtxVersion() { return getVersion("lifecycleRuntimeKtxVersion"); }
+
+        /**
          * Version alias <b>material</b> with value <b>1.7.0</b>
          * <p>
          * If the version is a rich version and cannot be represented as a
@@ -663,6 +889,26 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          * This version was declared in catalog libs.versions.toml
          */
         public Provider<String> getNavigationRuntimeKtx() { return getVersion("navigationRuntimeKtx"); }
+
+        /**
+         * Version alias <b>playServicesLocation</b> with value <b>21.3.0</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getPlayServicesLocation() { return getVersion("playServicesLocation"); }
+
+        /**
+         * Version alias <b>runtimeLivedata</b> with value <b>1.7.1</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getRuntimeLivedata() { return getVersion("runtimeLivedata"); }
 
     }
 

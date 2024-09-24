@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -83,5 +84,11 @@ dependencies {
     implementation ("io.coil-kt:coil-svg:2.7.0")
 
     implementation(libs.androidx.hilt.navigation.compose)
+
+    //implementation(libs.androidx.lifecycle.runtime.ktx.v286)
+    implementation(libs.play.services.location)
+
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 }
 

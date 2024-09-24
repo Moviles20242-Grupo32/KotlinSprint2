@@ -1,5 +1,6 @@
 package com.example.foodies.viewModel
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,8 +10,9 @@ import androidx.lifecycle.MutableLiveData
 import com.example.foodies.model.Cart
 import com.example.foodies.model.Item
 import com.example.foodies.model.ServiceAdapter
+import androidx.lifecycle.AndroidViewModel
 
-class ShoppingViewModel : ViewModel() {
+class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
     private val serviceAdapter = ServiceAdapter()
 
     // LiveData para la lista de Items
@@ -32,6 +34,10 @@ class ShoppingViewModel : ViewModel() {
     // LiveData para manejar errores
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
+
+    private val locationLiveData = LocationLiveData(application)
+
+    fun getLocation() = locationLiveData
 
     // Función para obtener los items desde Firebase
     fun fetchItems() {
