@@ -35,10 +35,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
 
-    private val locationLiveData = LocationLiveData(application)
-
-    fun getLocation() = locationLiveData
-
     // Función para obtener los items desde Firebase
     fun fetchItems() {
         if (_isLoaded.value == true) return
