@@ -1,5 +1,9 @@
 package com.example.foodies.view.home
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,17 +49,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.foodies.model.Item
 import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+
+
+private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
 
 
 @Composable
@@ -68,6 +80,15 @@ fun FoodiesHomeScreen(
     val msitem by viewModel.msitem.observeAsState(null)
     val isLoaded by viewModel.isLoaded.observeAsState(false)
     val error by viewModel.error.observeAsState()
+
+    val context = LocalContext.current
+
+    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+
+    val userLocation = getLastLocation(context)
+
+    val lat = userLocation.split("/")[0]
+    val long = userLocation.split("/")[1]
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
@@ -93,7 +114,7 @@ fun FoodiesHomeScreen(
             ActionButtons(navController)
 
             // Fila 2: Texto "Locación"
-            Location()
+            Location(long, lat)
 
             // Fila 3: Barra de busqueda
             FilterBar(onFilter = { query ->
@@ -164,7 +185,7 @@ fun ActionButtons(navController: NavController) {
 }
 
 @Composable
-fun Location() {
+fun Location(long: String, lat: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -180,7 +201,7 @@ fun Location() {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "Powell St, San Francisco",
+            text = "$long+$lat",
             color = Color(0.352f, 0.196f, 0.070f, 1.0f),
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.bodyLarge
@@ -269,6 +290,34 @@ fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel ) {
             ItemCard(item,viewModel)
         }
     }
+}
+
+
+private fun getLastLocation(context: Context): String {
+
+
+    val activity = context as Activity
+    var ubi: String = ""
+
+    if(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
+    }
+
+    val lastLocation = fusedLocationProviderClient.lastLocation
+
+    lastLocation.addOnSuccessListener {
+        if(it != null){
+            Log.d("Foodies", "latitud: ${it.latitude}")
+            Log.d("Foodies", "longitud: ${it.longitude}")
+            ubi = "${it.latitude}/${it.longitude}"
+        }
+    }
+    lastLocation.addOnFailureListener {
+        Log.d("Foodies", "Location not traced")
+    }
+
+    return ubi
+
 }
 
 @Composable
