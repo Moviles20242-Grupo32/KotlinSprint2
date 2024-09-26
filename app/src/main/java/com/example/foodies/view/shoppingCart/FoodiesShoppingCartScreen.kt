@@ -229,6 +229,7 @@ fun ItemCard(item: Item,viewModel: ShoppingViewModel) {
     }
 }
 
+
 @Composable
 fun ItemQuantityControl(item: Item, viewModel: ShoppingViewModel) {
     // Estado mutable que representa la cantidad actual del item
@@ -245,6 +246,7 @@ fun ItemQuantityControl(item: Item, viewModel: ShoppingViewModel) {
                     if (itemCartQuantity > 0) { // Evitar valores negativos
                         itemCartQuantity -= 1
                         viewModel.updateItemQuantity(item, -1)
+                        viewModel.updateTotal()
                     }
                 }
         )
@@ -264,6 +266,7 @@ fun ItemQuantityControl(item: Item, viewModel: ShoppingViewModel) {
                 .clickable {
                     itemCartQuantity += 1
                     viewModel.updateItemQuantity(item, 1)
+                    viewModel.updateTotal()
                 }
         )
     }

@@ -33,6 +33,11 @@ class ShoppingViewModel : ViewModel() {
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
 
+    // LiveData para total de producto calculado
+    private val _classTotalMutable = MutableLiveData<Int>()
+    val classTotal: LiveData<Int> = _classTotalMutable
+
+
     // Función para obtener los items desde Firebase
     fun fetchItems() {
         if (_isLoaded.value == true) return
@@ -127,6 +132,14 @@ class ShoppingViewModel : ViewModel() {
         val currentCart = _cart.value ?: Cart()
         currentCart.updateItemQuantity(item,change)
         _cart.postValue(currentCart)
+    }
+
+    // Función para actualizar total
+    fun updateTotal(){
+        val totalAmount = _cart.value ?: Cart()
+        totalAmount.getTotalCost()
+        _cart.postValue(totalAmount)
+
     }
 
 
