@@ -66,7 +66,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 
-private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
 
 
 
@@ -83,12 +83,9 @@ fun FoodiesHomeScreen(
 
     val context = LocalContext.current
 
-    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
 
-    val userLocation = getLastLocation(context)
 
-    val lat = userLocation.split("/")[0]
-    val long = userLocation.split("/")[1]
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
@@ -96,6 +93,8 @@ fun FoodiesHomeScreen(
             viewModel.mostSellItem()
             viewModel.fetchItems()
         }
+
+        viewModel.getLastLocation(context)
     }
 
     // Manejar posibles errores
@@ -114,7 +113,7 @@ fun FoodiesHomeScreen(
             ActionButtons(navController)
 
             // Fila 2: Texto "Locación"
-            Location(long, lat)
+            Location(userLocation)
 
             // Fila 3: Barra de busqueda
             FilterBar(onFilter = { query ->
@@ -185,7 +184,7 @@ fun ActionButtons(navController: NavController) {
 }
 
 @Composable
-fun Location(long: String, lat: String) {
+fun Location(ubi: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -201,10 +200,11 @@ fun Location(long: String, lat: String) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "$long+$lat",
+            text = ubi,
             color = Color(0.352f, 0.196f, 0.070f, 1.0f),
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -293,32 +293,7 @@ fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel ) {
 }
 
 
-private fun getLastLocation(context: Context): String {
 
-
-    val activity = context as Activity
-    var ubi: String = ""
-
-    if(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
-    }
-
-    val lastLocation = fusedLocationProviderClient.lastLocation
-
-    lastLocation.addOnSuccessListener {
-        if(it != null){
-            Log.d("Foodies", "latitud: ${it.latitude}")
-            Log.d("Foodies", "longitud: ${it.longitude}")
-            ubi = "${it.latitude}/${it.longitude}"
-        }
-    }
-    lastLocation.addOnFailureListener {
-        Log.d("Foodies", "Location not traced")
-    }
-
-    return ubi
-
-}
 
 @Composable
 fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
