@@ -119,4 +119,38 @@ class ServiceAdapter {
             }
         )
     }
+
+    // Función para crear una nueva orden en la colección "Orders"
+    fun createOrder(cart: Cart, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        // Definir una ubicación estándar
+        val standardLocation = hashMapOf(
+            "latitude" to 37.785834, // Latitud estándar
+            "longitude" to -122.406417 // Longitud estándar
+        )
+
+        // Crear un nuevo mapa para almacenar la orden
+        val orderData = hashMapOf(
+            "location" to standardLocation,
+            "total_cost" to cart.getTotalCost(),
+            "ordered_food" to cart.getItems().map { item ->
+                hashMapOf(
+                    "item_name" to item.item_name,
+                    "item_cost" to item.item_cost,
+                    "item_quantity" to item.cart_quantity
+                )
+            }
+        )
+
+        // Guardar la orden en Firestore
+        firestore.collection("Orders")
+            .add(orderData)
+            .addOnSuccessListener {
+                Log.d("ServiceAdapter", "Orden creada exitosamente")
+                onSuccess() // Llamar al callback de éxito
+            }
+            .addOnFailureListener { exception ->
+                Log.d("ServiceAdapter", "Error al crear la orden", exception)
+                onFailure(exception) // Llamar al callback de fallo
+            }
+    }
 }
