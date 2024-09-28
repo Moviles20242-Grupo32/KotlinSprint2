@@ -148,9 +148,10 @@ fun ActionButtons( items: List<Item>, navController: NavController, viewModel: S
                 )
                 .padding(8.dp)
                 .clickable {
-                    textSpeech = !textSpeech
-                    viewModel.readItemList(items)
-                    textSpeech = !textSpeech
+                    textSpeech = true // Cambiar el color a verde
+                    viewModel.readItemList(items) {
+                        textSpeech = false
+                    }
                 }
         )
         Spacer(modifier = Modifier.width(10.dp))

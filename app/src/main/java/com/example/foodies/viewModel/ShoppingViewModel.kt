@@ -44,11 +44,15 @@ class ShoppingViewModel : ViewModel() {
     }
 
     //Función para leer lista de productos
-    fun readItemList(items: List<Item>) {
+    fun readItemList(items: List<Item>, onComplete: () -> Unit) {
         val combinedText = items.joinToString(separator = ". ") { item ->
             "${item.item_name}: ${item.item_details}"
         }
-        textToSpeechManager?.speak(combinedText)
+
+        // Llamar a la función de TextToSpeechManager con callback
+        textToSpeechManager?.speakWithCallback(combinedText) {
+            onComplete()
+        }
     }
 
     // Función para obtener los items desde Firebase
