@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,6 +69,7 @@ fun FoodiesHomeScreen(
     val msitem by viewModel.msitem.observeAsState(null)
     val isLoaded by viewModel.isLoaded.observeAsState(false)
     val error by viewModel.error.observeAsState()
+    val context = LocalContext.current
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
@@ -75,6 +77,7 @@ fun FoodiesHomeScreen(
             viewModel.mostSellItem()
             viewModel.fetchItems()
         }
+        viewModel.initTextToSpeech(context)
     }
 
     // Manejar posibles errores
@@ -90,7 +93,7 @@ fun FoodiesHomeScreen(
             modifier = Modifier.padding(16.dp)
         ) {
             // Fila 1: Texto "Botones"
-            ActionButtons(navController)
+            ActionButtons(items,navController,viewModel)
 
             // Fila 2: Texto "Locación"
             Location()
@@ -110,7 +113,7 @@ fun FoodiesHomeScreen(
 }
 
 @Composable
-fun ActionButtons(navController: NavController) {
+fun ActionButtons( items: List<Item>, navController: NavController, viewModel: ShoppingViewModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement =  Arrangement.Center,
@@ -144,7 +147,11 @@ fun ActionButtons(navController: NavController) {
                     )
                 )
                 .padding(8.dp)
-                .clickable { textSpeech = !textSpeech }
+                .clickable {
+                    textSpeech = !textSpeech
+                    viewModel.readItemList(items)
+                    textSpeech = !textSpeech
+                }
         )
         Spacer(modifier = Modifier.width(10.dp))
         Icon(

@@ -1,5 +1,7 @@
 package com.example.foodies.viewModel
 
+import TextToSpeechManager
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,9 +11,12 @@ import androidx.lifecycle.MutableLiveData
 import com.example.foodies.model.Cart
 import com.example.foodies.model.Item
 import com.example.foodies.model.ServiceAdapter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 
 class ShoppingViewModel : ViewModel() {
     private val serviceAdapter = ServiceAdapter()
+    private var textToSpeechManager: TextToSpeechManager? = null
 
     // LiveData para la lista de Items
     private val _items = MutableLiveData<List<Item>>()
@@ -33,6 +38,19 @@ class ShoppingViewModel : ViewModel() {
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
 
+    //funcion para incicializr el texttospeech
+    fun initTextToSpeech(context: Context) {
+        textToSpeechManager = TextToSpeechManager(context)
+    }
+
+    //Función para leer lista de productos
+    fun readItemList(items: List<Item>) {
+        val combinedText = items.joinToString(separator = ". ") { item ->
+            "${item.item_name}: ${item.item_details}"
+        }
+        textToSpeechManager?.speak(combinedText)
+    }
+
     // Función para obtener los items desde Firebase
     fun fetchItems() {
         if (_isLoaded.value == true) return
@@ -51,7 +69,6 @@ class ShoppingViewModel : ViewModel() {
             )
         }
     }
-
 
     //Función para obtener el producto más vendido
     fun mostSellItem(){
