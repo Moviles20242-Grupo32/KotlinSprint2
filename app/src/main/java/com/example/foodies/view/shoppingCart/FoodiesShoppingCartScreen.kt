@@ -45,61 +45,67 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.livedata.observeAsState
 import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
+import androidx.compose.material3.Surface
 
 @Composable
 fun FoodiesShoppingCartScreen(
     navController: NavController,
     viewModel: ShoppingViewModel
 ) {
-    //Estados
+    // Estados
     val cart by viewModel.cart.observeAsState()
     val totalAmount by viewModel.totalAmount.observeAsState()
 
-    //Surface
-    Column(
-        modifier = Modifier
-            .fillMaxSize() //
-            .padding(16.dp)
+    // Surface con fondo blanco
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.White // Color de fondo del Surface
     ) {
-        // Fila para la flecha y el título
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,  // Usa el ícono AutoMirrored ArrowBack
-                contentDescription = "Back",
-                tint = Color(0xFFEC9A31), // Cambia el color de la flecha si lo necesitas
-                modifier = Modifier
-                    .size(50.dp)
-                    .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) }
-            )
-            Text(
-                text = "Carrito",
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                color = Color(0xFF5A3918), // Cambia el color del texto si es necesario
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Lista de items ocupando el espacio restante
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .weight(1f) // Ocupa el espacio restante
+                .fillMaxSize() // Ocupa todo el tamaño disponible
+                .padding(16.dp)
         ) {
-            cart?.let {
-                items(it.getItems()) { item ->
-                    ItemCard(item,viewModel)
+            // Fila para la flecha y el título
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack, // Usa el ícono AutoMirrored ArrowBack
+                    contentDescription = "Back",
+                    tint = Color(0xFFEC9A31), // Cambia el color de la flecha si lo necesitas
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) }
+                )
+                Text(
+                    text = "Carrito",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color(0xFF5A3918), // Cambia el color del texto si es necesario
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Lista de items ocupando el espacio restante
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f) // Ocupa el espacio restante
+            ) {
+                cart?.let {
+                    items(it.getItems()) { item ->
+                        ItemCard(item, viewModel)
+                    }
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Sección de total y botón de Check Out en la parte inferior
+            totalAmount?.let { CheckoutSection(it) }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Sección de total y botón de Check Out en la parte inferior
-        totalAmount?.let { CheckoutSection(it) }
     }
 }
 
