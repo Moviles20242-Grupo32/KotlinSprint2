@@ -93,7 +93,7 @@ fun FoodiesHomeScreen(
             viewModel.mostSellItem()
             viewModel.fetchItems()
         }
-
+        viewModel.initTextToSpeech(context)
         viewModel.getLastLocation(context)
     }
 
@@ -110,7 +110,7 @@ fun FoodiesHomeScreen(
             modifier = Modifier.padding(16.dp)
         ) {
             // Fila 1: Texto "Botones"
-            ActionButtons(navController)
+            ActionButtons(items,navController,viewModel)
 
             // Fila 2: Texto "Locación"
             Location(userLocation)
@@ -130,7 +130,7 @@ fun FoodiesHomeScreen(
 }
 
 @Composable
-fun ActionButtons(navController: NavController) {
+fun ActionButtons(items: List<Item>,navController: NavController, viewModel: ShoppingViewModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement =  Arrangement.Center,
@@ -164,7 +164,12 @@ fun ActionButtons(navController: NavController) {
                     )
                 )
                 .padding(8.dp)
-                .clickable { textSpeech = !textSpeech }
+                .clickable {
+                    textSpeech = true
+                    viewModel.readItemList(items){
+                        textSpeech = false
+                    }
+                }
         )
         Spacer(modifier = Modifier.width(10.dp))
         Icon(
