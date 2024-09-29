@@ -149,7 +149,6 @@ fun FoodiesShoppingCartScreen(
     }
 }
 
-
 @Composable
 fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
     Column(

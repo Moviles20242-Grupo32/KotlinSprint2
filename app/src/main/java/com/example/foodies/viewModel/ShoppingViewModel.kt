@@ -199,19 +199,22 @@ class ShoppingViewModel : ViewModel() {
     // Función para guardar la orden en Firestore
     fun saveOrder() {
         val cartValue = _cart.value
-        if (cartValue != null) {
-            serviceAdapter.createOrder(
-                cart = cartValue,
-                onSuccess = {
-                    _orderSuccess.postValue(true) // Publicar éxito
-                },
-                onFailure = { exception ->
-                    _error.postValue(exception.message) // Publicar error
-                }
-            )
-        } else {
-            _error.postValue("El carrito está vacío")
+        if (cartValue == null || cartValue.getItems().isEmpty()) {
+            // Si el carrito está vacío, mostramos un error
+            _error.postValue("El carrito está vacío, agrega productos antes de realizar el pedido.")
+            return
         }
+
+        // Si el carrito tiene productos, procesamos la orden
+        serviceAdapter.createOrder(
+            cart = cartValue,
+            onSuccess = {
+                _orderSuccess.postValue(true) // Publicar éxito
+            },
+            onFailure = { exception ->
+                _error.postValue(exception.message) // Publicar error
+            }
+        )
     }
 
     // Función para vaciar el carrito
