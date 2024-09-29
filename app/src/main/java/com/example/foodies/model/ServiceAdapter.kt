@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class ServiceAdapter {
     // FireStore Data Base
-    private val firestore = FirebaseFirestore.getInstance()
+    private val firestore = DbManager.firestoreInstance
 
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
