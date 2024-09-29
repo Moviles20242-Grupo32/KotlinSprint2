@@ -218,6 +218,7 @@ class ShoppingViewModel : ViewModel() {
     fun clearCart() {
         val emptyCart = Cart() // Crea un nuevo carrito vacío
         _cart.postValue(emptyCart) // Publica el carrito vacío en LiveData
+        _totalAmount.postValue(0)  // Resetear el total a 0
     }
 
     // Nueva función para resetear el estado de orderSuccess
