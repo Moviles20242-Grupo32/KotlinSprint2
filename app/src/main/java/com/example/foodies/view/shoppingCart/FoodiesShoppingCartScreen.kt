@@ -79,11 +79,18 @@ fun FoodiesShoppingCartScreen(
     // Mostrar el diálogo de éxito de la orden
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false }, // Acción al cerrar el diálogo
+            onDismissRequest = {
+                showDialog = false
+                viewModel.resetOrderSuccess() // Resetear orderSuccess al cerrar
+            },
             title = { Text(text = "Orden Creada") },
             text = { Text(text = "Tu orden ha sido creada exitosamente.") },
             confirmButton = {
-                Button(onClick = { showDialog = false }) {
+                Button(onClick = {
+                    viewModel.clearCart() // Vaciar el carrito
+                    showDialog = false    // Cerrar el diálogo
+                    viewModel.resetOrderSuccess() // Resetear orderSuccess
+                }) {
                     Text("Aceptar")
                 }
             }
@@ -142,6 +149,7 @@ fun FoodiesShoppingCartScreen(
     }
 }
 
+
 @Composable
 fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
     Column(
@@ -192,7 +200,6 @@ fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
         }
     }
 }
-
 
 
 @Composable
