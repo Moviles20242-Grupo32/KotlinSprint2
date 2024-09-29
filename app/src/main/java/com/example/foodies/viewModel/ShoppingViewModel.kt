@@ -4,7 +4,6 @@ import TextToSpeechManager
 import android.content.Context
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -47,7 +46,6 @@ class ShoppingViewModel : ViewModel() {
     val error: LiveData<String> get() = _error
 
     private val _userLocation = MutableLiveData<String>()
-
     val userLocation: LiveData<String> = _userLocation
 
     fun getLastLocation(context: Context) {
@@ -58,9 +56,7 @@ class ShoppingViewModel : ViewModel() {
             if (context is Activity) {
                 ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
             }
-
         }
-
 
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
