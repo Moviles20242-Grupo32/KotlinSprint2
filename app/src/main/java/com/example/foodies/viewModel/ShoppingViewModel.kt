@@ -1,8 +1,9 @@
 package com.example.foodies.viewModel
 
+import TextToSpeechManager
+import android.content.Context
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -14,12 +15,15 @@ import androidx.lifecycle.MutableLiveData
 import com.example.foodies.model.Cart
 import com.example.foodies.model.Item
 import com.example.foodies.model.ServiceAdapter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import com.google.android.gms.location.LocationServices
 import android.location.Geocoder
 import java.util.Locale
 
 class ShoppingViewModel : ViewModel() {
     private val serviceAdapter = ServiceAdapter()
+    private var textToSpeechManager: TextToSpeechManager? = null
 
     // LiveData para la lista de Items
     private val _items = MutableLiveData<List<Item>>()
@@ -42,7 +46,6 @@ class ShoppingViewModel : ViewModel() {
     val error: LiveData<String> get() = _error
 
     private val _userLocation = MutableLiveData<String>()
-
     val userLocation: LiveData<String> = _userLocation
 
     fun getLastLocation(context: Context) {
@@ -53,9 +56,7 @@ class ShoppingViewModel : ViewModel() {
             if (context is Activity) {
                 ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
             }
-
         }
-
 
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
@@ -83,6 +84,23 @@ class ShoppingViewModel : ViewModel() {
         }.addOnFailureListener {
             Log.d("Foodies", "Error al obtener la ubicación")
             _userLocation.postValue("Error al obtener la ubicación")
+        }
+    }
+
+    //funcion para incicializr el texttospeech
+    fun initTextToSpeech(context: Context) {
+        textToSpeechManager = TextToSpeechManager(context)
+    }
+
+    //Función para leer lista de productos
+    fun readItemList(items: List<Item>, onComplete: () -> Unit) {
+        val combinedText = items.joinToString(separator = ". ") { item ->
+            "${item.item_name}: ${item.item_details}"
+        }
+
+        // Llamar a la función de TextToSpeechManager con callback
+        textToSpeechManager?.speakWithCallback(combinedText) {
+            onComplete()
         }
     }
 
