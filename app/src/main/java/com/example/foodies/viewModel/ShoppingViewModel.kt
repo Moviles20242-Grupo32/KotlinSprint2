@@ -53,7 +53,7 @@ class ShoppingViewModel : ViewModel() {
             if (context is Activity) {
                 ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
             }
-            return
+
         }
 
 
