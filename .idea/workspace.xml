@@ -9,10 +9,12 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="433c440b-f872-41a5-b674-8f1fc9187b96" name="Changes" comment="Extra files">
+    <list default="true" id="433c440b-f872-41a5-b674-8f1fc9187b96" name="Changes" comment="Revert changes">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/TextToSpeechManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/TextToSpeechManager.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/home/FoodiesHomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/home/FoodiesHomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/ServiceAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/ServiceAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/login/FoodiesLoginScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/login/FoodiesLoginScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/LoginViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/LoginViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/ShoppingViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/ShoppingViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,7 +25,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=/Users/sandrilla/.android/avd/Small_Phone_API_35.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=5200898ab404c433)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -75,7 +77,6 @@
         <option value="Kotlin Data Class" />
         <option value="Class" />
         <option value="Kotlin File" />
-        <option value="Kotlin Object" />
         <option value="Kotlin Class" />
       </list>
     </option>
@@ -123,18 +124,14 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "com.google.services.firebase.aqiPopupShown": "true",
-    "git-widget-placeholder": "feature/text-to-speech-#11",
+    "git-widget-placeholder": "fix/login-authentication-#1",
     "kotlin-language-version-configured": "true",
     "last_directory_selection": "C:/Users/villo/Documents/App/KotlinSprint2/app/src/main/java",
-    "last_opened_file_path": "/Users/sandrilla/Desktop/KotlinSprint2/app/src/main/res/drawable-nodpi",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.17",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.keymap"
+    "last_opened_file_path": "/Users/sandrilla/Desktop/KotlinSprint2/app/src/main/res/drawable-nodpi"
   },
   "keyToStringList": {
     "kotlin-gradle-user-dirs": [
-      "/Users/sandrilla/.gradle"
+      "C:\\Users\\villo\\.gradle"
     ]
   }
 }]]></component>
@@ -255,14 +252,43 @@
       <option name="project" value="LOCAL" />
       <updated>1726022648344</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Geolocalization">
+      <option name="closed" value="true" />
+      <created>1727143610349</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1727143610349</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Revert changes">
+      <option name="closed" value="true" />
+      <created>1727386585780</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1727386585780</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="First step firebase authentication" />
     <MESSAGE value="Navigation and firebase authentication" />
     <MESSAGE value="Extra files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Extra files" />
+    <MESSAGE value="Geolocalization" />
+    <MESSAGE value="Revert changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Revert changes" />
   </component>
 </project>

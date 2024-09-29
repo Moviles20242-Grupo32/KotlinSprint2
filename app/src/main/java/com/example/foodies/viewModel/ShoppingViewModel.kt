@@ -2,7 +2,12 @@ package com.example.foodies.viewModel
 
 import TextToSpeechManager
 import android.content.Context
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -13,6 +18,9 @@ import com.example.foodies.model.Item
 import com.example.foodies.model.ServiceAdapter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
+import com.google.android.gms.location.LocationServices
+import android.location.Geocoder
+import java.util.Locale
 
 class ShoppingViewModel : ViewModel() {
     private val serviceAdapter = ServiceAdapter()
@@ -37,6 +45,51 @@ class ShoppingViewModel : ViewModel() {
     // LiveData para manejar errores
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
+
+    private val _userLocation = MutableLiveData<String>()
+
+    val userLocation: LiveData<String> = _userLocation
+
+    fun getLastLocation(context: Context) {
+        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Solicitar permisos si no están otorgados (esto lo deberías hacer en la actividad)
+            if (context is Activity) {
+                ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
+            }
+
+        }
+
+
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                Log.d("Foodies", "latitud: ${location.latitude}, longitud: ${location.longitude}")
+                val geocoder = Geocoder(context, Locale.getDefault())
+
+                try {
+                    val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                    if (!addresses.isNullOrEmpty()) {
+                        val address = addresses[0]
+                        val dir: String = address.getAddressLine(0).split(",")[0]
+                        //_userLocation.postValue(address.getAddressLine(0))
+                        _userLocation.postValue(dir)
+                    } else {
+                        Log.d("Foodies", "No se encontró ninguna dirección")
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e("Foodies", "Error al obtener la dirección: ${e.message}")
+                }
+                //_userLocation.postValue("${location.latitude}/${location.longitude}")
+            } else {
+                _userLocation.postValue("Ubicación no disponible")
+            }
+        }.addOnFailureListener {
+            Log.d("Foodies", "Error al obtener la ubicación")
+            _userLocation.postValue("Error al obtener la ubicación")
+        }
+    }
 
     //funcion para incicializr el texttospeech
     fun initTextToSpeech(context: Context) {
@@ -73,6 +126,7 @@ class ShoppingViewModel : ViewModel() {
             )
         }
     }
+
 
     //Función para obtener el producto más vendido
     fun mostSellItem(){
