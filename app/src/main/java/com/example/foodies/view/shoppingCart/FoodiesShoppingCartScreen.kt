@@ -1,5 +1,6 @@
 package com.example.foodies.view.shoppingCart
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
 import androidx.compose.material3.Surface
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+
 
 @Composable
 fun FoodiesShoppingCartScreen(
@@ -55,15 +60,44 @@ fun FoodiesShoppingCartScreen(
     // Estados
     val cart by viewModel.cart.observeAsState()
     val totalAmount by viewModel.totalAmount.observeAsState()
+    val orderSuccess by viewModel.orderSuccess.observeAsState() // Observa el éxito de la orden
+    val errorMessage by viewModel.error.observeAsState() // Observa los errores
+
+    // Estado para mostrar o no el diálogo
+    var showDialog by remember { mutableStateOf(false) }
+
+    // Si la orden se guardó con éxito, mostrar el diálogo
+    if (orderSuccess == true && !showDialog) {
+        showDialog = true // Activar el diálogo cuando la orden es exitosa
+    }
+
+    // Muestra un mensaje de error si ocurre uno
+    errorMessage?.let {
+        Toast.makeText(LocalContext.current, it, Toast.LENGTH_SHORT).show()
+    }
+
+    // Mostrar el diálogo de éxito de la orden
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false }, // Acción al cerrar el diálogo
+            title = { Text(text = "Orden Creada") },
+            text = { Text(text = "Tu orden ha sido creada exitosamente.") },
+            confirmButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
 
     // Surface con fondo blanco
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.White // Color de fondo del Surface
+        color = Color.White
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize() // Ocupa todo el tamaño disponible
+                .fillMaxSize()
                 .padding(16.dp)
         ) {
             // Fila para la flecha y el título
@@ -72,9 +106,9 @@ fun FoodiesShoppingCartScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack, // Usa el ícono AutoMirrored ArrowBack
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFFEC9A31), // Cambia el color de la flecha si lo necesitas
+                    tint = Color(0xFFEC9A31),
                     modifier = Modifier
                         .size(50.dp)
                         .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) }
@@ -82,7 +116,7 @@ fun FoodiesShoppingCartScreen(
                 Text(
                     text = "Carrito",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color(0xFF5A3918), // Cambia el color del texto si es necesario
+                    color = Color(0xFF5A3918),
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
@@ -91,8 +125,7 @@ fun FoodiesShoppingCartScreen(
 
             // Lista de items ocupando el espacio restante
             LazyColumn(
-                modifier = Modifier
-                    .weight(1f) // Ocupa el espacio restante
+                modifier = Modifier.weight(1f)
             ) {
                 cart?.let {
                     items(it.getItems()) { item ->
@@ -104,22 +137,21 @@ fun FoodiesShoppingCartScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección de total y botón de Check Out en la parte inferior
-            totalAmount?.let { CheckoutSection(it) }
+            totalAmount?.let { CheckoutSection(it, onCheckoutClicked = { viewModel.saveOrder() }) }
         }
     }
 }
 
 @Composable
-fun CheckoutSection(total: Int) {
+fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally, // Centrar horizontalmente
-        verticalArrangement = Arrangement.Bottom // Posicionar en la parte inferior
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
     ) {
-        // Sección de total y botón de Check Out
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -128,7 +160,7 @@ fun CheckoutSection(total: Int) {
             Text(
                 text = "Total",
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 30.sp),
-                color = Color(0xFF5A3918) // Color marrón
+                color = Color(0xFF5A3918)
             )
             Text(
                 text = total.toString(),
@@ -139,25 +171,28 @@ fun CheckoutSection(total: Int) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        // Botón de Check Out sin funcionalidad
+
+        // Botón de Check Out
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(
-                    color = Color(0xFF2F3C37), // Color oscuro del botón
+                    color = Color(0xFF2F3C37),
                     shape = RoundedCornerShape(8.dp)
-                ),
+                )
+                .clickable { onCheckoutClicked() }, // Ejecuta la función pasada al hacer clic
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Check Out",
-                color = Color.White, // Texto blanco
+                color = Color.White,
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
             )
         }
     }
 }
+
 
 
 @Composable

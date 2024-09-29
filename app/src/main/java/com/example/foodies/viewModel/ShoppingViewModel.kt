@@ -37,6 +37,10 @@ class ShoppingViewModel : ViewModel() {
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
 
+    // LiveData para manejar el estado de la orden (éxito o error)
+    private val _orderSuccess = MutableLiveData<Boolean>()
+    val orderSuccess: LiveData<Boolean> get() = _orderSuccess
+
     // Función para obtener los items desde Firebase
     fun fetchItems() {
         if (_isLoaded.value == true) return
@@ -139,6 +143,24 @@ class ShoppingViewModel : ViewModel() {
     fun updateTotal(){
         val totalAmountCalc = _cart.value?.getTotalCost() ?: 0
         _totalAmount.postValue(totalAmountCalc)
+    }
+
+    // Función para guardar la orden en Firestore
+    fun saveOrder() {
+        val cartValue = _cart.value
+        if (cartValue != null) {
+            serviceAdapter.createOrder(
+                cart = cartValue,
+                onSuccess = {
+                    _orderSuccess.postValue(true) // Publicar éxito
+                },
+                onFailure = { exception ->
+                    _error.postValue(exception.message) // Publicar error
+                }
+            )
+        } else {
+            _error.postValue("El carrito está vacío")
+        }
     }
 
 
