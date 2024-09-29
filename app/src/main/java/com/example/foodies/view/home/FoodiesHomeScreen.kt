@@ -85,15 +85,13 @@ fun FoodiesHomeScreen(
 
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
 
-
-
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
         if (!isLoaded) {
             viewModel.mostSellItem()
             viewModel.fetchItems()
         }
-
+        viewModel.initTextToSpeech(context)
         viewModel.getLastLocation(context)
     }
 

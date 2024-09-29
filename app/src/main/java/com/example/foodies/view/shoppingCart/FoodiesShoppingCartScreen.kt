@@ -59,7 +59,7 @@ fun FoodiesShoppingCartScreen(
 ) {
     // Estados
     val cart by viewModel.cart.observeAsState()
-    val totalAmount by viewModel.totalAmount.observeAsState()
+    val totalAmount by viewModel.totalAmount.observeAsState(0)
     val orderSuccess by viewModel.orderSuccess.observeAsState() // Observa el éxito de la orden
     val errorMessage by viewModel.error.observeAsState() // Observa los errores
 

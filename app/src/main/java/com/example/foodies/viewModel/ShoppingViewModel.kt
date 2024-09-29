@@ -168,11 +168,13 @@ class ShoppingViewModel : ViewModel() {
                 // Agregar el item al carrito si está marcado como añadido
                 if (updatedItem.isAdded) {
                     addItem(updatedItem)
+                    updateTotal()
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)
                     }
                 } else {
                     removeItem(updatedItem)
+                    updateTotal()
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)
                     }
