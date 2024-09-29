@@ -83,7 +83,5 @@ dependencies {
     implementation ("io.coil-kt:coil-svg:2.7.0")
 
     implementation(libs.androidx.hilt.navigation.compose)
-
-    implementation(libs.play.services.location)
 }
 

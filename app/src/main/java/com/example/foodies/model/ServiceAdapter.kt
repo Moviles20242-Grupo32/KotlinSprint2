@@ -16,37 +16,40 @@ class ServiceAdapter {
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
 
-    fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit, onError: (String) -> Unit) {
-        try {
+    fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit)
+    //= viewModelScope.launch
+    {
+
+        try{
             auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                .addOnCompleteListener { task->
+                    if(task.isSuccessful){
                         Log.d("Foodies", "signInWithEmailAndPassword logueado")
                         home()
-                    } else {
-                        val errorMessage = task.exception?.message ?: "Error desconocido"
-                        Log.d("Foodies", "signInWithEmailAndPassword: $errorMessage")
-                        onError(errorMessage)
+                    }
+                    else{
+                        Log.d("Foodies", "signInWithEmailAndPassword ${task.result.toString()}")
                     }
                 }
-        } catch (ex: Exception) {
-            Log.d("Foodies", "signInWithEmailAndPassword: ${ex.message}")
-            onError(ex.message ?: "Error desconocido")
         }
+        catch(ex: Exception){
+            Log.d("Foodies", "signInWithEmailAndPassword ${ex.message}")
+        }
+
+
     }
 
-    fun createUserWithEmailAndPassword(email: String, password: String, name: String, home: () -> Unit, onError: (String) -> Unit) {
-        if (_loading.value == false) {
+    fun createUserWithEmailAndPassword(email: String, password: String,name: String, home: () -> Unit){
+        if(_loading.value == false){
             _loading.value = true
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                    if(task.isSuccessful){
                         createUser(name, email)
                         home()
-                    } else {
-                        val errorMessage = task.exception?.message ?: "Error desconocido"
-                        Log.d("Foodies", "createUserWithEmailAndPassword: $errorMessage")
-                        onError(errorMessage)
+                    }
+                    else{
+                        Log.d("Foodies", "createUserWithEmailAndPassword: ${task.result.toString()}")
                     }
                     _loading.value = false
                 }
@@ -72,7 +75,6 @@ class ServiceAdapter {
                 }
         }
     }
-
 
 
     //SHOPPING SERVICES:

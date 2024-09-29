@@ -1,8 +1,5 @@
 package com.example.foodies.view.login
 
-import android.Manifest
-import android.app.Activity
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,15 +38,12 @@ import com.example.foodies.viewModel.FoodiesScreens
 import androidx.compose.foundation.Image
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodies.R
 import com.example.foodies.viewModel.LoginViewModel
@@ -60,17 +54,6 @@ fun FoodiesLoginScreen(navController: NavController,
                        ){
     val showLoginForm = rememberSaveable {
         mutableStateOf(true)
-    }
-
-    val errorMessage = remember { mutableStateOf("") }
-
-    val context = LocalContext.current
-
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        // Solicitar permisos si no están otorgados (esto lo deberías hacer en la actividad)
-        if (context is Activity) {
-            ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
-        }
     }
 
     Surface(modifier = Modifier
@@ -101,34 +84,26 @@ fun FoodiesLoginScreen(navController: NavController,
                 )
 
 
-
-            if (showLoginForm.value) {
-                UserForm(isCreateAccount = false) { email, password, name ->
+            if(showLoginForm.value){
+                UserForm(
+                    isCreateAccount = false
+                ){
+                    email, password, name->
                     Log.d("Foodies", "Logueando con $email y $password")
-                    viewModel.signInWithEmailAndPassword(email, password, {
+                    viewModel.signInWithEmailAndPassword(email, password){
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
-                    }, { message ->
-                        errorMessage.value = message // Guardar el mensaje de error
-                    })
-                }
-            } else {
-                UserForm(isCreateAccount = true) { email, password, name ->
-                    Log.d("Foodies", "Creando cuenta con $email y $password")
-                    viewModel.createUserWithEmailAndPassword(email, password, name, {
-                        navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
-                    }, { message ->
-                        errorMessage.value = message // Guardar el mensaje de error
-                    })
+                    }
                 }
             }
-
-            // Mostrar mensaje de error
-            if (errorMessage.value.isNotEmpty()) {
-                if(errorMessage.value == "The email address is badly formatted."){
-                    Text(text = "Formato de email invalido", color = Color.Red, modifier = Modifier.padding(16.dp))
-                }
-                else if(errorMessage.value == "The supplied auth credential is incorrect, malformed or has expired."){
-                    Text(text = "Email o contraseña incorrectos o no registrados", color = Color.Red, modifier = Modifier.padding(16.dp))
+            else{
+                UserForm(
+                    isCreateAccount = true
+                ){
+                        email, password, name->
+                        Log.d("Foodies", "Creando cuenta con $email y $password")
+                    viewModel.createUserWithEmailAndPassword(email, password, name){
+                        navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
+                    }
                 }
 
             }
@@ -207,8 +182,8 @@ fun UserForm(isCreateAccount: Boolean = false,onDone: (String, String, String) -
 }
 
 @Composable
-fun NameInput(nameState: MutableState<String>, labelId: String = "Ingrese su nombre") {
-    Text(text = "Nombre", fontWeight = FontWeight.Bold, textAlign = TextAlign.Left)
+fun NameInput(nameState: MutableState<String>, labelId: String = "Enter your name") {
+    Text(text = "Name", fontWeight = FontWeight.Bold, textAlign = TextAlign.Left)
     InputField(
         valueState = nameState,
         labelId = labelId,
@@ -288,16 +263,12 @@ fun PasswordVisibleIcon(passwordVisible: MutableState<Boolean>) {
 @Composable
 fun EmailInput(emailState: MutableState<String>,labelId: String = "nombre@ejemplo.com") {
     Text(text = "Email", fontWeight = FontWeight.Bold, textAlign = TextAlign.Left)
-
     InputField(
         valueState = emailState,
         labelId = labelId,
         keyboardType = KeyboardType.Email,
         placeholder = "nombre@ejemplo.com"
     )
-
-
-
 
 }
 

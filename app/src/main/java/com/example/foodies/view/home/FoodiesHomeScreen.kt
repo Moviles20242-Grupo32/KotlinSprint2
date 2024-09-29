@@ -1,9 +1,5 @@
 package com.example.foodies.view.home
 
-import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,25 +45,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.foodies.model.Item
 import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-
-
-
-
 
 
 @Composable
@@ -81,20 +69,12 @@ fun FoodiesHomeScreen(
     val isLoaded by viewModel.isLoaded.observeAsState(false)
     val error by viewModel.error.observeAsState()
 
-    val context = LocalContext.current
-
-    val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
-
-
-
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
         if (!isLoaded) {
             viewModel.mostSellItem()
             viewModel.fetchItems()
         }
-
-        viewModel.getLastLocation(context)
     }
 
     // Manejar posibles errores
@@ -113,7 +93,7 @@ fun FoodiesHomeScreen(
             ActionButtons(navController)
 
             // Fila 2: Texto "Locación"
-            Location(userLocation)
+            Location()
 
             // Fila 3: Barra de busqueda
             FilterBar(onFilter = { query ->
@@ -184,7 +164,7 @@ fun ActionButtons(navController: NavController) {
 }
 
 @Composable
-fun Location(ubi: String) {
+fun Location() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -200,11 +180,10 @@ fun Location(ubi: String) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = ubi,
+            text = "Powell St, San Francisco",
             color = Color(0.352f, 0.196f, 0.070f, 1.0f),
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyLarge,
-            overflow = TextOverflow.Ellipsis
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }
@@ -291,9 +270,6 @@ fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel ) {
         }
     }
 }
-
-
-
 
 @Composable
 fun ItemCard(item: Item, viewModel: ShoppingViewModel) {

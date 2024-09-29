@@ -20,12 +20,15 @@ class LoginViewModel: ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
 
-    fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit, onError: (String) -> Unit) = viewModelScope.launch {
-        serviceAdapter.signInWithEmailAndPassword(email, password, home, onError)
+    fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit) = viewModelScope.launch{
+
+        serviceAdapter.signInWithEmailAndPassword(email, password, home)
+
+
     }
 
-    fun createUserWithEmailAndPassword(email: String, password: String, name: String, home: () -> Unit, onError: (String) -> Unit) {
-        serviceAdapter.createUserWithEmailAndPassword(email, password, name, home, onError)
+    fun createUserWithEmailAndPassword(email: String, password: String,name: String, home: () -> Unit){
+        serviceAdapter.createUserWithEmailAndPassword(email, password, name, home)
     }
 
 
