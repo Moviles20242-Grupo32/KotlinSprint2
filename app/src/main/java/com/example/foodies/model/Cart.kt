@@ -1,5 +1,7 @@
 package com.example.foodies.model
 
+import android.util.Log
+
 data class Cart(
     private val items: MutableList<Item> = mutableListOf()
 ) {
@@ -20,15 +22,23 @@ data class Cart(
     }
 
     // Actualizar la cantidad de un item en el carrito
-    fun updateItemQuantity(item: Item, quantity: Int) {
+    fun updateItemQuantity(item: Item, change: Int) {
         val index = items.indexOfFirst { it.id == item.id }
         if (index >= 0) {
-            items[index] = items[index].copy(cart_quantity = quantity)
-            if (quantity <= 0) {
+            val currentQuantity = items[index].cart_quantity
+            val newQuantity = currentQuantity + change
+
+            // Si la nueva cantidad es mayor que 0, actualizamos el item con la nueva cantidad
+            if (newQuantity > 0) {
+                items[index] = items[index].copy(cart_quantity = newQuantity)
+                Log.d("Cart", "${items[index].cart_quantity}")
+            } else {
+                // Si la nueva cantidad es menor o igual a 0, removemos el item del carrito
                 removeItem(item)
             }
         }
     }
+
 
     // Obtener el total de costos de los items en el carrito
     fun getTotalCost(): Int {

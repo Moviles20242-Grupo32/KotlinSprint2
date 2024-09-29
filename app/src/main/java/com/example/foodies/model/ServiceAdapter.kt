@@ -117,4 +117,60 @@ class ServiceAdapter {
             }
         )
     }
+
+    fun createOrder(cart: Cart, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        // Definir una ubicación estándar
+        val standardLocation = hashMapOf(
+            "latitude" to 37.785834, // Latitud estándar
+            "longitude" to -122.406417 // Longitud estándar
+        )
+
+        // Crear un nuevo mapa para almacenar la orden
+        val orderData = hashMapOf(
+            "location" to standardLocation,
+            "total_cost" to cart.getTotalCost(),
+            "ordered_food" to cart.getItems().map { item ->
+                hashMapOf(
+                    "item_name" to item.item_name,
+                    "item_cost" to item.item_cost,
+                    "item_quantity" to item.cart_quantity
+                )
+            }
+        )
+
+        // Guardar la orden en Firestore
+        firestore.collection("Orders")
+            .add(orderData)
+            .addOnSuccessListener {
+                Log.d("ServiceAdapter", "Orden creada exitosamente")
+                // Actualizar times_ordered de cada producto después de crear la orden
+                cart.getItems().forEach { item ->
+                    updateTimesOrdered(item) // Llamar la función para actualizar
+                }
+                onSuccess() // Llamar al callback de éxito
+            }
+            .addOnFailureListener { exception ->
+                Log.d("ServiceAdapter", "Error al crear la orden", exception)
+                onFailure(exception) // Llamar al callback de fallo
+            }
+    }
+
+    // Función para actualizar el campo times_ordered del producto en Firestore
+    private fun updateTimesOrdered(item: Item) {
+        // Obtener la referencia del documento del ítem en Firestore
+        val itemRef = firestore.collection("Items").document(item.id ?: return)
+
+        // Realizar la actualización acumulativa del campo times_ordered
+        firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(itemRef)
+            val currentTimesOrdered = snapshot.getLong("times_ordered") ?: 0
+            val newTimesOrdered = currentTimesOrdered + item.cart_quantity // Sumar la cantidad pedida
+            transaction.update(itemRef, "times_ordered", newTimesOrdered)
+        }.addOnSuccessListener {
+            Log.d("ServiceAdapter", "times_ordered actualizado correctamente para el producto ${item.item_name}")
+        }.addOnFailureListener { exception ->
+            Log.d("ServiceAdapter", "Error al actualizar times_ordered", exception)
+        }
+    }
+
 }

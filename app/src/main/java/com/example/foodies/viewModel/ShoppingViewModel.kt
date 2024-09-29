@@ -37,6 +37,10 @@ class ShoppingViewModel : ViewModel() {
     private val _cart = MutableLiveData<Cart>()
     val cart: LiveData<Cart> get() = _cart
 
+    // LiveData para el total Amount
+    private val _totalAmount = MutableLiveData<Int>()
+    val totalAmount: LiveData<Int> get() = _totalAmount
+
     // Live Data para saber si los datos ya fueron cargados
     private val _isLoaded = MutableLiveData<Boolean>()
     val isLoaded: LiveData<Boolean> get() = _isLoaded
@@ -44,6 +48,10 @@ class ShoppingViewModel : ViewModel() {
     // LiveData para manejar errores
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
+
+    // LiveData para manejar el estado de la orden (éxito o error)
+    private val _orderSuccess = MutableLiveData<Boolean>()
+    val orderSuccess: LiveData<Boolean> get() = _orderSuccess
 
     private val _userLocation = MutableLiveData<String>()
     val userLocation: LiveData<String> = _userLocation
@@ -160,11 +168,13 @@ class ShoppingViewModel : ViewModel() {
                 // Agregar el item al carrito si está marcado como añadido
                 if (updatedItem.isAdded) {
                     addItem(updatedItem)
+                    updateTotal()
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)
                     }
                 } else {
                     removeItem(updatedItem)
+                    updateTotal()
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)
                     }
@@ -192,5 +202,53 @@ class ShoppingViewModel : ViewModel() {
         currentCart.removeItem(item)
         _cart.postValue(currentCart)
     }
+
+    // Función para agregar cantidad
+    fun updateItemQuantity(item: Item, change: Int) {
+        val currentCart = _cart.value ?: Cart()
+        currentCart.updateItemQuantity(item,change)
+        _cart.postValue(currentCart)
+    }
+
+    // Función para actualizar total
+    fun updateTotal(){
+        val totalAmountCalc = _cart.value?.getTotalCost() ?: 0
+        _totalAmount.postValue(totalAmountCalc)
+    }
+
+    // Función para guardar la orden en Firestore
+    fun saveOrder() {
+        val cartValue = _cart.value
+        if (cartValue == null || cartValue.getItems().isEmpty()) {
+            // Si el carrito está vacío, mostramos un error
+            _error.postValue("El carrito está vacío, agrega productos antes de realizar el pedido.")
+            return
+        }
+
+        // Si el carrito tiene productos, procesamos la orden
+        serviceAdapter.createOrder(
+            cart = cartValue,
+            onSuccess = {
+                _orderSuccess.postValue(true) // Publicar éxito
+            },
+            onFailure = { exception ->
+                _error.postValue(exception.message) // Publicar error
+            }
+        )
+    }
+
+    // Función para vaciar el carrito
+    fun clearCart() {
+        val emptyCart = Cart() // Crea un nuevo carrito vacío
+        _cart.postValue(emptyCart) // Publica el carrito vacío en LiveData
+        _totalAmount.postValue(0)  // Resetear el total a 0
+    }
+
+    // Nueva función para resetear el estado de orderSuccess
+    fun resetOrderSuccess() {
+        _orderSuccess.postValue(false)
+    }
+
+
 
 }
