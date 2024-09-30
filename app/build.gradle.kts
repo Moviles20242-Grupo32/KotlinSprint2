@@ -85,5 +85,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.play.services.location)
+
+    implementation(libs.firebase.analytics.ktx)
 }
 

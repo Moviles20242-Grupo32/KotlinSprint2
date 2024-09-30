@@ -3,6 +3,9 @@ package com.example.foodies.model
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -12,6 +15,7 @@ import kotlinx.coroutines.launch
 class ServiceAdapter {
     // FireStore Data Base
     private val firestore = DbManager.firestoreInstance
+    private var fireAnalytics: FirebaseAnalytics = Firebase.analytics
 
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
@@ -171,6 +175,13 @@ class ServiceAdapter {
         }.addOnFailureListener { exception ->
             Log.d("ServiceAdapter", "Error al actualizar times_ordered", exception)
         }
+    }
+
+    fun registerPriceFB(price: Double){
+        fireAnalytics.logEvent("purchased"){
+            param("Total", price)
+        }
+
     }
 
 }
