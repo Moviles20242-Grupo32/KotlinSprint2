@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +51,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 
 
 @Composable
@@ -221,20 +223,18 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
         AsyncImage(
             model = item.item_image,
             contentDescription = "Imagen de ${item.item_name}",
-            modifier = Modifier
-                .size(100.dp)
+            modifier = Modifier.size(100.dp)
         )
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Columna 2: Información del item (nombre, detalles, calificación)
+        // Columna 2: Información del item (nombre, detalles, precio)
         Column(
             modifier = Modifier
                 .weight(2f)
                 .align(Alignment.CenterVertically),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Nombre
             Text(
                 text = item.item_name,
                 style = TextStyle(
@@ -245,7 +245,6 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
                 overflow = TextOverflow.Ellipsis,
                 color = Color(0.352f, 0.196f, 0.070f, 1.0f)
             )
-            // Detalle
             Text(
                 text = item.item_details,
                 style = MaterialTheme.typography.bodyMedium,
@@ -274,8 +273,24 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
                 }
             }
         }
+
+        // Espacio entre las columnas
+        Spacer(modifier = Modifier.width(20.dp))
+
+        // Columna 3: Botón para eliminar item del carrito
+        IconButton(
+            onClick = { viewModel.removeItemFromCart(item) }  // Llamar a la función de ViewModel para eliminar el ítem
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,  // Icono de eliminación
+                contentDescription = "Eliminar",  // Descripción del icono
+                tint = Color.Red  // Color del icono
+            )
+        }
     }
 }
+
+
 
 @Composable
 fun ItemQuantityControl(item: Item, viewModel: ShoppingViewModel, itemCartQuantity: Int, onQuantityChange: (Int) -> Unit) {

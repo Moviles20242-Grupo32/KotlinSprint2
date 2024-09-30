@@ -249,6 +249,13 @@ class ShoppingViewModel : ViewModel() {
         _orderSuccess.postValue(false)
     }
 
+    // Funcion para remover el item del carrito
+    fun removeItemFromCart(item: Item) {
+        val currentCart = _cart.value ?: Cart()
+        currentCart.removeItem(item) // Remueve el item del carrito
+        _cart.postValue(currentCart)  // Actualiza el estado del carrito
+        updateTotal() // Actualiza el total después de eliminar el item
+    }
 
 
 }
