@@ -200,6 +200,15 @@ class ShoppingViewModel : ViewModel() {
     fun removeItem(item: Item) {
         val currentCart = _cart.value ?: Cart()
         currentCart.removeItem(item)
+        val updatedList = _items.value?.map { itemList ->
+            if (itemList.id == item.id) {
+                val updatedItem = item.copy(isAdded = false)
+                updatedItem
+            }else{
+                itemList
+            }
+        }?: emptyList()
+        _items.postValue(updatedList)
         _cart.postValue(currentCart)
     }
 
