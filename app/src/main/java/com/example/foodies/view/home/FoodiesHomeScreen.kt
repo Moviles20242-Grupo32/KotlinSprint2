@@ -316,7 +316,7 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
                 Box(
                     modifier = Modifier
                         .background(
-                            color = Color(0.878f, 0.878f, 0.878f, 1.0f), // Color de fondo
+                            color = Color(0.925f, 0.925f, 0.922f, 1.0f), // Color de fondo
                             shape = RoundedCornerShape(16.dp) // Esquinas redondeadas
                         )
                         .padding(horizontal = 5.dp, vertical = 2.dp) // Padding interno del texto
