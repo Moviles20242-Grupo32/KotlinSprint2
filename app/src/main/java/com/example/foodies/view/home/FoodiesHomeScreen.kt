@@ -65,11 +65,6 @@ import com.example.foodies.viewModel.ShoppingViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
-
-
-
-
-
 @Composable
 fun FoodiesHomeScreen(
     navController: NavController,
@@ -80,12 +75,8 @@ fun FoodiesHomeScreen(
     val msitem by viewModel.msitem.observeAsState(null)
     val isLoaded by viewModel.isLoaded.observeAsState(false)
     val error by viewModel.error.observeAsState()
-
     val context = LocalContext.current
-
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
-
-
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
@@ -94,7 +85,7 @@ fun FoodiesHomeScreen(
             viewModel.fetchItems()
         }
         viewModel.initTextToSpeech(context)
-        viewModel.getLastLocation(context)
+        viewModel.requestLocationUpdate(context)
     }
 
     // Manejar posibles errores

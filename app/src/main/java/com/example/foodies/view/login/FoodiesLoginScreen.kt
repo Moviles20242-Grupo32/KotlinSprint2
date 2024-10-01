@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodies.R
+import com.example.foodies.model.FoodiesNotificationManager
 import com.example.foodies.viewModel.LoginViewModel
 
 @Composable
@@ -63,13 +64,21 @@ fun FoodiesLoginScreen(navController: NavController,
     }
 
     val errorMessage = remember { mutableStateOf("") }
-
     val context = LocalContext.current
 
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        // Solicitar permisos si no están otorgados (esto lo deberías hacer en la actividad)
+    // Verifica si los permisos de ubicación y notificaciones están otorgados
+    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        // Solicitar permisos si no están otorgados
         if (context is Activity) {
-            ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
+            ActivityCompat.requestPermissions(
+                context,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ),
+                101 // Código de solicitud
+            )
         }
     }
 

@@ -177,6 +177,34 @@ class ServiceAdapter {
         }
     }
 
+    fun getRestaurants(onSuccess: (HashMap<String, List<Double>>) -> Unit, onFailure: (Exception) -> Unit) {
+        // HashMap para almacenar los resultados
+        val restaurantMap = HashMap<String, List<Double>>()
+
+        // Acceder a la colección de restaurantes en Firestore
+        firestore.collection("restaurants")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    // Obtener los datos de cada restaurante
+                    val name = document.getString("name")
+                    val latitude = document.getDouble("latitude")
+                    val longitude = document.getDouble("longitude")
+
+                    // Asegurarse de que los datos no sean nulos antes de agregarlos al mapa
+                    if (name != null && latitude != null && longitude != null) {
+                        restaurantMap[name] = listOf(latitude, longitude)
+                    }
+                }
+                // Llamar al callback de éxito con el HashMap resultante
+                onSuccess(restaurantMap)
+            }
+            .addOnFailureListener { exception ->
+                // Llamar al callback de error en caso de fallo
+                onFailure(exception)
+            }
+    }
+
     fun registerPriceFB(price: Double){
         fireAnalytics.logEvent("purchased"){
             param("Total", price)
