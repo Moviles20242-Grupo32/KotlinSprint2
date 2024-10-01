@@ -100,6 +100,7 @@ fun FoodiesShoppingCartScreen(
         )
     }
 
+
     // Diálogo de error de carrito vacío
     if (showEmptyCartDialog) {
         AlertDialog(
@@ -141,7 +142,7 @@ fun FoodiesShoppingCartScreen(
                     tint = Color(0.945f, 0.600f, 0.216f, 1.0f),
                     modifier = Modifier
                         .size(50.dp)
-                        .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) }
+                        .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) } // Navegar solo al hacer clic
                 )
                 Text(
                     text = "Carrito",
@@ -167,14 +168,22 @@ fun FoodiesShoppingCartScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección de total y botón de Check Out en la parte inferior
-            totalAmount?.let { CheckoutSection(it, onCheckoutClicked = { viewModel.saveOrder() }) }
+            totalAmount?.let {
+                CheckoutSection(
+                    total = it,
+                    viewModel = viewModel,
+                    navController = navController
+                )
+            }
+
         }
     }
 }
 
 
+
 @Composable
-fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
+fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -194,7 +203,7 @@ fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
                 color = Color(0.353f, 0.196f, 0.071f, 1.0f)
             )
             Text(
-                text = total.toString(),
+                text = "$$total", // Mostrar el total en formato de precio
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 30.sp),
                 color = Color(0.353f, 0.196f, 0.071f, 1.0f),
                 fontWeight = FontWeight.Bold
@@ -212,7 +221,17 @@ fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
                     color = Color(0.192f, 0.263f, 0.255f, 1.0f),
                     shape = RoundedCornerShape(8.dp)
                 )
-                .clickable { onCheckoutClicked() }, // Ejecuta la función pasada al hacer clic
+                .clickable {
+                    viewModel.saveOrder(
+                        onSuccess = {
+                            // Solo limpiar el carrito, no navegar automáticamente
+                            viewModel.clearCart()
+                        },
+                        onFailure = { exception ->
+                            // Manejo de errores, por ejemplo, mostrar un diálogo
+                        }
+                    )
+                }, // Ejecuta la función pasada al hacer clic
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -221,6 +240,7 @@ fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
             )
         }
+
     }
 }
 
