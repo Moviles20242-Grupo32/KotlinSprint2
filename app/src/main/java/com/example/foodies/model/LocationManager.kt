@@ -31,15 +31,12 @@ object LocationManager {
             onComplete(false) // Indica que no se pudo obtener la ubicación
             return
         }
-
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 // Actualizamos latitud y longitud
                 latitude = location.latitude
                 longitude = location.longitude
-
                 Log.d("LocationManager", "Latitud: $latitude, Longitud: $longitude")
-
                 // Obtenemos la dirección con el Geocoder
                 val geocoder = Geocoder(context, Locale.getDefault())
                 try {

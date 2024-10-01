@@ -30,7 +30,7 @@ class FoodiesNotificationManager(private val context: Context) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = CHANNEL_DESCRIPTION
             }
@@ -42,7 +42,7 @@ class FoodiesNotificationManager(private val context: Context) {
             .setSmallIcon(R.drawable.logo) // Icono de la notificación
             .setContentTitle("¡Estas cerca!")
             .setContentText("Tienes un restaurante Foodies cerca de ti, ¡aprovecha y pide ya!")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setPublicVersion(
                 NotificationCompat.Builder(context, CHANNEL_ID)
