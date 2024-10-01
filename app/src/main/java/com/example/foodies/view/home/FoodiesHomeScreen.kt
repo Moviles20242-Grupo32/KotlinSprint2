@@ -64,6 +64,8 @@ import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
 fun FoodiesHomeScreen(
@@ -75,15 +77,27 @@ fun FoodiesHomeScreen(
     val msitem by viewModel.msitem.observeAsState(null)
     val isLoaded by viewModel.isLoaded.observeAsState(false)
     val error by viewModel.error.observeAsState()
+
     val context = LocalContext.current
+
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
         if (!isLoaded) {
             viewModel.mostSellItem()
-            viewModel.fetchItems()
+
+            // Obtener el ID del usuario y pasarle a fetchItems
+            val userId = Firebase.auth.currentUser?.uid
+            viewModel.fetchItems(userId)  // Pasa el userId aquí
         }
+
+        // Obtener el ID del usuario y cargar sus preferencias
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            viewModel.fetchUserPreferences(userId)  // Ordenar items según las preferencias del usuario
+        }
+
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
     }
@@ -101,12 +115,12 @@ fun FoodiesHomeScreen(
             modifier = Modifier.padding(16.dp)
         ) {
             // Fila 1: Texto "Botones"
-            ActionButtons(items,navController,viewModel)
+            ActionButtons(items, navController, viewModel)
 
             // Fila 2: Texto "Locación"
             Location(userLocation)
 
-            // Fila 3: Barra de busqueda
+            // Fila 3: Barra de búsqueda
             FilterBar(onFilter = { query ->
                 viewModel.filterItemsByName(query)
             })
@@ -115,7 +129,7 @@ fun FoodiesHomeScreen(
             msitem?.let { MostSellItem(it, viewModel) }
 
             // Lista de ítems usando la función modularizada
-            ItemsList(items,viewModel)
+            ItemsList(items, viewModel)
         }
     }
 }

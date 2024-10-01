@@ -123,6 +123,7 @@ class ServiceAdapter {
     }
 
     fun createOrder(cart: Cart, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val userId = auth.currentUser?.uid
         // Definir una ubicación estándar
         val standardLocation = hashMapOf(
             "latitude" to 37.785834, // Latitud estándar
@@ -131,6 +132,7 @@ class ServiceAdapter {
 
         // Crear un nuevo mapa para almacenar la orden
         val orderData = hashMapOf(
+            "user_id" to userId,
             "location" to standardLocation,
             "total_cost" to cart.getTotalCost(),
             "ordered_food" to cart.getItems().map { item ->
@@ -211,5 +213,30 @@ class ServiceAdapter {
         }
 
     }
+
+    fun getUserOrderHistory(userId: String, onSuccess: (Map<String, Int>) -> Unit, onFailure: (Exception) -> Unit) {
+        firestore.collection("Orders")
+            .whereEqualTo("user_id", userId)
+            .get()
+            .addOnSuccessListener { documents ->
+                val itemQuantityMap = mutableMapOf<String, Int>()
+
+                for (document in documents) {
+                    val orderedItems = document.get("ordered_food") as? List<Map<String, Any>> ?: continue
+                    for (item in orderedItems) {
+                        val itemName = item["item_name"] as? String ?: continue
+                        val itemQuantity = (item["item_quantity"] as? Long)?.toInt() ?: 0
+
+                        // Sum the quantity for each item
+                        itemQuantityMap[itemName] = itemQuantityMap.getOrDefault(itemName, 0) + itemQuantity
+                    }
+                }
+                onSuccess(itemQuantityMap) // Return the total quantities
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
+            }
+    }
+
 
 }
