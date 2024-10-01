@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation ("io.coil-kt:coil-svg:2.7.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 
     implementation(libs.androidx.hilt.navigation.compose)
 
