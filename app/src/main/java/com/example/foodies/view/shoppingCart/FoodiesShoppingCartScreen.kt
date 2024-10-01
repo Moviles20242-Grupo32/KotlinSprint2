@@ -138,7 +138,7 @@ fun FoodiesShoppingCartScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFFEC9A31),
+                    tint = Color(0.945f, 0.600f, 0.216f, 1.0f),
                     modifier = Modifier
                         .size(50.dp)
                         .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) }
@@ -146,7 +146,7 @@ fun FoodiesShoppingCartScreen(
                 Text(
                     text = "Carrito",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color(0xFF5A3918),
+                    color = Color(0.353f, 0.196f, 0.071f, 1.0f),
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
@@ -191,12 +191,12 @@ fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
             Text(
                 text = "Total",
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 30.sp),
-                color = Color(0xFF5A3918)
+                color = Color(0.353f, 0.196f, 0.071f, 1.0f)
             )
             Text(
                 text = total.toString(),
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 30.sp),
-                color = Color(0xFF5A3918),
+                color = Color(0.353f, 0.196f, 0.071f, 1.0f),
                 fontWeight = FontWeight.Bold
             )
         }
@@ -209,7 +209,7 @@ fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(
-                    color = Color(0xFF2F3C37),
+                    color = Color(0.192f, 0.263f, 0.255f, 1.0f),
                     shape = RoundedCornerShape(8.dp)
                 )
                 .clickable { onCheckoutClicked() }, // Ejecuta la función pasada al hacer clic
