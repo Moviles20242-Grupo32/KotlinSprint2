@@ -62,28 +62,29 @@ fun FoodiesShoppingCartScreen(
     // Estados
     val cart by viewModel.cart.observeAsState()
     val totalAmount by viewModel.totalAmount.observeAsState(0)
-    val orderSuccess by viewModel.orderSuccess.observeAsState() // Observa el éxito de la orden
+    val orderSuccess by viewModel.orderSuccess.observeAsState()
     val errorMessage by viewModel.error.observeAsState() // Observa los errores
 
     // Estado para mostrar o no el diálogo
     var showDialog by remember { mutableStateOf(false) }
+    var showEmptyCartDialog by remember { mutableStateOf(false) } // Estado para el diálogo de carrito vacío
 
-    // Si la orden se guardó con éxito, mostrar el diálogo
+    // Si la orden se guardó con éxito, mostrar el diálogo de éxito
     if (orderSuccess == true && !showDialog) {
         showDialog = true // Activar el diálogo cuando la orden es exitosa
     }
 
-    // Muestra un mensaje de error si ocurre uno
-    errorMessage?.let {
-        Toast.makeText(LocalContext.current, it, Toast.LENGTH_SHORT).show()
+    // Mostrar el diálogo de carrito vacío si hay un error de carrito vacío
+    if (errorMessage != null && !showEmptyCartDialog) {
+        showEmptyCartDialog = true
     }
 
-    // Mostrar el diálogo de éxito de la orden
+    // Diálogo de éxito de la orden
     if (showDialog) {
         AlertDialog(
             onDismissRequest = {
                 showDialog = false
-                viewModel.resetOrderSuccess() // Resetear orderSuccess al cerrar
+                viewModel.resetOrderSuccess() // Resetear el estado de éxito
             },
             title = { Text(text = "Orden Creada") },
             text = { Text(text = "Tu orden ha sido creada exitosamente.") },
@@ -92,6 +93,26 @@ fun FoodiesShoppingCartScreen(
                     viewModel.clearCart() // Vaciar el carrito
                     showDialog = false    // Cerrar el diálogo
                     viewModel.resetOrderSuccess() // Resetear orderSuccess
+                }) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+
+    // Diálogo de error de carrito vacío
+    if (showEmptyCartDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showEmptyCartDialog = false
+                viewModel.resetError() // Resetear el estado de error
+            },
+            title = { Text(text = "Error") },
+            text = { Text(text = "El carrito está vacío, agrega productos antes de realizar el pedido.") },
+            confirmButton = {
+                Button(onClick = {
+                    showEmptyCartDialog = false // Cerrar el diálogo
+                    viewModel.resetError() // Resetear el estado de error
                 }) {
                     Text("Aceptar")
                 }
@@ -150,6 +171,7 @@ fun FoodiesShoppingCartScreen(
         }
     }
 }
+
 
 @Composable
 fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
@@ -217,7 +239,8 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clip(RoundedCornerShape(8.dp))
-            .padding(8.dp)
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically // Alineación vertical al centro
     ) {
         // Columna 1: Imagen del item
         AsyncImage(
@@ -232,7 +255,7 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
         Column(
             modifier = Modifier
                 .weight(2f)
-                .align(Alignment.CenterVertically),
+                .align(Alignment.CenterVertically), // Alineación vertical al centro
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -279,16 +302,18 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
 
         // Columna 3: Botón para eliminar item del carrito
         IconButton(
+            modifier = Modifier.align(Alignment.CenterVertically), // Centrar el ícono de eliminar verticalmente
             onClick = { viewModel.removeItemFromCart(item) }  // Llamar a la función de ViewModel para eliminar el ítem
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,  // Icono de eliminación
                 contentDescription = "Eliminar",  // Descripción del icono
-                tint = Color.Red  // Color del icono
+                tint = Color(0.352f, 0.196f, 0.070f, 1.0f) // Color del icono
             )
         }
     }
 }
+
 
 
 

@@ -225,7 +225,7 @@ class ShoppingViewModel : ViewModel() {
         _totalAmount.postValue(totalAmountCalc)
     }
 
-    // Función para guardar la orden en Firestore
+    // Función para guardar la orden en Firestore o backend
     fun saveOrder() {
         val cartValue = _cart.value
         if (cartValue == null || cartValue.getItems().isEmpty()) {
@@ -241,7 +241,7 @@ class ShoppingViewModel : ViewModel() {
                 _orderSuccess.postValue(true) // Publicar éxito
             },
             onFailure = { exception ->
-                _error.postValue(exception.message) // Publicar error
+                _error.postValue("Error al procesar la orden: ${exception.message}") // Publicar error
             }
         )
     }
@@ -256,6 +256,10 @@ class ShoppingViewModel : ViewModel() {
     // Nueva función para resetear el estado de orderSuccess
     fun resetOrderSuccess() {
         _orderSuccess.postValue(false)
+    }
+    // Función para resetear el estado de error
+    fun resetError() {
+        _error.postValue(null) // Limpiar el error
     }
 
     // Funcion para remover el item del carrito
