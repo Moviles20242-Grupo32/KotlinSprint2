@@ -144,7 +144,10 @@ fun FoodiesShoppingCartScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección de total y botón de Check Out en la parte inferior
-            totalAmount?.let { CheckoutSection(it, onCheckoutClicked = { viewModel.saveOrder() }) }
+            totalAmount?.let { CheckoutSection(it, onCheckoutClicked = {
+                viewModel.saveOrder()
+                viewModel.registerPrice()
+            }) }
         }
     }
 }

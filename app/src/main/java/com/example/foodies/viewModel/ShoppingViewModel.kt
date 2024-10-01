@@ -249,6 +249,13 @@ class ShoppingViewModel : ViewModel() {
         _orderSuccess.postValue(false)
     }
 
+    fun registerPrice(){
+        val totalAmountCalc = _cart.value?.getTotalCost() ?: 0
+        val price = totalAmountCalc.toDouble()
+        serviceAdapter.registerPriceFB(price)
+
+    }
+
 
 
 }
