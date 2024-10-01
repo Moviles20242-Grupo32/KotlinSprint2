@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.rounded.Verified
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -111,11 +112,8 @@ fun FoodiesHomeScreen(
                 viewModel.filterItemsByName(query)
             })
 
-            //Most Sell box
-            msitem?.let { MostSellItem(it, viewModel) }
-
             // Lista de ítems usando la función modularizada
-            ItemsList(items,viewModel)
+            msitem?.let { ItemsList(items,viewModel, it) }
         }
     }
 }
@@ -259,40 +257,24 @@ fun MostSellItem(item: Item, viewModel: ShoppingViewModel){
             overflow = TextOverflow.Ellipsis,
             color = Color(0.352f, 0.196f, 0.070f, 1.0f)
         )
-        ItemCard(item,viewModel)
+        ItemCard(item,viewModel,item)
     }
 }
 
 @Composable
-fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel ) {
+fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel, msitem:Item) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        item {
-            Text(
-                text = "Mistery boxes",
-                style = TextStyle(
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = Color(0.352f, 0.196f, 0.070f, 1.0f)
-            )
-        }
-
         val filteredItems = items.filter { it.show }
         items(filteredItems) { item ->
-            ItemCard(item,viewModel)
+            ItemCard(item,viewModel,msitem)
         }
     }
 }
 
-
-
-
 @Composable
-fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
+fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
     val rating = item.item_ratings.toFloatOrNull() ?: 0f
     Row(
         modifier = Modifier
@@ -318,6 +300,7 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
                 .align(Alignment.CenterVertically),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+
             Text(
                 text = item.item_name,
                 style = TextStyle(
@@ -328,6 +311,24 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
                 overflow = TextOverflow.Ellipsis,
                 color = Color(0.352f, 0.196f, 0.070f, 1.0f)
             )
+
+            if (item.id == msitem.id) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0.925f, 0.925f, 0.922f, 1.0f), // Color de fondo
+                            shape = RoundedCornerShape(16.dp) // Esquinas redondeadas
+                        )
+                        .padding(horizontal = 5.dp, vertical = 2.dp) // Padding interno del texto
+                ) {
+                    Text(
+                        text = "Favorita del público",
+                        color = Color(0.352f, 0.196f, 0.070f, 1.0f), // Color del texto
+                        style = MaterialTheme.typography.bodySmall // Estilo del texto
+                    )
+                }
+            }
+
             Text(
                 text = item.item_details,
                 style = MaterialTheme.typography.bodyMedium,
