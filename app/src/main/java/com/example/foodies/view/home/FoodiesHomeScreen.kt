@@ -65,6 +65,8 @@ import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
 fun FoodiesHomeScreen(
@@ -83,8 +85,18 @@ fun FoodiesHomeScreen(
     LaunchedEffect(Unit) {
         if (!isLoaded) {
             viewModel.mostSellItem()
-            viewModel.fetchItems()
+
+            // Obtener el ID del usuario y pasarle a fetchItems
+            val userId = Firebase.auth.currentUser?.uid
+            viewModel.fetchItems(userId)  // Pasa el userId aquí
         }
+
+        // Obtener el ID del usuario y cargar sus preferencias
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            viewModel.fetchUserPreferences(userId)  // Ordenar items según las preferencias del usuario
+        }
+
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
     }
@@ -107,7 +119,7 @@ fun FoodiesHomeScreen(
             // Fila 2: Texto "Locación"
             Location(userLocation)
 
-            // Fila 3: Barra de busqueda
+            // Fila 3: Barra de búsqueda
             FilterBar(onFilter = { query ->
                 viewModel.filterItemsByName(query)
             })

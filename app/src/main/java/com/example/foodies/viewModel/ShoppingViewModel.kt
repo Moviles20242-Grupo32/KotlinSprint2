@@ -21,6 +21,8 @@ import kotlinx.coroutines.delay
 import com.google.android.gms.location.LocationServices
 import android.location.Geocoder
 import android.location.Location
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import java.util.Locale
 
 class ShoppingViewModel : ViewModel() {
@@ -90,8 +92,7 @@ class ShoppingViewModel : ViewModel() {
         }
     }
 
-    // Función para obtener los items desde Firebase
-    fun fetchItems() {
+    fun fetchItems(userId: String?) {
         if (_isLoaded.value == true) return
         viewModelScope.launch {
             serviceAdapter.getAllItems(
@@ -99,6 +100,11 @@ class ShoppingViewModel : ViewModel() {
                     _items.postValue(itemList)
                     _isLoaded.postValue(true)
                     Log.d("FoodiesHomeScreen", "items.isEmpty(): ${isLoaded.value}")
+
+                    // After fetching items, sort based on user preferences if userId is available
+                    userId?.let {
+                        fetchUserPreferences(it) // Fetch user preferences and sort items accordingly
+                    }
                 },
                 onFailure = { exception ->
                     // Publicar el error si ocurre
@@ -108,6 +114,25 @@ class ShoppingViewModel : ViewModel() {
             )
         }
     }
+
+    fun fetchUserPreferences(userId: String) {
+        serviceAdapter.getUserOrderHistory(
+            userId = userId,
+            onSuccess = { itemQuantityMap ->
+                // Sort items based on the quantity ordered by the user
+                val sortedItems = _items.value?.sortedByDescending { item ->
+                    itemQuantityMap[item.item_name] ?: 0 // Sort by user order history
+                } ?: emptyList()
+
+                // Update LiveData with the sorted items
+                _items.postValue(sortedItems)
+            },
+            onFailure = { exception ->
+                _error.postValue(exception.message)
+            }
+        )
+    }
+
 
 
     //Función para obtener el producto más vendido
