@@ -62,14 +62,14 @@ fun FoodiesShoppingCartScreen(
     // Estados
     val cart by viewModel.cart.observeAsState()
     val totalAmount by viewModel.totalAmount.observeAsState(0)
-    val orderSuccess by viewModel.orderSuccess.observeAsState()
+    val orderSuccess by viewModel.orderSuccess.observeAsState() // Observa el éxito de la orden
     val errorMessage by viewModel.error.observeAsState() // Observa los errores
 
     // Estado para mostrar o no el diálogo
     var showDialog by remember { mutableStateOf(false) }
     var showEmptyCartDialog by remember { mutableStateOf(false) } // Estado para el diálogo de carrito vacío
 
-    // Si la orden se guardó con éxito, mostrar el diálogo de éxito
+    // Si la orden se guardó con éxito, mostrar el diálogo
     if (orderSuccess == true && !showDialog) {
         showDialog = true // Activar el diálogo cuando la orden es exitosa
     }
@@ -79,7 +79,7 @@ fun FoodiesShoppingCartScreen(
         showEmptyCartDialog = true
     }
 
-    // Diálogo de éxito de la orden
+    // Mostrar el diálogo de éxito de la orden
     if (showDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -180,8 +180,6 @@ fun FoodiesShoppingCartScreen(
     }
 }
 
-
-
 @Composable
 fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: NavController) {
     Column(
@@ -240,7 +238,6 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
             )
         }
-
     }
 }
 
@@ -278,6 +275,7 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
                 .align(Alignment.CenterVertically), // Alineación vertical al centro
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // Nombre
             Text(
                 text = item.item_name,
                 style = TextStyle(
@@ -288,6 +286,7 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
                 overflow = TextOverflow.Ellipsis,
                 color = Color(0.352f, 0.196f, 0.070f, 1.0f)
             )
+            // Detalle
             Text(
                 text = item.item_details,
                 style = MaterialTheme.typography.bodyMedium,
@@ -333,9 +332,6 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
         }
     }
 }
-
-
-
 
 @Composable
 fun ItemQuantityControl(item: Item, viewModel: ShoppingViewModel, itemCartQuantity: Int, onQuantityChange: (Int) -> Unit) {

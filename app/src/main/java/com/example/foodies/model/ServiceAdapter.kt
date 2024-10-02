@@ -3,6 +3,9 @@ package com.example.foodies.model
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -12,6 +15,7 @@ import kotlinx.coroutines.launch
 class ServiceAdapter {
     // FireStore Data Base
     private val firestore = DbManager.firestoreInstance
+    private var fireAnalytics: FirebaseAnalytics = Firebase.analytics
 
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
@@ -171,6 +175,41 @@ class ServiceAdapter {
         }.addOnFailureListener { exception ->
             Log.d("ServiceAdapter", "Error al actualizar times_ordered", exception)
         }
+    }
+
+    fun getRestaurants(onSuccess: (HashMap<String, List<Double>>) -> Unit, onFailure: (Exception) -> Unit) {
+        // HashMap para almacenar los resultados
+        val restaurantMap = HashMap<String, List<Double>>()
+
+        // Acceder a la colección de restaurantes en Firestore
+        firestore.collection("restaurants")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    // Obtener los datos de cada restaurante
+                    val name = document.getString("name")
+                    val latitude = document.getDouble("latitude")
+                    val longitude = document.getDouble("longitude")
+
+                    // Asegurarse de que los datos no sean nulos antes de agregarlos al mapa
+                    if (name != null && latitude != null && longitude != null) {
+                        restaurantMap[name] = listOf(latitude, longitude)
+                    }
+                }
+                // Llamar al callback de éxito con el HashMap resultante
+                onSuccess(restaurantMap)
+            }
+            .addOnFailureListener { exception ->
+                // Llamar al callback de error en caso de fallo
+                onFailure(exception)
+            }
+    }
+
+    fun registerPriceFB(price: Double){
+        fireAnalytics.logEvent("purchased"){
+            param("Total", price)
+        }
+
     }
 
 }

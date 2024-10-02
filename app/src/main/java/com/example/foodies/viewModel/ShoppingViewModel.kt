@@ -1,5 +1,6 @@
 package com.example.foodies.viewModel
 
+import LocationManager
 import TextToSpeechManager
 import android.content.Context
 import android.Manifest
@@ -19,11 +20,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import com.google.android.gms.location.LocationServices
 import android.location.Geocoder
+import android.location.Location
 import java.util.Locale
 
 class ShoppingViewModel : ViewModel() {
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
+    private var location = LocationManager
 
     // LiveData para la lista de Items
     private val _items = MutableLiveData<List<Item>>()
@@ -53,46 +56,21 @@ class ShoppingViewModel : ViewModel() {
     private val _orderSuccess = MutableLiveData<Boolean>()
     val orderSuccess: LiveData<Boolean> get() = _orderSuccess
 
+    // LiveData para mantener la dirección del usuario
     private val _userLocation = MutableLiveData<String>()
-    val userLocation: LiveData<String> = _userLocation
+    val userLocation: LiveData<String> get() = _userLocation
 
-    fun getLastLocation(context: Context) {
-        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Solicitar permisos si no están otorgados (esto lo deberías hacer en la actividad)
-            if (context is Activity) {
-                ActivityCompat.requestPermissions(context, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 101)
-            }
+    //Inicialización: Cargamos la LocationManager address
+    init {
+        // Observamos los cambios en la dirección
+        LocationManager.address.observeForever { newAddress ->
+            _userLocation.postValue(newAddress)
         }
+    }
 
-        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                Log.d("Foodies", "latitud: ${location.latitude}, longitud: ${location.longitude}")
-                val geocoder = Geocoder(context, Locale.getDefault())
-
-                try {
-                    val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                    if (!addresses.isNullOrEmpty()) {
-                        val address = addresses[0]
-                        val dir: String = address.getAddressLine(0).split(",")[0]
-                        //_userLocation.postValue(address.getAddressLine(0))
-                        _userLocation.postValue(dir)
-                    } else {
-                        Log.d("Foodies", "No se encontró ninguna dirección")
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e("Foodies", "Error al obtener la dirección: ${e.message}")
-                }
-                //_userLocation.postValue("${location.latitude}/${location.longitude}")
-            } else {
-                _userLocation.postValue("Ubicación no disponible")
-            }
-        }.addOnFailureListener {
-            Log.d("Foodies", "Error al obtener la ubicación")
-            _userLocation.postValue("Error al obtener la ubicación")
-        }
+    // Método para solicitar la actualización de la ubicación
+    fun requestLocationUpdate(context: Context) {
+        location.updateLocation(context){}
     }
 
     //funcion para incicializr el texttospeech
@@ -295,6 +273,13 @@ class ShoppingViewModel : ViewModel() {
         _items.postValue(updatedList)
         _cart.postValue(currentCart)  // Actualiza el estado del carrito
         updateTotal() // Actualiza el total después de eliminar el item
+    }
+
+    fun registerPrice(){
+        val totalAmountCalc = _cart.value?.getTotalCost() ?: 0
+        val price = totalAmountCalc.toDouble()
+        serviceAdapter.registerPriceFB(price)
+
     }
 
 
