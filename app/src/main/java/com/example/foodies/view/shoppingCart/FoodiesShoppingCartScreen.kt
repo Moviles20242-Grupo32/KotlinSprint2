@@ -233,7 +233,7 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Check Out",
+                text = "Ordenar",
                 color = Color.White,
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
             )
