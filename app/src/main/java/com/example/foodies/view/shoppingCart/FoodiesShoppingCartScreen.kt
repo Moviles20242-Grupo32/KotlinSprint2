@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +51,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 
 
 @Composable
@@ -65,15 +67,16 @@ fun FoodiesShoppingCartScreen(
 
     // Estado para mostrar o no el diálogo
     var showDialog by remember { mutableStateOf(false) }
+    var showEmptyCartDialog by remember { mutableStateOf(false) } // Estado para el diálogo de carrito vacío
 
     // Si la orden se guardó con éxito, mostrar el diálogo
     if (orderSuccess == true && !showDialog) {
         showDialog = true // Activar el diálogo cuando la orden es exitosa
     }
 
-    // Muestra un mensaje de error si ocurre uno
-    errorMessage?.let {
-        Toast.makeText(LocalContext.current, it, Toast.LENGTH_SHORT).show()
+    // Mostrar el diálogo de carrito vacío si hay un error de carrito vacío
+    if (errorMessage != null && !showEmptyCartDialog) {
+        showEmptyCartDialog = true
     }
 
     // Mostrar el diálogo de éxito de la orden
@@ -81,7 +84,7 @@ fun FoodiesShoppingCartScreen(
         AlertDialog(
             onDismissRequest = {
                 showDialog = false
-                viewModel.resetOrderSuccess() // Resetear orderSuccess al cerrar
+                viewModel.resetOrderSuccess() // Resetear el estado de éxito
             },
             title = { Text(text = "Orden Creada") },
             text = { Text(text = "Tu orden ha sido creada exitosamente.") },
@@ -90,6 +93,27 @@ fun FoodiesShoppingCartScreen(
                     viewModel.clearCart() // Vaciar el carrito
                     showDialog = false    // Cerrar el diálogo
                     viewModel.resetOrderSuccess() // Resetear orderSuccess
+                }) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+
+
+    // Diálogo de error de carrito vacío
+    if (showEmptyCartDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showEmptyCartDialog = false
+                viewModel.resetError() // Resetear el estado de error
+            },
+            title = { Text(text = "Error") },
+            text = { Text(text = "El carrito está vacío, agrega productos antes de realizar el pedido.") },
+            confirmButton = {
+                Button(onClick = {
+                    showEmptyCartDialog = false // Cerrar el diálogo
+                    viewModel.resetError() // Resetear el estado de error
                 }) {
                     Text("Aceptar")
                 }
@@ -115,15 +139,15 @@ fun FoodiesShoppingCartScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFFEC9A31),
+                    tint = Color(0.945f, 0.600f, 0.216f, 1.0f),
                     modifier = Modifier
                         .size(50.dp)
-                        .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) }
+                        .clickable { navController.navigate(FoodiesScreens.FoodiesHomeScreen.name) } // Navegar solo al hacer clic
                 )
                 Text(
                     text = "Carrito",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color(0xFF5A3918),
+                    color = Color(0.353f, 0.196f, 0.071f, 1.0f),
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
@@ -144,16 +168,20 @@ fun FoodiesShoppingCartScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección de total y botón de Check Out en la parte inferior
-            totalAmount?.let { CheckoutSection(it, onCheckoutClicked = {
-                viewModel.saveOrder()
-                viewModel.registerPrice()
-            }) }
+            totalAmount?.let {
+                CheckoutSection(
+                    total = it,
+                    viewModel = viewModel,
+                    navController = navController
+                )
+            }
+
         }
     }
 }
 
 @Composable
-fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
+fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,12 +198,12 @@ fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
             Text(
                 text = "Total",
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 30.sp),
-                color = Color(0xFF5A3918)
+                color = Color(0.353f, 0.196f, 0.071f, 1.0f)
             )
             Text(
-                text = total.toString(),
+                text = "$$total", // Mostrar el total en formato de precio
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 30.sp),
-                color = Color(0xFF5A3918),
+                color = Color(0.353f, 0.196f, 0.071f, 1.0f),
                 fontWeight = FontWeight.Bold
             )
         }
@@ -188,14 +216,24 @@ fun CheckoutSection(total: Int, onCheckoutClicked: () -> Unit) {
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(
-                    color = Color(0xFF2F3C37),
+                    color = Color(0.192f, 0.263f, 0.255f, 1.0f),
                     shape = RoundedCornerShape(8.dp)
                 )
-                .clickable { onCheckoutClicked() }, // Ejecuta la función pasada al hacer clic
+                .clickable {
+                    viewModel.saveOrder(
+                        onSuccess = {
+                            // Solo limpiar el carrito, no navegar automáticamente
+                            viewModel.clearCart()
+                        },
+                        onFailure = { exception ->
+                            // Manejo de errores, por ejemplo, mostrar un diálogo
+                        }
+                    )
+                }, // Ejecuta la función pasada al hacer clic
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Check Out",
+                text = "Ordenar",
                 color = Color.White,
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
             )
@@ -218,23 +256,23 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clip(RoundedCornerShape(8.dp))
-            .padding(8.dp)
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically // Alineación vertical al centro
     ) {
         // Columna 1: Imagen del item
         AsyncImage(
             model = item.item_image,
             contentDescription = "Imagen de ${item.item_name}",
-            modifier = Modifier
-                .size(100.dp)
+            modifier = Modifier.size(100.dp)
         )
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // Columna 2: Información del item (nombre, detalles, calificación)
+        // Columna 2: Información del item (nombre, detalles, precio)
         Column(
             modifier = Modifier
                 .weight(2f)
-                .align(Alignment.CenterVertically),
+                .align(Alignment.CenterVertically), // Alineación vertical al centro
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             // Nombre
@@ -276,6 +314,21 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel) {
                     itemCartQuantity = newQuantity
                 }
             }
+        }
+
+        // Espacio entre las columnas
+        Spacer(modifier = Modifier.width(20.dp))
+
+        // Columna 3: Botón para eliminar item del carrito
+        IconButton(
+            modifier = Modifier.align(Alignment.CenterVertically), // Centrar el ícono de eliminar verticalmente
+            onClick = { viewModel.removeItemFromCart(item) }  // Llamar a la función de ViewModel para eliminar el ítem
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,  // Icono de eliminación
+                contentDescription = "Eliminar",  // Descripción del icono
+                tint = Color(0.352f, 0.196f, 0.070f, 1.0f) // Color del icono
+            )
         }
     }
 }

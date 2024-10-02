@@ -203,8 +203,21 @@ class ShoppingViewModel : ViewModel() {
     fun removeItem(item: Item) {
         val currentCart = _cart.value ?: Cart()
         currentCart.removeItem(item)
+
+        // Actualizar el estado de isAdded a false para el item eliminado
+        val updatedList = _items.value?.map { itemList ->
+            if (itemList.id == item.id) {
+                itemList.copy(isAdded = false)
+            } else {
+                itemList
+            }
+        } ?: emptyList()
+
+        _items.postValue(updatedList)
         _cart.postValue(currentCart)
+        updateTotal() // Actualiza el total después de eliminar el item
     }
+
 
     // Función para agregar cantidad
     fun updateItemQuantity(item: Item, change: Int) {
@@ -219,8 +232,8 @@ class ShoppingViewModel : ViewModel() {
         _totalAmount.postValue(totalAmountCalc)
     }
 
-    // Función para guardar la orden en Firestore
-    fun saveOrder() {
+    // Función para guardar la orden en Firestore o backend
+    fun saveOrder(onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val cartValue = _cart.value
         if (cartValue == null || cartValue.getItems().isEmpty()) {
             // Si el carrito está vacío, mostramos un error
@@ -232,14 +245,12 @@ class ShoppingViewModel : ViewModel() {
         serviceAdapter.createOrder(
             cart = cartValue,
             onSuccess = {
-                _orderSuccess.postValue(true)
-                val userId = Firebase.auth.currentUser?.uid
-                if (userId != null) {
-                    fetchUserPreferences(userId)  // Actualiza las preferencias después de crear la orden
-                }
+                _orderSuccess.postValue(true) // Publicar éxito
+                onSuccess() // Llamar al callback de éxito
             },
             onFailure = { exception ->
-                _error.postValue(exception.message)
+                _error.postValue("Error al procesar la orden: ${exception.message}") // Publicar error
+                onFailure(exception) // Llamar al callback de fallo
             }
         )
     }
@@ -249,11 +260,44 @@ class ShoppingViewModel : ViewModel() {
         val emptyCart = Cart() // Crea un nuevo carrito vacío
         _cart.postValue(emptyCart) // Publica el carrito vacío en LiveData
         _totalAmount.postValue(0)  // Resetear el total a 0
+
+        // Recorrer los items y marcar isAdded como false
+        val updatedItems = _items.value?.map { item ->
+            item.copy(isAdded = false)
+        } ?: emptyList()
+
+        // Publicar la lista de items actualizada
+        _items.postValue(updatedItems)
     }
+
 
     // Nueva función para resetear el estado de orderSuccess
     fun resetOrderSuccess() {
         _orderSuccess.postValue(false)
+    }
+    // Función para resetear el estado de error
+    fun resetError() {
+        _error.postValue(null) // Limpiar el error
+    }
+
+    // Función para remover el item del carrito
+    fun removeItemFromCart(item: Item) {
+        val currentCart = _cart.value ?: Cart()
+        currentCart.removeItem(item) // Remueve el item del carrito
+
+        // Actualiza el estado de isAdded del item a false
+        val updatedList = _items.value?.map { itemList ->
+            if (itemList.id == item.id) {
+                itemList.copy(isAdded = false)
+            } else {
+                itemList
+            }
+        } ?: emptyList()
+
+        // Publica los cambios en la lista de items y el carrito
+        _items.postValue(updatedList)
+        _cart.postValue(currentCart)  // Actualiza el estado del carrito
+        updateTotal() // Actualiza el total después de eliminar el item
     }
 
     fun registerPrice(){
