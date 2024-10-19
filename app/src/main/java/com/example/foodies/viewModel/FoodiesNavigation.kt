@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodies.view.home.FoodiesHomeScreen
 import com.example.foodies.view.login.FoodiesLoginScreen
 import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
+import com.example.foodies.view.profile.UserProfileScreen
 
 @Composable
 fun FoodiesNavigation(){
@@ -25,6 +26,10 @@ fun FoodiesNavigation(){
 
         composable(FoodiesScreens.FoodiesShoppingCartScreen.name){
             FoodiesShoppingCartScreen(navController = navController, viewModel = viewModel)
+        }
+        composable(FoodiesScreens.UserProfileScreen.name) {
+            val loginViewModel: LoginViewModel = viewModel()  // Use LoginViewModel for UserProfileScreen
+            UserProfileScreen(navController = navController, viewModel = loginViewModel)
         }
     }
 }

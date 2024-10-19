@@ -131,10 +131,10 @@ fun FoodiesHomeScreen(
 }
 
 @Composable
-fun ActionButtons(items: List<Item>,navController: NavController, viewModel: ShoppingViewModel) {
+fun ActionButtons(items: List<Item>, navController: NavController, viewModel: ShoppingViewModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement =  Arrangement.Center,
+        horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxWidth()
             .padding(12.dp)
@@ -148,6 +148,7 @@ fun ActionButtons(items: List<Item>,navController: NavController, viewModel: Sho
                 .clickable { navController.navigate(FoodiesScreens.FoodiesShoppingCartScreen.name) }
         )
         Spacer(modifier = Modifier.width(10.dp))
+
         var textSpeech by rememberSaveable { mutableStateOf(false) }
         Icon(
             imageVector = Icons.AutoMirrored.Filled.VolumeUp, // Megáfono
@@ -167,12 +168,13 @@ fun ActionButtons(items: List<Item>,navController: NavController, viewModel: Sho
                 .padding(8.dp)
                 .clickable {
                     textSpeech = true
-                    viewModel.readItemList(items){
+                    viewModel.readItemList(items) {
                         textSpeech = false
                     }
                 }
         )
         Spacer(modifier = Modifier.width(10.dp))
+
         Icon(
             imageVector = Icons.Filled.Person, // Usuario
             contentDescription = "Usuario",
@@ -185,9 +187,14 @@ fun ActionButtons(items: List<Item>,navController: NavController, viewModel: Sho
                     color = Color(0.968f, 0.588f, 0.066f, 1.0f),
                     shape = CircleShape
                 )
+                .clickable {
+                    // Navigate to UserProfileScreen when clicked
+                    navController.navigate(FoodiesScreens.UserProfileScreen.name)
+                }
         )
     }
 }
+
 
 @Composable
 fun Location(ubi: String) {
