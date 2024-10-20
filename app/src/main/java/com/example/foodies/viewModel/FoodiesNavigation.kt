@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.foodies.view.home.FoodiesHomeScreen
 import com.example.foodies.view.login.FoodiesLoginScreen
+import com.example.foodies.view.profile.FoodiesProfileScreen
 import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
 
 @Composable
@@ -25,6 +26,9 @@ fun FoodiesNavigation(){
 
         composable(FoodiesScreens.FoodiesShoppingCartScreen.name){
             FoodiesShoppingCartScreen(navController = navController, viewModel = viewModel)
+        }
+        composable(FoodiesScreens.FoodiesProfileScreen.name) {
+            FoodiesProfileScreen(navController = navController, viewModel = viewModel)
         }
     }
 }
