@@ -64,10 +64,12 @@ fun FoodiesShoppingCartScreen(
     val totalAmount by viewModel.totalAmount.observeAsState(0)
     val orderSuccess by viewModel.orderSuccess.observeAsState() // Observa el éxito de la orden
     val errorMessage by viewModel.error.observeAsState() // Observa los errores
+    val internetConnected by viewModel.internetConnected.observeAsState()
 
     // Estado para mostrar o no el diálogo
     var showDialog by remember { mutableStateOf(false) }
     var showEmptyCartDialog by remember { mutableStateOf(false) } // Estado para el diálogo de carrito vacío
+    var showNoInternetDialog by remember { mutableStateOf(false) }
 
     // Si la orden se guardó con éxito, mostrar el diálogo
     if (orderSuccess == true && !showDialog) {
@@ -77,6 +79,11 @@ fun FoodiesShoppingCartScreen(
     // Mostrar el diálogo de carrito vacío si hay un error de carrito vacío
     if (errorMessage != null && !showEmptyCartDialog) {
         showEmptyCartDialog = true
+    }
+
+    // Mostrar el diálogo de pérdida de internet si no hay conexión
+    if (internetConnected == false && !showNoInternetDialog) {
+        showNoInternetDialog = true
     }
 
     // Mostrar el diálogo de éxito de la orden
@@ -114,6 +121,27 @@ fun FoodiesShoppingCartScreen(
                 Button(onClick = {
                     showEmptyCartDialog = false // Cerrar el diálogo
                     viewModel.resetError() // Resetear el estado de error
+                }) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+
+    // Diálogo de pérdida de conexión a internet
+    if (showNoInternetDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                // Evitar que el diálogo se cierre accidentalmente
+                showNoInternetDialog = true
+            },
+            title = { Text(text = "Sin Conexión a Internet") },
+            text = { Text(text = "La aplicación perdió conexión a internet. Por favor, verifica tu conexión.") },
+            confirmButton = {
+                Button(onClick = {
+                    if (internetConnected == true) {
+                        showNoInternetDialog = false // Cerrar si se recupera la conexión
+                    }
                 }) {
                     Text("Aceptar")
                 }
