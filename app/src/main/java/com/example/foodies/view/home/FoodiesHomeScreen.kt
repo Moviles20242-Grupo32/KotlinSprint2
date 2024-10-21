@@ -434,7 +434,22 @@ fun ShimmerList() {
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp) // Espacio entre los items
     ) {
-        items(3) { // Generar 3 placeholders
+        // Texto informativo
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Esperando conexión a internet...",
+                    color = Color(0.352f, 0.196f, 0.070f, 1.0f),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(fontSize = 15.sp)
+                )
+            }
+        }
+        // Placeholder de shimmer
+        items(3) {
             ShimmerEffect()
         }
     }

@@ -89,6 +89,9 @@ fun FoodiesShoppingCartScreen(
     // Mostrar el diálogo de éxito de la orden
     if (showDialog) {
         AlertDialog(
+            modifier = Modifier
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp)),
             onDismissRequest = {
                 showDialog = false
                 viewModel.resetOrderSuccess() // Resetear el estado de éxito
@@ -111,6 +114,9 @@ fun FoodiesShoppingCartScreen(
     // Diálogo de error de carrito vacío
     if (showEmptyCartDialog) {
         AlertDialog(
+            modifier = Modifier
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp)),
             onDismissRequest = {
                 showEmptyCartDialog = false
                 viewModel.resetError() // Resetear el estado de error
@@ -131,17 +137,19 @@ fun FoodiesShoppingCartScreen(
     // Diálogo de pérdida de conexión a internet
     if (showNoInternetDialog) {
         AlertDialog(
+            modifier = Modifier
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp)),
             onDismissRequest = {
                 // Evitar que el diálogo se cierre accidentalmente
                 showNoInternetDialog = true
             },
-            title = { Text(text = "Sin Conexión a Internet") },
-            text = { Text(text = "La aplicación perdió conexión a internet. Por favor, verifica tu conexión.") },
+            title = { Text(text = "Sin conexión a internet") },
+            text = { Text(text = "No puede realizar una orden sin internet") },
             confirmButton = {
                 Button(onClick = {
-                    if (internetConnected == true) {
-                        showNoInternetDialog = false // Cerrar si se recupera la conexión
-                    }
+                    showNoInternetDialog = false
+                    navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                 }) {
                     Text("Aceptar")
                 }

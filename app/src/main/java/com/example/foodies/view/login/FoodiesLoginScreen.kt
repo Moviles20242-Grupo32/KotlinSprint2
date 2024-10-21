@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.foodies.viewModel.FoodiesScreens
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -91,11 +92,14 @@ fun FoodiesLoginScreen(navController: NavController,
     // Diálogo de pérdida de conexión a internet
     if (showNoInternetDialog) {
         AlertDialog(
+            modifier = Modifier
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp)),
             onDismissRequest = {
                 showNoInternetDialog = false
             },
-            title = { Text(text = "Sin Conexión a Internet") },
-            text = { Text(text = "La aplicación perdió conexión a internet. Por favor, verifica tu conexión.") },
+            title = { Text(text = "Sin conexión a internet") },
+            text = { Text(text = "No puede iniciar sesión o registrarse sin internet") },
             confirmButton = {
                 Button(onClick = {
                     showNoInternetDialog = false
