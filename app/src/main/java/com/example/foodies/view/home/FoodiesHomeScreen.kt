@@ -93,6 +93,23 @@ fun FoodiesHomeScreen(
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
+        if (!isLoaded) {
+            viewModel.mostSellItem()
+
+            // Obtener el ID del usuario y pasarle a fetchItems
+            val userId = Firebase.auth.currentUser?.uid
+            viewModel.fetchItems(userId)  // Pasa el userId aquí
+            //viewModel.getCartInfo()
+
+
+        }
+
+        // Obtener el ID del usuario y cargar sus preferencias
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            viewModel.fetchUserPreferences(userId)  // Ordenar items según las preferencias del usuario
+        }
+
         //Obtener productos iniciales
         viewModel.fetchItems()
         //Incialización de elementos adicionales

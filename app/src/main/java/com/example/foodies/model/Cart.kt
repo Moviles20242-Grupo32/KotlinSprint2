@@ -7,10 +7,10 @@ data class Cart(
 ) {
 
     // Agregar un item al carrito
-    fun addItem(item: Item) {
+    fun addItem(item: Item, quantity: Int) {
         val existingItem = items.find { it.id == item.id }
         if (existingItem == null) {
-            items.add(item.copy(cart_quantity = 1)) // Inicializa la cantidad en el carrito a 1
+            items.add(item.copy(cart_quantity = quantity)) // Inicializa la cantidad en el carrito a 1
         } else {
             updateItemQuantity(existingItem, existingItem.cart_quantity + 1)
         }

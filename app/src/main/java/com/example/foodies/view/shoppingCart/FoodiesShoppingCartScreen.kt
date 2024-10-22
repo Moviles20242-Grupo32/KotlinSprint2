@@ -256,6 +256,7 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                     shape = RoundedCornerShape(8.dp)
                 )
                 .clickable {
+                    viewModel.registerPrice()
                     viewModel.saveOrder(
                         onSuccess = {
                             // Solo limpiar el carrito, no navegar automáticamente
