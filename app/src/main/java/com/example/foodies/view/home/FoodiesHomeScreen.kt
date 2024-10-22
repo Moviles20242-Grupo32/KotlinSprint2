@@ -5,6 +5,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -43,10 +50,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -80,6 +89,7 @@ fun FoodiesHomeScreen(
     val error by viewModel.error.observeAsState()
     val context = LocalContext.current
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
+    val internetConnected by viewModel.internetConnected.observeAsState()
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
@@ -100,6 +110,9 @@ fun FoodiesHomeScreen(
             viewModel.fetchUserPreferences(userId)  // Ordenar items según las preferencias del usuario
         }
 
+        //Obtener productos iniciales
+        viewModel.fetchItems()
+        //Incialización de elementos adicionales
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
     }
@@ -128,13 +141,45 @@ fun FoodiesHomeScreen(
             })
 
             // Lista de ítems usando la función modularizada
-            msitem?.let { ItemsList(items,viewModel, it) }
-
-            Text("Summers")
+            if (internetConnected == true) {
+                //Obtener datos
+                FetchItemsData(viewModel, onComplete = {
+                    msitem?.let { ItemsList(items,viewModel, it) }
+                })
+            } else {
+                ShimmerList()
+            }
         }
     }
 }
 
+
+//Función para obtener datos
+@Composable
+fun FetchItemsData(viewModel: ShoppingViewModel, onComplete: @Composable () -> Unit) {
+    // Estado para rastrear si la operación ha terminado
+    var isComplete by remember { mutableStateOf(false) }
+
+    // Ejecutar la lógica suspendida en LaunchedEffect
+    LaunchedEffect(Unit) {
+        //Producto más vendido
+        viewModel.mostSellItem()
+        //Obtiene los items disponibles
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            viewModel.fetchUserPreferences(userId)
+        }
+        // Marcar como completo una vez finalicen las operaciones
+        isComplete = true
+    }
+
+    // Llamar a onComplete solo cuando se haya terminado
+    if (isComplete) {
+        onComplete()
+    }
+}
+
+//Botones de acciones
 @Composable
 fun ActionButtons(items: List<Item>,navController: NavController, viewModel: ShoppingViewModel) {
     Row(
@@ -278,6 +323,8 @@ fun MostSellItem(item: Item, viewModel: ShoppingViewModel){
     }
 }
 
+
+//LISTA DE ITEMS
 @Composable
 fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel, msitem:Item) {
     LazyColumn(
@@ -390,6 +437,102 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
                 modifier = Modifier
                     .align(Alignment.Center) // Centra el Icon dentro del Box
                     .size(30.dp) // Tamaño del Icono
+            )
+        }
+    }
+}
+
+//Skelon effect
+@Composable
+fun ShimmerList() {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp) // Espacio entre los items
+    ) {
+        // Texto informativo
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Esperando conexión a internet...",
+                    color = Color(0.352f, 0.196f, 0.070f, 1.0f),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(fontSize = 15.sp)
+                )
+            }
+        }
+        // Placeholder de shimmer
+        items(3) {
+            ShimmerEffect()
+        }
+    }
+}
+
+@Composable
+fun ShimmerEffect() {
+    val transition = rememberInfiniteTransition(label = "")
+    val alphaAnim = transition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically // Alinear elementos verticalmente
+    ) {
+        // Círculo en la primera columna
+        Box(
+            modifier = Modifier
+                .size(80.dp) // Tamaño del círculo
+                .alpha(alphaAnim.value)
+                .background(
+                    color = Color(0.855f, 0.855f, 0.855f, 1.0f),
+                    shape = CircleShape
+                )
+        )
+
+        Spacer(modifier = Modifier.width(16.dp)) // Espacio entre columnas
+
+        // Segunda columna con dos filas
+        Column(
+            modifier = Modifier.weight(1f) // Ocupa todo el espacio restante
+        ) {
+            // Primera fila con rectángulo más grande
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth() // Ocupa todo el ancho disponible
+                    .height(20.dp) // Altura del rectángulo
+                    .alpha(alphaAnim.value)
+                    .background(
+                        color = Color(0.855f, 0.855f, 0.855f, 1.0f),
+                        shape = RoundedCornerShape(4.dp)
+                    )
+            )
+
+            Spacer(modifier = Modifier.height(8.dp)) // Espacio entre filas
+
+            // Segunda fila con rectángulo más pequeño (3/4 del ancho)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.75f) // Ocupa 3/4 del ancho
+                    .height(15.dp) // Menor altura
+                    .alpha(alphaAnim.value)
+                    .background(
+                        color = Color(0.855f, 0.855f, 0.855f, 1.0f),
+                        shape = RoundedCornerShape(4.dp)
+                    )
             )
         }
     }

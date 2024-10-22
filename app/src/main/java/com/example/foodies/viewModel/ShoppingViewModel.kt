@@ -26,6 +26,7 @@ import android.location.Location
 import androidx.lifecycle.AndroidViewModel
 import com.example.foodies.model.CartDao
 import com.example.foodies.model.DBProvider
+import com.example.foodies.model.NetworkMonitor
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.gson.Gson
@@ -67,8 +68,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     val isLoaded: LiveData<Boolean> get() = _isLoaded
 
     // LiveData para manejar errores
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
+    private val _error = MutableLiveData<String?>()
+    val error: MutableLiveData<String?> get() = _error
 
     // LiveData para manejar el estado de la orden (éxito o error)
     private val _orderSuccess = MutableLiveData<Boolean>()
@@ -80,6 +81,9 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
 
+    //LiveData para atender el estado de conexión de internet
+    private val _internetConnected = MutableLiveData<Boolean>()
+    val internetConnected: LiveData<Boolean> get() = _internetConnected
 
     //Inicialización: Cargamos la LocationManager address
     init {
@@ -120,8 +124,13 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             }
 
             _cart.postValue(carrito)
+
+        //Observamos los cambios en la red
+        NetworkMonitor.isConnected.observeForever { connection->
+            _internetConnected.postValue(connection)
         }
     }
+    
 
     // Método para solicitar la actualización de la ubicación
     fun requestLocationUpdate(context: Context) {
@@ -145,19 +154,14 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun fetchItems(userId: String?) {
+    fun fetchItems() {
         if (_isLoaded.value == true) return
         viewModelScope.launch {
             serviceAdapter.getAllItems(
                 onSuccess = { itemList ->
                     _items.postValue(itemList)
+                    Log.d("FoodiesHome-items-items", "$itemList")
                     _isLoaded.postValue(true)
-                    Log.d("FoodiesHomeScreen", "items.isEmpty(): ${isLoaded.value}")
-
-                    // After fetching items, sort based on user preferences if userId is available
-                    userId?.let {
-                        fetchUserPreferences(it) // Fetch user preferences and sort items accordingly
-                    }
                 },
                 onFailure = { exception ->
                     // Publicar el error si ocurre
@@ -172,10 +176,17 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         serviceAdapter.getUserOrderHistory(
             userId = userId,
             onSuccess = { itemQuantityMap ->
-                // Sort items based on the quantity ordered by the user
-                val sortedItems = _items.value?.sortedByDescending { item ->
-                    itemQuantityMap[item.item_name] ?: 0 // Sort by user order history
-                } ?: emptyList()
+                fetchItems()
+                Log.d("FoodiesHome-items-p", "$itemQuantityMap")
+                // Si los items aún no están inicializados, usa una lista por defecto
+                val currentItems = _items.value ?: emptyList()
+                Log.d("FoodiesHome-items-cp", "$currentItems")
+                Log.d("FoodiesHome-items-v", "${_items.value}")
+                // Ordenar los items según la historia del usuario
+                val sortedItems = currentItems.sortedByDescending { item ->
+                    Log.d("FoodiesHome-item-p", "$item")
+                    itemQuantityMap[item.item_name] ?: 0
+                }
 
                 // Update LiveData with the sorted items
                 _items.postValue(sortedItems)
@@ -373,4 +384,5 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
 
 
+    }
 }
