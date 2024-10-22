@@ -54,22 +54,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodies.R
 import com.example.foodies.model.FoodiesNotificationManager
 import com.example.foodies.viewModel.LoginViewModel
+import com.example.foodies.viewModel.LogoutViewModel
 
 @Composable
-fun FoodiesLoginScreen(navController: NavController,
-                       viewModel: LoginViewModel = viewModel(),
-                       ){
-    val showLoginForm = rememberSaveable {
-        mutableStateOf(true)
-    }
-
+fun FoodiesLoginScreen(
+    navController: NavController,
+    loginViewModel: LoginViewModel = viewModel(),  // Inject LoginViewModel
+    logoutViewModel: LogoutViewModel = viewModel() // Inject LogoutViewModel
+) {
+    val showLoginForm = rememberSaveable { mutableStateOf(true) }
     val errorMessage = remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    // Verifica si los permisos de ubicación y notificaciones están otorgados
+    // Check if location and notification permissions are granted
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
         ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-        // Solicitar permisos si no están otorgados
         if (context is Activity) {
             ActivityCompat.requestPermissions(
                 context,
@@ -77,93 +76,82 @@ fun FoodiesLoginScreen(navController: NavController,
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.POST_NOTIFICATIONS
                 ),
-                101 // Código de solicitud
+                101 // Request code
             )
         }
     }
 
-    Surface(modifier = Modifier
-        .fillMaxSize()
+    Surface(
+        modifier = Modifier.fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            //verticalArrangement = Arrangement.spacedBy(30.dp),
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Image(
+                painterResource(id = R.drawable.tipografia),
+                contentDescription = "Foodies"
+            )
 
-        ){
-                Image(
-                    painterResource(id = R.drawable.tipografia),
-                    contentDescription = "Foodies",
-                    modifier = Modifier
-
-                )
-
-                //Spacer(modifier = Modifier.height(10.dp))
-
-                Image(
-                    painterResource(id = R.drawable.logo),
-                    contentDescription = "Foodies",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .size(80.dp)
-                )
-
-
+            Image(
+                painterResource(id = R.drawable.logo),
+                contentDescription = "Foodies",
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .size(80.dp)
+            )
 
             if (showLoginForm.value) {
                 UserForm(isCreateAccount = false) { email, password, name ->
-                    Log.d("Foodies", "Logueando con $email y $password")
-                    viewModel.signInWithEmailAndPassword(email, password, {
+                    // Log in with email and password
+                    loginViewModel.signInWithEmailAndPassword(email, password, {
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                     }, { message ->
-                        errorMessage.value = message // Guardar el mensaje de error
-                    })
+                        errorMessage.value = message
+                    }, logoutViewModel) // Pass LogoutViewModel
                 }
             } else {
                 UserForm(isCreateAccount = true) { email, password, name ->
-                    Log.d("Foodies", "Creando cuenta con $email y $password")
-                    viewModel.createUserWithEmailAndPassword(email, password, name, {
+                    // Create a new account
+                    loginViewModel.createUserWithEmailAndPassword(email, password, name, {
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                     }, { message ->
-                        errorMessage.value = message // Guardar el mensaje de error
-                    })
+                        errorMessage.value = message
+                    }, logoutViewModel) // Pass LogoutViewModel
                 }
             }
 
-            // Mostrar mensaje de error
+            // Display error message if present
             if (errorMessage.value.isNotEmpty()) {
-                if(errorMessage.value == "The email address is badly formatted."){
-                    Text(text = "Formato de email invalido", color = Color.Red, modifier = Modifier.padding(16.dp))
-                }
-                else if(errorMessage.value == "The supplied auth credential is incorrect, malformed or has expired."){
-                    Text(text = "Email o contraseña incorrectos o no registrados", color = Color.Red, modifier = Modifier.padding(16.dp))
-                }
-
+                Text(
+                    text = when (errorMessage.value) {
+                        "The email address is badly formatted." -> "Formato de email invalido"
+                        "The supplied auth credential is incorrect, malformed or has expired." -> "Email o contraseña incorrectos o no registrados"
+                        else -> errorMessage.value
+                    },
+                    color = Color.Red,
+                    modifier = Modifier.padding(16.dp)
+                )
             }
 
-            Row (
+            // Toggle between login and signup forms
+            Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
-            ){
-                val text1 =
-                    if(showLoginForm.value) "¿No tienes cuenta?" else "¿Ya tienes cuenta?"
-
-                val text2 =
-                    if(showLoginForm.value) "Regístrate" else "Inicia sesión"
+            ) {
+                val text1 = if (showLoginForm.value) "¿No tienes cuenta?" else "¿Ya tienes cuenta?"
+                val text2 = if (showLoginForm.value) "Regístrate" else "Inicia sesión"
 
                 Text(text = text1)
-                Text(text = text2,
+                Text(
+                    text = text2,
                     modifier = Modifier
                         .clickable { showLoginForm.value = !showLoginForm.value }
                         .padding(start = 5.dp),
                     fontWeight = FontWeight.Bold
-
                 )
-
             }
         }
-
     }
 }
 

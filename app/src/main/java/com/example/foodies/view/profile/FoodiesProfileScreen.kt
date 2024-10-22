@@ -54,11 +54,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.LaunchedEffect
+import com.example.foodies.viewModel.LogoutViewModel
+import com.google.firebase.auth.FirebaseAuth
+
 @Composable
-fun FoodiesProfileScreen(navController: NavController, viewModel: ShoppingViewModel) {
+fun FoodiesProfileScreen(
+    navController: NavController,
+    logoutViewModel: LogoutViewModel = viewModel() // Inject LogoutViewModel
+) {
+    val user by logoutViewModel.user.observeAsState() // Observe the current user
+
+    // If the user is null (after logging out), navigate to the login screen
+    LaunchedEffect(user) {
+        if (user == null) {
+            // Navigate to the login screen if the user is signed out
+            navController.navigate(FoodiesScreens.FoodiesLoginScreen.name) {
+                popUpTo(FoodiesScreens.FoodiesHomeScreen.name) { inclusive = true } // Clear backstack
+            }
+        }
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.White // Set the background color to white
+        color = Color.White
     ) {
         Column(
             modifier = Modifier
@@ -102,11 +124,15 @@ fun FoodiesProfileScreen(navController: NavController, viewModel: ShoppingViewMo
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(Color(0.945f, 0.600f, 0.216f, 1.0f)), // Background color for avatar
+                            .background(Color(0.945f, 0.600f, 0.216f, 1.0f)),
                         contentAlignment = Alignment.Center
                     ) {
+                        val initials = user?.displayName?.split(" ")?.joinToString("") {
+                            it.first().toString().uppercase()
+                        } ?: "NA" // Default initials if user is not available
+
                         Text(
-                            text = "JA", // Initials or user avatar
+                            text = initials,
                             color = Color.White,
                             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
                         )
@@ -114,16 +140,17 @@ fun FoodiesProfileScreen(navController: NavController, viewModel: ShoppingViewMo
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // User Info (Name and Email)
+                    // Display user's name
                     Text(
-                        text = "Juan Andres",
+                        text = user?.displayName ?: "Name not available",
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
 
+                    // Display user's email
                     Text(
-                        text = "correoprueba@gmail.com",
+                        text = user?.email ?: "Email not available",
                         style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                     )
                 }
@@ -197,7 +224,7 @@ fun FoodiesProfileScreen(navController: NavController, viewModel: ShoppingViewMo
                     .background(Color(0.952f, 0.952f, 0.949f))
                     .padding(16.dp)
                     .clickable {
-                        // Add your logout logic here
+                        logoutViewModel.signOut() // Use LogoutViewModel for signing out
                     }
             ) {
                 Row(
@@ -221,3 +248,7 @@ fun FoodiesProfileScreen(navController: NavController, viewModel: ShoppingViewMo
         }
     }
 }
+
+
+
+
