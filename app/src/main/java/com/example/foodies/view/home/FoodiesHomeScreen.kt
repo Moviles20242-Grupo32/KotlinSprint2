@@ -89,6 +89,9 @@ fun FoodiesHomeScreen(
             // Obtener el ID del usuario y pasarle a fetchItems
             val userId = Firebase.auth.currentUser?.uid
             viewModel.fetchItems(userId)  // Pasa el userId aquí
+            //viewModel.getCartInfo()
+
+
         }
 
         // Obtener el ID del usuario y cargar sus preferencias
@@ -126,6 +129,8 @@ fun FoodiesHomeScreen(
 
             // Lista de ítems usando la función modularizada
             msitem?.let { ItemsList(items,viewModel, it) }
+
+            Text("Summers")
         }
     }
 }

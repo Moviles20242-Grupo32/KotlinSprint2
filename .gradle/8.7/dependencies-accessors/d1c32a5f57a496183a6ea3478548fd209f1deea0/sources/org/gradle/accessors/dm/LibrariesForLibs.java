@@ -25,6 +25,7 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
     private final AndroidxLibraryAccessors laccForAndroidxLibraryAccessors = new AndroidxLibraryAccessors(owner);
     private final EngageLibraryAccessors laccForEngageLibraryAccessors = new EngageLibraryAccessors(owner);
     private final FirebaseLibraryAccessors laccForFirebaseLibraryAccessors = new FirebaseLibraryAccessors(owner);
+    private final PlayLibraryAccessors laccForPlayLibraryAccessors = new PlayLibraryAccessors(owner);
     private final VersionAccessors vaccForVersionAccessors = new VersionAccessors(providers, config);
     private final BundleAccessors baccForBundleAccessors = new BundleAccessors(objects, providers, config, attributesFactory, capabilityNotationParser);
     private final PluginAccessors paccForPluginAccessors = new PluginAccessors(providers, config);
@@ -32,6 +33,16 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
     @Inject
     public LibrariesForLibs(DefaultVersionCatalog config, ProviderFactory providers, ObjectFactory objects, ImmutableAttributesFactory attributesFactory, CapabilityNotationParser capabilityNotationParser) {
         super(config, providers, objects, attributesFactory, capabilityNotationParser);
+    }
+
+    /**
+     * Dependency provider for <b>gson</b> with <b>com.google.code.gson:gson</b> coordinates and
+     * with version reference <b>gson</b>
+     * <p>
+     * This dependency was declared in catalog libs.versions.toml
+     */
+    public Provider<MinimalExternalModuleDependency> getGson() {
+        return create("gson");
     }
 
     /**
@@ -66,6 +77,13 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
     }
 
     /**
+     * Group of libraries at <b>play</b>
+     */
+    public PlayLibraryAccessors getPlay() {
+        return laccForPlayLibraryAccessors;
+    }
+
+    /**
      * Group of versions at <b>versions</b>
      */
     public VersionAccessors getVersions() {
@@ -95,6 +113,7 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         private final AndroidxLifecycleLibraryAccessors laccForAndroidxLifecycleLibraryAccessors = new AndroidxLifecycleLibraryAccessors(owner);
         private final AndroidxMaterialLibraryAccessors laccForAndroidxMaterialLibraryAccessors = new AndroidxMaterialLibraryAccessors(owner);
         private final AndroidxNavigationLibraryAccessors laccForAndroidxNavigationLibraryAccessors = new AndroidxNavigationLibraryAccessors(owner);
+        private final AndroidxRoomLibraryAccessors laccForAndroidxRoomLibraryAccessors = new AndroidxRoomLibraryAccessors(owner);
         private final AndroidxRuntimeLibraryAccessors laccForAndroidxRuntimeLibraryAccessors = new AndroidxRuntimeLibraryAccessors(owner);
         private final AndroidxUiLibraryAccessors laccForAndroidxUiLibraryAccessors = new AndroidxUiLibraryAccessors(owner);
 
@@ -174,6 +193,13 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          */
         public AndroidxNavigationLibraryAccessors getNavigation() {
             return laccForAndroidxNavigationLibraryAccessors;
+        }
+
+        /**
+         * Group of libraries at <b>androidx.room</b>
+         */
+        public AndroidxRoomLibraryAccessors getRoom() {
+            return laccForAndroidxRoomLibraryAccessors;
         }
 
         /**
@@ -410,6 +436,66 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
 
     }
 
+    public static class AndroidxRoomLibraryAccessors extends SubDependencyFactory {
+        private final AndroidxRoomCompilerLibraryAccessors laccForAndroidxRoomCompilerLibraryAccessors = new AndroidxRoomCompilerLibraryAccessors(owner);
+
+        public AndroidxRoomLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>ktx</b> with <b>androidx.room:room-ktx</b> coordinates and
+         * with version reference <b>roomCompiler</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getKtx() {
+            return create("androidx.room.ktx");
+        }
+
+        /**
+         * Dependency provider for <b>runtime</b> with <b>androidx.room:room-runtime</b> coordinates and
+         * with version reference <b>roomRuntime</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getRuntime() {
+            return create("androidx.room.runtime");
+        }
+
+        /**
+         * Group of libraries at <b>androidx.room.compiler</b>
+         */
+        public AndroidxRoomCompilerLibraryAccessors getCompiler() {
+            return laccForAndroidxRoomCompilerLibraryAccessors;
+        }
+
+    }
+
+    public static class AndroidxRoomCompilerLibraryAccessors extends SubDependencyFactory implements DependencyNotationSupplier {
+
+        public AndroidxRoomCompilerLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>compiler</b> with <b>androidx.room:room-compiler</b> coordinates and
+         * with version reference <b>roomRuntime</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> asProvider() {
+            return create("androidx.room.compiler");
+        }
+
+        /**
+         * Dependency provider for <b>v250</b> with <b>androidx.room:room-compiler</b> coordinates and
+         * with version reference <b>roomCompiler</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getV250() {
+            return create("androidx.room.compiler.v250");
+        }
+
+    }
+
     public static class AndroidxRuntimeLibraryAccessors extends SubDependencyFactory {
 
         public AndroidxRuntimeLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
@@ -537,19 +623,10 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
     }
 
     public static class FirebaseLibraryAccessors extends SubDependencyFactory {
+        private final FirebaseAnalyticsLibraryAccessors laccForFirebaseAnalyticsLibraryAccessors = new FirebaseAnalyticsLibraryAccessors(owner);
         private final FirebaseFirestoreLibraryAccessors laccForFirebaseFirestoreLibraryAccessors = new FirebaseFirestoreLibraryAccessors(owner);
 
         public FirebaseLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
-
-        /**
-         * Dependency provider for <b>analytics</b> with <b>com.google.firebase:firebase-analytics</b> coordinates and
-         * with <b>no version specified</b>
-         * <p>
-         * This dependency was declared in catalog libs.versions.toml
-         */
-        public Provider<MinimalExternalModuleDependency> getAnalytics() {
-            return create("firebase.analytics");
-        }
 
         /**
          * Dependency provider for <b>auth</b> with <b>com.google.firebase:firebase-auth</b> coordinates and
@@ -572,10 +649,43 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         }
 
         /**
+         * Group of libraries at <b>firebase.analytics</b>
+         */
+        public FirebaseAnalyticsLibraryAccessors getAnalytics() {
+            return laccForFirebaseAnalyticsLibraryAccessors;
+        }
+
+        /**
          * Group of libraries at <b>firebase.firestore</b>
          */
         public FirebaseFirestoreLibraryAccessors getFirestore() {
             return laccForFirebaseFirestoreLibraryAccessors;
+        }
+
+    }
+
+    public static class FirebaseAnalyticsLibraryAccessors extends SubDependencyFactory implements DependencyNotationSupplier {
+
+        public FirebaseAnalyticsLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>analytics</b> with <b>com.google.firebase:firebase-analytics</b> coordinates and
+         * with <b>no version specified</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> asProvider() {
+            return create("firebase.analytics");
+        }
+
+        /**
+         * Dependency provider for <b>ktx</b> with <b>com.google.firebase:firebase-analytics-ktx</b> coordinates and
+         * with version reference <b>firebaseAnalyticsKtx</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getKtx() {
+            return create("firebase.analytics.ktx");
         }
 
     }
@@ -592,6 +702,36 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          */
         public Provider<MinimalExternalModuleDependency> getKtx() {
             return create("firebase.firestore.ktx");
+        }
+
+    }
+
+    public static class PlayLibraryAccessors extends SubDependencyFactory {
+        private final PlayServicesLibraryAccessors laccForPlayServicesLibraryAccessors = new PlayServicesLibraryAccessors(owner);
+
+        public PlayLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Group of libraries at <b>play.services</b>
+         */
+        public PlayServicesLibraryAccessors getServices() {
+            return laccForPlayServicesLibraryAccessors;
+        }
+
+    }
+
+    public static class PlayServicesLibraryAccessors extends SubDependencyFactory {
+
+        public PlayServicesLibraryAccessors(AbstractExternalDependencyFactory owner) { super(owner); }
+
+        /**
+         * Dependency provider for <b>location</b> with <b>com.google.android.gms:play-services-location</b> coordinates and
+         * with version reference <b>playServicesLocation</b>
+         * <p>
+         * This dependency was declared in catalog libs.versions.toml
+         */
+        public Provider<MinimalExternalModuleDependency> getLocation() {
+            return create("play.services.location");
         }
 
     }
@@ -661,6 +801,16 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
         public Provider<String> getEspressoCore() { return getVersion("espressoCore"); }
 
         /**
+         * Version alias <b>firebaseAnalyticsKtx</b> with value <b>22.1.0</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getFirebaseAnalyticsKtx() { return getVersion("firebaseAnalyticsKtx"); }
+
+        /**
          * Version alias <b>firebaseAuth</b> with value <b>23.0.0</b>
          * <p>
          * If the version is a rich version and cannot be represented as a
@@ -689,6 +839,16 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          * This version was declared in catalog libs.versions.toml
          */
         public Provider<String> getFirebaseFirestoreKtx() { return getVersion("firebaseFirestoreKtx"); }
+
+        /**
+         * Version alias <b>gson</b> with value <b>2.10.1</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getGson() { return getVersion("gson"); }
 
         /**
          * Version alias <b>hiltNavigationCompose</b> with value <b>1.2.0</b>
@@ -769,6 +929,36 @@ public class LibrariesForLibs extends AbstractExternalDependencyFactory {
          * This version was declared in catalog libs.versions.toml
          */
         public Provider<String> getNavigationRuntimeKtx() { return getVersion("navigationRuntimeKtx"); }
+
+        /**
+         * Version alias <b>playServicesLocation</b> with value <b>21.3.0</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getPlayServicesLocation() { return getVersion("playServicesLocation"); }
+
+        /**
+         * Version alias <b>roomCompiler</b> with value <b>2.5.0</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getRoomCompiler() { return getVersion("roomCompiler"); }
+
+        /**
+         * Version alias <b>roomRuntime</b> with value <b>2.6.1</b>
+         * <p>
+         * If the version is a rich version and cannot be represented as a
+         * single version string, an empty string is returned.
+         * <p>
+         * This version was declared in catalog libs.versions.toml
+         */
+        public Provider<String> getRoomRuntime() { return getVersion("roomRuntime"); }
 
         /**
          * Version alias <b>runtimeLivedata</b> with value <b>1.7.1</b>
