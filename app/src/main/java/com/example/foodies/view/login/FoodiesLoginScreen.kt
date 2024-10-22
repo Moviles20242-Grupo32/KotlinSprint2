@@ -39,10 +39,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.foodies.viewModel.FoodiesScreens
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -62,9 +67,11 @@ fun FoodiesLoginScreen(navController: NavController,
     val showLoginForm = rememberSaveable {
         mutableStateOf(true)
     }
-
+    val internetConnected by viewModel.internetConnected.observeAsState()
     val errorMessage = remember { mutableStateOf("") }
     val context = LocalContext.current
+    // Estado para mostrar o no el diálogo
+    var showNoInternetDialog by remember { mutableStateOf(false) }
 
     // Verifica si los permisos de ubicación y notificaciones están otorgados
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -82,6 +89,28 @@ fun FoodiesLoginScreen(navController: NavController,
         }
     }
 
+    // Diálogo de pérdida de conexión a internet
+    if (showNoInternetDialog) {
+        AlertDialog(
+            modifier = Modifier
+                .padding(24.dp)
+                .clip(RoundedCornerShape(16.dp)),
+            onDismissRequest = {
+                showNoInternetDialog = false
+            },
+            title = { Text(text = "Sin conexión a internet") },
+            text = { Text(text = "No puede iniciar sesión o registrarse sin internet") },
+            confirmButton = {
+                Button(onClick = {
+                    showNoInternetDialog = false
+                }) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+
+    //vista principal
     Surface(modifier = Modifier
         .fillMaxSize()
     ) {
@@ -118,6 +147,10 @@ fun FoodiesLoginScreen(navController: NavController,
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                     }, { message ->
                         errorMessage.value = message // Guardar el mensaje de error
+                        // Mostrar el diálogo de pérdida de internet si no hay conexión
+                        if (internetConnected == false && !showNoInternetDialog) {
+                            showNoInternetDialog = true
+                        }
                     })
                 }
             } else {
@@ -127,6 +160,10 @@ fun FoodiesLoginScreen(navController: NavController,
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                     }, { message ->
                         errorMessage.value = message // Guardar el mensaje de error
+                        // Mostrar el diálogo de pérdida de internet si no hay conexión
+                        if (internetConnected == false && !showNoInternetDialog) {
+                            showNoInternetDialog = true
+                        }
                     })
                 }
             }
@@ -326,7 +363,5 @@ fun InputField(valueState: MutableState<String>, labelId: String, isSingleLine: 
         ),
         //textStyle = TextStyle(fontSize = 3.sp)
     )
-
-
-
 }
+
