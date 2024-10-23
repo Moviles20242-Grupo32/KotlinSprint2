@@ -260,6 +260,7 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                     viewModel.saveOrder(
                         onSuccess = {
                             // Solo limpiar el carrito, no navegar automáticamente
+                            viewModel.registerPrice()
                             viewModel.clearCart()
                         },
                         onFailure = { exception ->

@@ -87,11 +87,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     private val _userLocation = MutableLiveData<String>()
     val userLocation: LiveData<String> get() = _userLocation
 
-    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
-
     //LiveData para atender el estado de conexión de internet
     private val _internetConnected = MutableLiveData<Boolean>()
     val internetConnected: LiveData<Boolean> get() = _internetConnected
+    
+    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
 
     //Inicialización: Cargamos la LocationManager address
     init {
@@ -149,7 +149,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     // Método para solicitar la actualización de la ubicación
     fun requestLocationUpdate(context: Context) {
-        location.updateLocation(context) {}
+        location.updateLocation(context){}
     }
 
     //funcion para incicializr el texttospeech
@@ -312,7 +312,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     // Función para agregar cantidad
     fun updateItemQuantity(item: Item, change: Int) {
         val currentCart = _cart.value ?: Cart()
-        currentCart.updateItemQuantity(item, change)
+        currentCart.updateItemQuantity(item,change)
         viewModelScope.launch {
             val itemDB = item.copy(cart_quantity = item.cart_quantity + change)
             cartDao.updateItem(itemDB)
