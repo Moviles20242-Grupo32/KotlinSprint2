@@ -5,6 +5,8 @@ import TextToSpeechManager
 import android.content.Context
 import android.Manifest
 import android.app.Activity
+import android.app.Application
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -21,12 +23,16 @@ import kotlinx.coroutines.delay
 import com.google.android.gms.location.LocationServices
 import android.location.Geocoder
 import android.location.Location
+import androidx.lifecycle.AndroidViewModel
+import com.example.foodies.model.CartDao
+import com.example.foodies.model.DBProvider
 import com.example.foodies.model.NetworkMonitor
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.gson.Gson
 import java.util.Locale
 
-class ShoppingViewModel : ViewModel() {
+class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
     private var location = LocationManager
@@ -67,6 +73,15 @@ class ShoppingViewModel : ViewModel() {
     private val _internetConnected = MutableLiveData<Boolean>()
     val internetConnected: LiveData<Boolean> get() = _internetConnected
 
+    private val sharedPreferences: SharedPreferences =
+        application.getSharedPreferences("shoppingCart", Context.MODE_PRIVATE)
+
+    private val gson = Gson()
+
+    private val cartItemsAdded = "cartItems"
+
+    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
+
     //Inicialización: Cargamos la LocationManager address
     init {
         // Observamos los cambios en la dirección
@@ -78,6 +93,36 @@ class ShoppingViewModel : ViewModel() {
         NetworkMonitor.isConnected.observeForever { connection->
             _internetConnected.postValue(connection)
         }
+
+        _cart.value = Cart()
+        loadCartItems()
+    }
+
+    private fun saveItemToCart(item: Item){
+        viewModelScope.launch {
+            cartDao.insertItem(item)
+        }
+    }
+
+    private fun removeItemFromCartId(id: String){
+        viewModelScope.launch {
+            cartDao.deleteItemById(id)
+        }
+    }
+
+    private fun loadCartItems(){
+        viewModelScope.launch {
+            val itemsIncart = cartDao.getAllItems()
+
+            val carrito = Cart()
+
+            itemsIncart.forEach {
+                carrito.addItem(it, it.cart_quantity)
+            }
+
+            _cart.postValue(carrito)
+        }
+
     }
 
     // Método para solicitar la actualización de la ubicación
@@ -182,14 +227,17 @@ class ShoppingViewModel : ViewModel() {
                 val updatedItem = item.copy(isAdded = !item.isAdded)
                 // Agregar el item al carrito si está marcado como añadido
                 if (updatedItem.isAdded) {
-                    addItem(updatedItem)
+                    addItem(updatedItem, 1)
                     updateTotal()
+                    val itemDB = item.copy(cart_quantity = 1, isAdded = true)
+                    saveItemToCart(itemDB)
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)
                     }
                 } else {
                     removeItem(updatedItem)
                     updateTotal()
+                    removeItemFromCartId(itemId)
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)
                     }
@@ -205,9 +253,9 @@ class ShoppingViewModel : ViewModel() {
     }
 
     // Función para agregar un item al carrito
-    fun addItem(item: Item) {
+    fun addItem(item: Item, q: Int) {
         val currentCart = _cart.value ?: Cart()
-        currentCart.addItem(item)
+        currentCart.addItem(item, q)
         _cart.postValue(currentCart)
     }
 
@@ -235,6 +283,10 @@ class ShoppingViewModel : ViewModel() {
     fun updateItemQuantity(item: Item, change: Int) {
         val currentCart = _cart.value ?: Cart()
         currentCart.updateItemQuantity(item,change)
+        viewModelScope.launch {
+            val itemDB = item.copy(cart_quantity = item.cart_quantity + change)
+            cartDao.updateItem(itemDB)
+        }
         _cart.postValue(currentCart)
     }
 
@@ -310,6 +362,8 @@ class ShoppingViewModel : ViewModel() {
         _items.postValue(updatedList)
         _cart.postValue(currentCart)  // Actualiza el estado del carrito
         updateTotal() // Actualiza el total después de eliminar el item
+
+        removeItemFromCartId(item.id)
     }
 
     fun registerPrice(){
