@@ -25,12 +25,9 @@ class LoginViewModel : ViewModel() {
         email: String,
         password: String,
         home: () -> Unit,
-        onError: (String) -> Unit,
-        logoutViewModel: LogoutViewModel // Pass the LogoutViewModel to refresh user state
+        onError: (String) -> Unit// Pass the LogoutViewModel to refresh user state
     ) = viewModelScope.launch {
         serviceAdapter.signInWithEmailAndPassword(email, password, {
-            // Refresh the user after logging in
-            logoutViewModel.refreshUser()
             home() // Navigate to home
         }, onError)
     }
@@ -41,8 +38,7 @@ class LoginViewModel : ViewModel() {
         password: String,
         name: String,
         home: () -> Unit,
-        onError: (String) -> Unit,
-        logoutViewModel: LogoutViewModel // Pass LogoutViewModel to refresh user state
+        onError: (String) -> Unit// Pass LogoutViewModel to refresh user state
     ) {
         serviceAdapter.createUserWithEmailAndPassword(email, password, name, {
             val currentUser = auth.currentUser
@@ -52,7 +48,6 @@ class LoginViewModel : ViewModel() {
                 }
                 it.updateProfile(profileUpdates).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        logoutViewModel.refreshUser() // Refresh user state after updating profile
                         home()
                     } else {
                         onError("Profile update failed")

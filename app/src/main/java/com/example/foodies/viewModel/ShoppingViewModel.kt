@@ -51,8 +51,8 @@ class ShoppingViewModel : ViewModel() {
     val isLoaded: LiveData<Boolean> get() = _isLoaded
 
     // LiveData para manejar errores
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
+    private val _error = MutableLiveData<String?>()
+    val error: MutableLiveData<String?> get() = _error
 
     // LiveData para manejar el estado de la orden (éxito o error)
     private val _orderSuccess = MutableLiveData<Boolean>()

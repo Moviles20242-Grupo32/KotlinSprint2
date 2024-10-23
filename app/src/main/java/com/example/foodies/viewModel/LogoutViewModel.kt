@@ -2,6 +2,7 @@ package com.example.foodies.viewModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodies.model.ServiceAdapter
@@ -26,17 +27,17 @@ class LogoutViewModel : ViewModel() {
     // Function to sign out the user
     fun signOut() {
         Firebase.auth.signOut()
-        _user.value = null // Clear the user data after signing out
+        _user.postValue(null) // Clear the user data after signing out
     }
 
     // Function to refresh user state after login
-    fun refreshUser() {
-        Firebase.auth.currentUser?.reload()?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                _user.value = Firebase.auth.currentUser
-            }
-        }
+    fun setUpUser() {
+        val currentUser = Firebase.auth.currentUser
+        // Publica el valor del usuario actual
+        _user.postValue(currentUser)
     }
+
+
 }
 
 

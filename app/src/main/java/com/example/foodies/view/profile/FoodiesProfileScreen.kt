@@ -1,4 +1,5 @@
 package com.example.foodies.view.profile
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,13 +70,8 @@ fun FoodiesProfileScreen(
     val user by logoutViewModel.user.observeAsState() // Observe the current user
 
     // If the user is null (after logging out), navigate to the login screen
-    LaunchedEffect(user) {
-        if (user == null) {
-            // Navigate to the login screen if the user is signed out
-            navController.navigate(FoodiesScreens.FoodiesLoginScreen.name) {
-                popUpTo(FoodiesScreens.FoodiesHomeScreen.name) { inclusive = true } // Clear backstack
-            }
-        }
+    LaunchedEffect(Unit) {
+        logoutViewModel.setUpUser()
     }
 
     Surface(
@@ -225,6 +221,11 @@ fun FoodiesProfileScreen(
                     .padding(16.dp)
                     .clickable {
                         logoutViewModel.signOut() // Use LogoutViewModel for signing out
+                        navController.navigate(FoodiesScreens.FoodiesLoginScreen.name) {
+                            popUpTo(FoodiesScreens.FoodiesHomeScreen.name) {
+                                inclusive = true
+                            } // Clear backstack
+                        }
                     }
             ) {
                 Row(

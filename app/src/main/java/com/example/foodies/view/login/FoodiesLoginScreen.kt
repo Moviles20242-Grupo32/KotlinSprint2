@@ -59,8 +59,7 @@ import com.example.foodies.viewModel.LogoutViewModel
 @Composable
 fun FoodiesLoginScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel = viewModel(),  // Inject LoginViewModel
-    logoutViewModel: LogoutViewModel = viewModel() // Inject LogoutViewModel
+    loginViewModel: LoginViewModel = viewModel()// Inject LogoutViewModel
 ) {
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
     val errorMessage = remember { mutableStateOf("") }
@@ -108,7 +107,7 @@ fun FoodiesLoginScreen(
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                     }, { message ->
                         errorMessage.value = message
-                    }, logoutViewModel) // Pass LogoutViewModel
+                    }) // Pass LogoutViewModel
                 }
             } else {
                 UserForm(isCreateAccount = true) { email, password, name ->
@@ -117,7 +116,7 @@ fun FoodiesLoginScreen(
                         navController.navigate(FoodiesScreens.FoodiesHomeScreen.name)
                     }, { message ->
                         errorMessage.value = message
-                    }, logoutViewModel) // Pass LogoutViewModel
+                    }) // Pass LogoutViewModel
                 }
             }
 
