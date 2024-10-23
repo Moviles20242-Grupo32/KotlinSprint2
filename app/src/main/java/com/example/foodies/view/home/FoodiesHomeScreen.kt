@@ -98,6 +98,7 @@ fun FoodiesHomeScreen(
         //Incialización de elementos adicionales
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
+        viewModel.initOrderWorker(context)
     }
 
     // Manejar posibles errores

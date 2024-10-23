@@ -21,7 +21,7 @@ class FoodiesNotificationManager(private val context: Context) {
         const val CHANNEL_DESCRIPTION = "Canal para notificaciones de restaurantes Foodies cercanos"
     }
 
-    fun sendNotification() {
+    fun sendNotification(tittle: String, content: String, notificationId: Int) {
         // Crear el NotificationManager
         val notificationManager = NotificationManagerCompat.from(context)
 
@@ -40,15 +40,15 @@ class FoodiesNotificationManager(private val context: Context) {
         // Crear la notificación
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.logo) // Icono de la notificación
-            .setContentTitle("¡Estas cerca!")
-            .setContentText("Tienes un restaurante Foodies cerca de ti, ¡aprovecha y pide ya!")
+            .setContentTitle(tittle)
+            .setContentText(content)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setPublicVersion(
                 NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.logo)
-                    .setContentTitle("¡Estas cerca!")
-                    .setContentText("Tienes un restaurante Foodies cerca de ti, ¡aprovecha y pide ya!")
+                    .setContentTitle(tittle)
+                    .setContentText(content)
                     .build()
             )
 
@@ -61,6 +61,6 @@ class FoodiesNotificationManager(private val context: Context) {
             Log.d("FoodiesNotification", "Permiso para enviar notificaciones no concedido.")
             return
         }
-        notificationManager.notify(1, notificationBuilder.build())
+        notificationManager.notify(notificationId, notificationBuilder.build())
     }
 }

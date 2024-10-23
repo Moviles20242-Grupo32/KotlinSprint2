@@ -1,6 +1,8 @@
 package com.example.foodies.model
 
 import android.util.Log
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class Cart(
     private val items: MutableList<Item> = mutableListOf()
@@ -53,5 +55,50 @@ data class Cart(
     // Vaciar el carrito
     fun clearCart() {
         items.clear()
+    }
+
+    // Verificar si el carrito está vacío
+    fun isEmpty(): Boolean {
+        return items.isEmpty()
+    }
+
+    // Convertir el carrito a JSON
+    fun toJson(): String {
+        val jsonObject = JSONObject()
+        val jsonArray = JSONArray()
+
+        for (item in items) {
+            val itemJson = JSONObject()
+            itemJson.put("id", item.id)
+            itemJson.put("name", item.item_name)
+            itemJson.put("cart_quantity", item.cart_quantity)
+            itemJson.put("item_cost", item.item_cost)
+            jsonArray.put(itemJson)
+        }
+
+        jsonObject.put("items", jsonArray)
+        return jsonObject.toString()
+    }
+
+    // Crear un carrito a partir de un JSON
+    companion object {
+        fun fromJson(cartJson: String): Cart {
+            val jsonObject = JSONObject(cartJson)
+            val jsonArray = jsonObject.getJSONArray("items")
+            val cart = Cart()
+
+            for (i in 0 until jsonArray.length()) {
+                val itemJson = jsonArray.getJSONObject(i)
+                val item = Item(
+                    id = itemJson.getString("id"),
+                    item_name = itemJson.getString("name"),
+                    cart_quantity = itemJson.getInt("cart_quantity"),
+                    item_cost = itemJson.getInt("item_cost")
+                )
+                cart.addItem(item)
+            }
+
+            return cart
+        }
     }
 }

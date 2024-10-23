@@ -21,15 +21,24 @@ import kotlinx.coroutines.delay
 import com.google.android.gms.location.LocationServices
 import android.location.Geocoder
 import android.location.Location
+import android.util.LruCache
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.foodies.model.LocationWorker
+import com.example.foodies.model.LruCashingManager
 import com.example.foodies.model.NetworkMonitor
+import com.example.foodies.model.OrderWorker
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import java.io.File
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
-class ShoppingViewModel : ViewModel() {
+class ShoppingViewModel() : ViewModel() {
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
     private var location = LocationManager
+    val lruCache = LruCashingManager
 
     // LiveData para la lista de Items
     private val _items = MutableLiveData<List<Item>>()
@@ -78,6 +87,14 @@ class ShoppingViewModel : ViewModel() {
         NetworkMonitor.isConnected.observeForever { connection->
             _internetConnected.postValue(connection)
         }
+
+        _cart.observeForever { newCart ->
+            //Volver el cart un JSON
+            val cartJson = newCart.toJson()
+            // Guarda el JSON en el LRU Cache usando una clave
+            lruCache.lruCashing.put("cartKey", cartJson)
+        }
+
     }
 
     // Método para solicitar la actualización de la ubicación
@@ -88,6 +105,14 @@ class ShoppingViewModel : ViewModel() {
     //funcion para incicializr el texttospeech
     fun initTextToSpeech(context: Context) {
         textToSpeechManager = TextToSpeechManager(context)
+    }
+
+    //Inicalizamos el order worker
+    fun initOrderWorker(context: Context){
+        val orderWorker = PeriodicWorkRequestBuilder<OrderWorker>(17, TimeUnit.MINUTES)
+            .addTag("order_worker")
+            .build()
+        WorkManager.getInstance(context).enqueue(orderWorker)
     }
 
     //Función para leer lista de productos
@@ -296,7 +321,6 @@ class ShoppingViewModel : ViewModel() {
     fun removeItemFromCart(item: Item) {
         val currentCart = _cart.value ?: Cart()
         currentCart.removeItem(item) // Remueve el item del carrito
-
         // Actualiza el estado de isAdded del item a false
         val updatedList = _items.value?.map { itemList ->
             if (itemList.id == item.id) {
