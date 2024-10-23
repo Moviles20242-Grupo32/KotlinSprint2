@@ -5,6 +5,8 @@ import TextToSpeechManager
 import android.content.Context
 import android.Manifest
 import android.app.Activity
+import android.app.Application
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -21,11 +23,25 @@ import kotlinx.coroutines.delay
 import com.google.android.gms.location.LocationServices
 import android.location.Geocoder
 import android.location.Location
+import androidx.lifecycle.AndroidViewModel
+import com.example.foodies.model.CartDao
+import com.example.foodies.model.DBProvider
+import com.example.foodies.model.NetworkMonitor
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.util.Locale
 
-class ShoppingViewModel : ViewModel() {
+class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val sharedPreferences: SharedPreferences =
+      application.getSharedPreferences("shopping_cart", Context.MODE_PRIVATE)
+
+    private val gson = Gson()
+
+    private val cartItemsKey = "cart_items"
+
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
     private var location = LocationManager
@@ -33,6 +49,7 @@ class ShoppingViewModel : ViewModel() {
     // LiveData para la lista de Items
     private val _items = MutableLiveData<List<Item>>()
     val items: LiveData<List<Item>> get() = _items
+
 
     // LiveData para item más vendido
     private val _msitem = MutableLiveData<Item>()
@@ -62,13 +79,58 @@ class ShoppingViewModel : ViewModel() {
     private val _userLocation = MutableLiveData<String>()
     val userLocation: LiveData<String> get() = _userLocation
 
+    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
+
+    //LiveData para atender el estado de conexión de internet
+    private val _internetConnected = MutableLiveData<Boolean>()
+    val internetConnected: LiveData<Boolean> get() = _internetConnected
+
     //Inicialización: Cargamos la LocationManager address
     init {
         // Observamos los cambios en la dirección
         LocationManager.address.observeForever { newAddress ->
             _userLocation.postValue(newAddress)
         }
+        _cart.value = Cart()
+        loadCartItems()
+
+
     }
+
+    private fun saveItemToCart(item: Item){
+        viewModelScope.launch {
+            cartDao.insertItem(item)
+        }
+    }
+
+    private fun removeItemFromCartId(id: String){
+        viewModelScope.launch {
+                cartDao.deleteItemById(id)
+            }
+
+    }
+
+    private fun loadCartItems() {
+        viewModelScope.launch {
+            // Cargar los items del carrito desde la base de datos
+            val itemsInCart = cartDao.getAllItems()
+
+            // Crear un carrito temporal para añadir los items del carrito
+            val carrito = Cart()
+
+            itemsInCart.forEach {
+                carrito.addItem(it, it.cart_quantity)
+
+            }
+
+            _cart.postValue(carrito)
+
+        //Observamos los cambios en la red
+        NetworkMonitor.isConnected.observeForever { connection->
+            _internetConnected.postValue(connection)
+        }
+    }
+    
 
     // Método para solicitar la actualización de la ubicación
     fun requestLocationUpdate(context: Context) {
@@ -92,19 +154,14 @@ class ShoppingViewModel : ViewModel() {
         }
     }
 
-    fun fetchItems(userId: String?) {
+    fun fetchItems() {
         if (_isLoaded.value == true) return
         viewModelScope.launch {
             serviceAdapter.getAllItems(
                 onSuccess = { itemList ->
                     _items.postValue(itemList)
+                    Log.d("FoodiesHome-items-items", "$itemList")
                     _isLoaded.postValue(true)
-                    Log.d("FoodiesHomeScreen", "items.isEmpty(): ${isLoaded.value}")
-
-                    // After fetching items, sort based on user preferences if userId is available
-                    userId?.let {
-                        fetchUserPreferences(it) // Fetch user preferences and sort items accordingly
-                    }
                 },
                 onFailure = { exception ->
                     // Publicar el error si ocurre
@@ -119,10 +176,17 @@ class ShoppingViewModel : ViewModel() {
         serviceAdapter.getUserOrderHistory(
             userId = userId,
             onSuccess = { itemQuantityMap ->
-                // Sort items based on the quantity ordered by the user
-                val sortedItems = _items.value?.sortedByDescending { item ->
-                    itemQuantityMap[item.item_name] ?: 0 // Sort by user order history
-                } ?: emptyList()
+                fetchItems()
+                Log.d("FoodiesHome-items-p", "$itemQuantityMap")
+                // Si los items aún no están inicializados, usa una lista por defecto
+                val currentItems = _items.value ?: emptyList()
+                Log.d("FoodiesHome-items-cp", "$currentItems")
+                Log.d("FoodiesHome-items-v", "${_items.value}")
+                // Ordenar los items según la historia del usuario
+                val sortedItems = currentItems.sortedByDescending { item ->
+                    Log.d("FoodiesHome-item-p", "$item")
+                    itemQuantityMap[item.item_name] ?: 0
+                }
 
                 // Update LiveData with the sorted items
                 _items.postValue(sortedItems)
@@ -170,14 +234,17 @@ class ShoppingViewModel : ViewModel() {
                 val updatedItem = item.copy(isAdded = !item.isAdded)
                 // Agregar el item al carrito si está marcado como añadido
                 if (updatedItem.isAdded) {
-                    addItem(updatedItem)
+                    addItem(updatedItem, 1)
                     updateTotal()
+                    val itemDB = item.copy(cart_quantity = 1)
+                    saveItemToCart(itemDB)
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)
                     }
                 } else {
                     removeItem(updatedItem)
                     updateTotal()
+                    removeItemFromCartId(itemId)
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)
                     }
@@ -193,9 +260,9 @@ class ShoppingViewModel : ViewModel() {
     }
 
     // Función para agregar un item al carrito
-    fun addItem(item: Item) {
+    fun addItem(item: Item, q: Int) {
         val currentCart = _cart.value ?: Cart()
-        currentCart.addItem(item)
+        currentCart.addItem(item, q)
         _cart.postValue(currentCart)
     }
 
@@ -223,7 +290,13 @@ class ShoppingViewModel : ViewModel() {
     fun updateItemQuantity(item: Item, change: Int) {
         val currentCart = _cart.value ?: Cart()
         currentCart.updateItemQuantity(item,change)
+        viewModelScope.launch {
+            val itemDB = item.copy(cart_quantity = item.cart_quantity + change)
+            cartDao.updateItem(itemDB)
+        }
         _cart.postValue(currentCart)
+
+
     }
 
     // Función para actualizar total
@@ -298,6 +371,8 @@ class ShoppingViewModel : ViewModel() {
         _items.postValue(updatedList)
         _cart.postValue(currentCart)  // Actualiza el estado del carrito
         updateTotal() // Actualiza el total después de eliminar el item
+
+        removeItemFromCartId(item.id)
     }
 
     fun registerPrice(){
@@ -309,4 +384,5 @@ class ShoppingViewModel : ViewModel() {
 
 
 
+    }
 }

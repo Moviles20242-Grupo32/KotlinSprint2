@@ -1,9 +1,12 @@
 package com.example.foodies.viewModel
 
 import android.util.Log
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.foodies.model.NetworkMonitor
 import com.example.foodies.model.ServiceAdapter
 import com.example.foodies.model.User
 import com.google.firebase.auth.FirebaseAuth
@@ -14,47 +17,31 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel: ViewModel() {
+
     private val serviceAdapter = ServiceAdapter()
 
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
 
-    // Updated function to sign in with email and password
-    fun signInWithEmailAndPassword(
-        email: String,
-        password: String,
-        home: () -> Unit,
-        onError: (String) -> Unit// Pass the LogoutViewModel to refresh user state
-    ) = viewModelScope.launch {
-        serviceAdapter.signInWithEmailAndPassword(email, password, {
-            home() // Navigate to home
-        }, onError)
+    //LiveData para atender el estado de conexión de internet
+    private val _internetConnected = MutableLiveData<Boolean>()
+    val internetConnected: LiveData<Boolean> get() = _internetConnected
+
+    //Inicialización: Cargamos la LocationManager address
+    init {
+        //Observamos los cambios en la red
+        NetworkMonitor.isConnected.observeForever { connection->
+            _internetConnected.postValue(connection)
+        }
+    }
+    fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit, onError: (String) -> Unit) = viewModelScope.launch {
+        serviceAdapter.signInWithEmailAndPassword(email, password, home, onError)
     }
 
-    // Updated function to create a new user account
-    fun createUserWithEmailAndPassword(
-        email: String,
-        password: String,
-        name: String,
-        home: () -> Unit,
-        onError: (String) -> Unit// Pass LogoutViewModel to refresh user state
-    ) {
-        serviceAdapter.createUserWithEmailAndPassword(email, password, name, {
-            val currentUser = auth.currentUser
-            currentUser?.let {
-                val profileUpdates = userProfileChangeRequest {
-                    displayName = name
-                }
-                it.updateProfile(profileUpdates).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        home()
-                    } else {
-                        onError("Profile update failed")
-                    }
-                }
-            }
-        }, onError)
+    fun createUserWithEmailAndPassword(email: String, password: String, name: String, home: () -> Unit, onError: (String) -> Unit) {
+        serviceAdapter.createUserWithEmailAndPassword(email, password, name, home, onError)
     }
+
+
 }
-
