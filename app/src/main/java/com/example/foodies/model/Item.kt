@@ -3,11 +3,10 @@ package com.example.foodies.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
 @Entity(tableName = "cart_items")
 data class Item(
-    //@PrimaryKey(autoGenerate = true) val entityId: Long = 0,
-    @PrimaryKey(autoGenerate = false) val id: String ="",
+
+    @PrimaryKey(autoGenerate = false) val id: String = "",
     val item_cost: Int = 0,
     val item_details: String = "",
     val item_image: String = "",
@@ -29,5 +28,4 @@ data class Item(
             "times_ordered" to this.times_ordered
         )
     }
-
 }
