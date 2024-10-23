@@ -23,6 +23,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.foodies.model.FoodiesNotificationManager
 import com.example.foodies.model.LocationWorker
+import com.example.foodies.model.NetworkMonitor
 import com.example.foodies.viewModel.FoodiesNavigation
 import com.example.foodies.ui.theme.FoodiesTheme
 import java.util.concurrent.TimeUnit
@@ -41,12 +42,19 @@ class MainActivity : ComponentActivity() {
         }
         // Iniciar los Workers al crear la actividad
         locationWorker()
+        NetworkMonitor.initialize(this)
     }
 
     //Workers
     private fun locationWorker(){
         val locationWorker = PeriodicWorkRequestBuilder<LocationWorker>(15, TimeUnit.MINUTES).build()
         WorkManager.getInstance(this).enqueue(locationWorker)
+    }
+
+    //On destroy activity
+    override fun onDestroy() {
+        super.onDestroy()
+        NetworkMonitor.stopMonitoring() // Liberar recursos
     }
 }
 
