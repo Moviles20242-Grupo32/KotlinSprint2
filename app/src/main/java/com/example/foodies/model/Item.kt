@@ -1,7 +1,12 @@
 package com.example.foodies.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "cart_items")
 data class Item(
-    val id: String? = null,
+
+    @PrimaryKey(autoGenerate = false) val id: String = "",
     val item_cost: Int = 0,
     val item_details: String = "",
     val item_image: String = "",

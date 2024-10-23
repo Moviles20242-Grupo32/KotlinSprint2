@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 
     id("com.google.gms.google-services")
+
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -88,5 +90,20 @@ dependencies {
     implementation(libs.play.services.location)
 
     implementation(libs.firebase.analytics.ktx)
+
+    implementation(libs.gson)
+
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+
+
+    ksp(libs.androidx.room.compiler)
+
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation(libs.androidx.room.ktx)
+
+    
+
 }
 
