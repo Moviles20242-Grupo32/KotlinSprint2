@@ -133,18 +133,18 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
             _cart.postValue(carrito)
 
-        //Observamos los cambios en la red
-        NetworkMonitor.isConnected.observeForever { connection->
-            _internetConnected.postValue(connection)
-        }
+            //Observamos los cambios en la red
+            NetworkMonitor.isConnected.observeForever { connection ->
+                _internetConnected.postValue(connection)
+            }
 
-        _cart.observeForever { newCart ->
-            //Volver el cart un JSON
-            val cartJson = newCart.toJson()
-            // Guarda el JSON en el LRU Cache usando una clave
-            lruCache.lruCashing.put("cartKey", cartJson)
+            _cart.observeForever { newCart ->
+                //Volver el cart un JSON
+                val cartJson = newCart.toJson()
+                // Guarda el JSON en el LRU Cache usando una clave
+                lruCache.lruCashing.put("cartKey", cartJson)
+            }
         }
-
     }
 
     // Método para solicitar la actualización de la ubicación
