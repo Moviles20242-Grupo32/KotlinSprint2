@@ -95,7 +95,7 @@ data class Cart(
                     cart_quantity = itemJson.getInt("cart_quantity"),
                     item_cost = itemJson.getInt("item_cost")
                 )
-                cart.addItem(item)
+                cart.addItem(item,1)
             }
 
             return cart
