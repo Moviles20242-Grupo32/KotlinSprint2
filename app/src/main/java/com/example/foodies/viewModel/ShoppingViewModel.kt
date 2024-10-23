@@ -125,16 +125,16 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
             _cart.postValue(carrito)
 
-        //Observamos los cambios en la red
-        NetworkMonitor.isConnected.observeForever { connection->
-            _internetConnected.postValue(connection)
+            //Observamos los cambios en la red
+            NetworkMonitor.isConnected.observeForever { connection ->
+                _internetConnected.postValue(connection)
+            }
         }
     }
-    
 
     // Método para solicitar la actualización de la ubicación
     fun requestLocationUpdate(context: Context) {
-        location.updateLocation(context){}
+        location.updateLocation(context) {}
     }
 
     //funcion para incicializr el texttospeech
@@ -198,9 +198,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
 
-
     //Función para obtener el producto más vendido
-    fun mostSellItem(){
+    fun mostSellItem() {
         viewModelScope.launch {
             serviceAdapter.mostSellItem(
                 onSuccess = { item ->
@@ -289,7 +288,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     // Función para agregar cantidad
     fun updateItemQuantity(item: Item, change: Int) {
         val currentCart = _cart.value ?: Cart()
-        currentCart.updateItemQuantity(item,change)
+        currentCart.updateItemQuantity(item, change)
         viewModelScope.launch {
             val itemDB = item.copy(cart_quantity = item.cart_quantity + change)
             cartDao.updateItem(itemDB)
@@ -300,7 +299,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
     // Función para actualizar total
-    fun updateTotal(){
+    fun updateTotal() {
         val totalAmountCalc = _cart.value?.getTotalCost() ?: 0
         _totalAmount.postValue(totalAmountCalc)
     }
@@ -348,6 +347,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     fun resetOrderSuccess() {
         _orderSuccess.postValue(false)
     }
+
     // Función para resetear el estado de error
     fun resetError() {
         _error.postValue(null) // Limpiar el error
@@ -375,14 +375,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         removeItemFromCartId(item.id)
     }
 
-    fun registerPrice(){
+    fun registerPrice() {
         val totalAmountCalc = _cart.value?.getTotalCost() ?: 0
         val price = totalAmountCalc.toDouble()
         serviceAdapter.registerPriceFB(price)
-
-    }
-
-
 
     }
 }
