@@ -79,19 +79,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     private val _userLocation = MutableLiveData<String>()
     val userLocation: LiveData<String> get() = _userLocation
 
-    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
-
     //LiveData para atender el estado de conexión de internet
     private val _internetConnected = MutableLiveData<Boolean>()
     val internetConnected: LiveData<Boolean> get() = _internetConnected
-
-    private val sharedPreferences: SharedPreferences =
-        application.getSharedPreferences("shoppingCart", Context.MODE_PRIVATE)
-
-    private val gson = Gson()
-
-    private val cartItemsAdded = "cartItems"
-
+    
     private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
 
     //Inicialización: Cargamos la LocationManager address
