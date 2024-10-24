@@ -54,7 +54,9 @@ class MainActivity : ComponentActivity() {
     //On destroy activity
     override fun onDestroy() {
         super.onDestroy()
-        NetworkMonitor.stopMonitoring() // Liberar recursos
+        // Liberar recursos
+        NetworkMonitor.stopMonitoring()
+        WorkManager.getInstance(this).cancelAllWorkByTag("order_worker")
     }
 }
 

@@ -23,15 +23,23 @@ import kotlinx.coroutines.delay
 import com.google.android.gms.location.LocationServices
 import android.location.Geocoder
 import android.location.Location
+import android.util.LruCache
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.foodies.model.LocationWorker
+import com.example.foodies.model.LruCashingManager
 import androidx.lifecycle.AndroidViewModel
 import com.example.foodies.model.CartDao
 import com.example.foodies.model.DBProvider
 import com.example.foodies.model.NetworkMonitor
+import com.example.foodies.model.OrderWorker
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import java.io.File
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -45,11 +53,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
     private var location = LocationManager
+    val lruCache = LruCashingManager
 
     // LiveData para la lista de Items
     private val _items = MutableLiveData<List<Item>>()
     val items: LiveData<List<Item>> get() = _items
-
 
     // LiveData para item más vendido
     private val _msitem = MutableLiveData<Item>()
@@ -129,6 +137,13 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             NetworkMonitor.isConnected.observeForever { connection ->
                 _internetConnected.postValue(connection)
             }
+
+            _cart.observeForever { newCart ->
+                //Volver el cart un JSON
+                val cartJson = newCart.toJson()
+                // Guarda el JSON en el LRU Cache usando una clave
+                lruCache.lruCashing.put("cartKey", cartJson)
+            }
         }
     }
 
@@ -140,6 +155,14 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     //funcion para incicializr el texttospeech
     fun initTextToSpeech(context: Context) {
         textToSpeechManager = TextToSpeechManager(context)
+    }
+
+    //Inicalizamos el order worker
+    fun initOrderWorker(context: Context){
+        val orderWorker = PeriodicWorkRequestBuilder<OrderWorker>(17, TimeUnit.MINUTES)
+            .addTag("order_worker")
+            .build()
+        WorkManager.getInstance(context).enqueue(orderWorker)
     }
 
     //Función para leer lista de productos
