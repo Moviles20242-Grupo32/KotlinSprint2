@@ -59,6 +59,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodies.R
 import com.example.foodies.model.FoodiesNotificationManager
 import com.example.foodies.viewModel.LoginViewModel
+import com.example.foodies.viewModel.LogoutViewModel
 
 @Composable
 fun FoodiesLoginScreen(navController: NavController,
@@ -363,5 +364,7 @@ fun InputField(valueState: MutableState<String>, labelId: String, isSingleLine: 
         ),
         //textStyle = TextStyle(fontSize = 3.sp)
     )
-}
 
+
+
+}
