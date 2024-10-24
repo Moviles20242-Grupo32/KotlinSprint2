@@ -46,10 +46,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     private val sharedPreferences: SharedPreferences =
       application.getSharedPreferences("shopping_cart", Context.MODE_PRIVATE)
 
-    private val gson = Gson()
-
-    private val cartItemsKey = "cart_items"
-
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
     private var location = LocationManager
@@ -147,6 +143,40 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    private fun saveItemSavedIcon() {
+        val editor = sharedPreferences.edit()
+
+        _items.value?.forEachIndexed { index, item ->
+            // Guardar el estado booleano directamente
+            editor.putBoolean("item${index + 1}_isAdded", item.isAdded)
+            //editor.putBoolean("item${index + 1}_isAdded", true)
+        }
+
+        editor.apply() // Aplicar los cambios
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Guardar el estado de los ítems en SharedPreferences cuando el ViewModel es destruido
+        saveItemSavedIcon()
+    }
+
+
+    private fun loadItemSavedIcon() {
+        _items.value?.let { itemList ->
+            val updatedItems = itemList.mapIndexed { index, item ->
+                // Cargar el estado booleano, si no está guardado, devolver false
+                val isAddedState = sharedPreferences.getBoolean("item${index + 1}_isAdded", false)
+
+                // Retornar el item con el estado actualizado
+                item.copy(isAdded = isAddedState)
+            }
+
+            // Publicar la lista de items actualizada
+            _items.postValue(updatedItems)
+        }
+    }
+
     // Método para solicitar la actualización de la ubicación
     fun requestLocationUpdate(context: Context) {
         location.updateLocation(context){}
@@ -185,6 +215,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     _items.postValue(itemList)
                     Log.d("FoodiesHome-items-items", "$itemList")
                     _isLoaded.postValue(true)
+                    loadItemSavedIcon()
                 },
                 onFailure = { exception ->
                     // Publicar el error si ocurre
@@ -283,14 +314,14 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
     // Función para agregar un item al carrito
-    fun addItem(item: Item, q: Int) {
+    private fun addItem(item: Item, q: Int) {
         val currentCart = _cart.value ?: Cart()
         currentCart.addItem(item, q)
         _cart.postValue(currentCart)
     }
 
     // Función para eliminar un item del carrito
-    fun removeItem(item: Item) {
+    private fun removeItem(item: Item) {
         val currentCart = _cart.value ?: Cart()
         currentCart.removeItem(item)
 
