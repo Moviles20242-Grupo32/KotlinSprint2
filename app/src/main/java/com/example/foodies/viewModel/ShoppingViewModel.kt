@@ -23,19 +23,37 @@ import kotlinx.coroutines.delay
 import com.google.android.gms.location.LocationServices
 import android.location.Geocoder
 import android.location.Location
+import android.util.LruCache
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.foodies.model.LocationWorker
+import com.example.foodies.model.LruCashingManager
 import androidx.lifecycle.AndroidViewModel
 import com.example.foodies.model.CartDao
 import com.example.foodies.model.DBProvider
 import com.example.foodies.model.NetworkMonitor
+import com.example.foodies.model.OrderWorker
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import java.io.File
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val sharedPreferences: SharedPreferences =
+      application.getSharedPreferences("shopping_cart", Context.MODE_PRIVATE)
+
+    private val gson = Gson()
+
+    private val cartItemsKey = "cart_items"
+
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
     private var location = LocationManager
+    val lruCache = LruCashingManager
 
     // LiveData para la lista de Items
     private val _items = MutableLiveData<List<Item>>()
@@ -72,14 +90,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     //LiveData para atender el estado de conexión de internet
     private val _internetConnected = MutableLiveData<Boolean>()
     val internetConnected: LiveData<Boolean> get() = _internetConnected
-
-    private val sharedPreferences: SharedPreferences =
-        application.getSharedPreferences("shoppingCart", Context.MODE_PRIVATE)
-
-    private val gson = Gson()
-
-    private val cartItemsAdded = "cartItems"
-
+    
     private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
 
     //Inicialización: Cargamos la LocationManager address
@@ -88,14 +99,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         LocationManager.address.observeForever { newAddress ->
             _userLocation.postValue(newAddress)
         }
-
-        //Observamos los cambios en la red
-        NetworkMonitor.isConnected.observeForever { connection->
-            _internetConnected.postValue(connection)
-        }
-
         _cart.value = Cart()
         loadCartItems()
+
+
     }
 
     private fun saveItemToCart(item: Item){
@@ -106,23 +113,38 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     private fun removeItemFromCartId(id: String){
         viewModelScope.launch {
-            cartDao.deleteItemById(id)
-        }
+                cartDao.deleteItemById(id)
+            }
+
     }
 
-    private fun loadCartItems(){
+    private fun loadCartItems() {
         viewModelScope.launch {
-            val itemsIncart = cartDao.getAllItems()
+            // Cargar los items del carrito desde la base de datos
+            val itemsInCart = cartDao.getAllItems()
 
+            // Crear un carrito temporal para añadir los items del carrito
             val carrito = Cart()
 
-            itemsIncart.forEach {
+            itemsInCart.forEach {
                 carrito.addItem(it, it.cart_quantity)
+
             }
 
             _cart.postValue(carrito)
-        }
 
+            //Observamos los cambios en la red
+            NetworkMonitor.isConnected.observeForever { connection ->
+                _internetConnected.postValue(connection)
+            }
+
+            _cart.observeForever { newCart ->
+                //Volver el cart un JSON
+                val cartJson = newCart.toJson()
+                // Guarda el JSON en el LRU Cache usando una clave
+                lruCache.lruCashing.put("cartKey", cartJson)
+            }
+        }
     }
 
     // Método para solicitar la actualización de la ubicación
@@ -133,6 +155,14 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     //funcion para incicializr el texttospeech
     fun initTextToSpeech(context: Context) {
         textToSpeechManager = TextToSpeechManager(context)
+    }
+
+    //Inicalizamos el order worker
+    fun initOrderWorker(context: Context){
+        val orderWorker = PeriodicWorkRequestBuilder<OrderWorker>(17, TimeUnit.MINUTES)
+            .addTag("order_worker")
+            .build()
+        WorkManager.getInstance(context).enqueue(orderWorker)
     }
 
     //Función para leer lista de productos
@@ -229,7 +259,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 if (updatedItem.isAdded) {
                     addItem(updatedItem, 1)
                     updateTotal()
-                    val itemDB = item.copy(cart_quantity = 1, isAdded = true)
+                    val itemDB = item.copy(cart_quantity = 1)
                     saveItemToCart(itemDB)
                     if (updatedItem.id == _msitem.value?.id) {
                         _msitem.postValue(updatedItem)

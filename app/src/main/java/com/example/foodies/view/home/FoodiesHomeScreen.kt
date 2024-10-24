@@ -98,6 +98,7 @@ fun FoodiesHomeScreen(
         //Incialización de elementos adicionales
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
+        viewModel.initOrderWorker(context)
     }
 
     // Manejar posibles errores
@@ -218,6 +219,10 @@ fun ActionButtons(items: List<Item>,navController: NavController, viewModel: Sho
                     color = Color(0.968f, 0.588f, 0.066f, 1.0f),
                     shape = CircleShape
                 )
+                .clickable {
+                    navController.navigate(FoodiesScreens.FoodiesProfileScreen.name) // Navigate to profile screen
+                }
+
         )
     }
 }

@@ -45,7 +45,11 @@ class LocationWorker(context: Context, workerParams: WorkerParameters) : Worker(
                     nearbyRestaurant?.let { (restaurantName, _) ->
                         val notificationManager = FoodiesNotificationManager(applicationContext)
                         val message = "¡Estás cerca de $restaurantName!"
-                        notificationManager.sendNotification()
+                        val content = "Tienes un restaurante Foodies cerca de ti, ¡aprovecha y pide ya!"
+                        // Crear un ID único usando el nombre del restaurante
+                        val notificationId = restaurantName.hashCode()
+                        notificationManager.sendNotification(message, content, notificationId)
+
                     }
                 },
                 onFailure = { exception ->
