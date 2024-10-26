@@ -9,15 +9,27 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="">
+    <list default="true" id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="Implementation of shared preferences for local storage to save the items saved in the cart and show the saved icon">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/AuthViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/1f14a02c12f923aa50c171f5d93655994d90b609/metadata.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/1f14a02c12f923aa50c171f5d93655994d90b609/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/1f14a02c12f923aa50c171f5d93655994d90b609/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/ce70755f8169169e215e1d483fe0d83cb52b9717/metadata.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/ce70755f8169169e215e1d483fe0d83cb52b9717/metadata.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/Cart.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/Cart.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/CartDao.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/CartDao.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/ServiceAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/ServiceAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/login/FoodiesLoginScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/login/FoodiesLoginScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/profile/FoodiesProfileScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/profile/FoodiesProfileScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/FoodiesNavigation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/FoodiesNavigation.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/LoginViewModel.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/LogoutViewModel.kt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +39,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=RF8N80B7Y9A)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\villo\.android\avd\Backup.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -80,15 +92,15 @@
         <option value="Class" />
         <option value="Kotlin File" />
         <option value="Kotlin Interface" />
-        <option value="Kotlin Class" />
         <option value="Kotlin Object" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="feature/local-storage-sharedPreferences-#2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -119,7 +131,13 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Android App.app.executor": "Run",
-    "git-widget-placeholder": "feature/not-order-complete#42"
+    "PROJECT_TRUSTED_KEY": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "feature/caching-fbSession-#1",
+    "kotlin-language-version-configured": "true"
   },
   "keyToStringList": {
     "kotlin-gradle-user-dirs": [
@@ -214,7 +232,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="433c440b-f872-41a5-b674-8f1fc9187b96" name="Changes" comment="" />
+      <changelist id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="" />
       <created>1725815019396</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -260,7 +278,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727386585780</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Implementation of shared preferences for local storage to save the items saved in the cart and show the saved icon">
+      <option name="closed" value="true" />
+      <created>1729806048783</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1729806048783</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -282,6 +308,7 @@
     <MESSAGE value="Geolocalization" />
     <MESSAGE value="Revert changes" />
     <MESSAGE value="Implementation of firebase analytics for BQ" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implementation of firebase analytics for BQ" />
+    <MESSAGE value="Implementation of shared preferences for local storage to save the items saved in the cart and show the saved icon" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implementation of shared preferences for local storage to save the items saved in the cart and show the saved icon" />
   </component>
 </project>

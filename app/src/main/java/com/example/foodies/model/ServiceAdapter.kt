@@ -2,15 +2,14 @@ package com.example.foodies.model
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
 
 class ServiceAdapter {
     // FireStore Data Base
@@ -19,6 +18,11 @@ class ServiceAdapter {
 
     private val auth: FirebaseAuth = Firebase.auth
     private val _loading = MutableLiveData(false)
+
+    // Método para obtener el usuario actual
+    fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
+    }
 
     fun signInWithEmailAndPassword(email: String, password: String, home: () -> Unit, onError: (String) -> Unit) {
         try {
@@ -57,15 +61,33 @@ class ServiceAdapter {
         }
     }
 
+    fun getUserNameByUid(uid: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        firestore.collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    // Obtiene el campo 'name' del documento
+                    val name = document.getString("name")
+                    if (name != null) {
+                        onSuccess(name)  // Llama al callback de éxito con el nombre
+                    } else {
+                        onFailure(Exception("El campo 'name' no está disponible"))
+                    }
+                } else {
+                    onFailure(Exception("El documento de usuario no existe"))
+                }
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)  // Llama al callback de fallo con la excepción
+            }
+    }
+
+
     private fun createUser(name: String, email: String) {
         val userId = auth.currentUser?.uid
 
         val user2 = User(userId, name, email).toMap()
-        //val user = hashMapOf(
-        //  "name" to name,
-        //"email" to email,
-        //"id" to userId
-        //)
         userId?.let {
             FirebaseFirestore.getInstance().collection("users").document(it)
                 .set(user2)
@@ -236,6 +258,11 @@ class ServiceAdapter {
             .addOnFailureListener { exception ->
                 onFailure(exception)
             }
+    }
+
+    // Function to sign out the user
+    fun signOut() {
+        auth.signOut()
     }
 
 

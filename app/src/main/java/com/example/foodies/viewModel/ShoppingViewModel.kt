@@ -161,6 +161,23 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         saveItemSavedIcon()
     }
 
+    fun resetCart(){
+        viewModelScope.launch {
+            cartDao.deleteAllItems()
+            lruCache.lruCashing.remove("cartKey")
+
+            val editor = sharedPreferences.edit()
+
+            _items.value?.forEachIndexed { index, item ->
+                // Guardar el estado booleano directamente
+                editor.putBoolean("item${index + 1}_isAdded", false)
+                //editor.putBoolean("item${index + 1}_isAdded", true)
+            }
+
+            editor.apply()
+        }
+    }
+
 
     private fun loadItemSavedIcon() {
         _items.value?.let { itemList ->

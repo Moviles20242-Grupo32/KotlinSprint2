@@ -1,5 +1,7 @@
 package com.example.foodies.viewModel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -10,13 +12,14 @@ import com.example.foodies.view.login.FoodiesLoginScreen
 import com.example.foodies.view.profile.FoodiesProfileScreen
 import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun FoodiesNavigation(){
     val navController = rememberNavController()
     val shoppingViewModel: ShoppingViewModel = viewModel() // Inject ShoppingViewModel
-    val logoutViewModel: LogoutViewModel = viewModel() // Inject LogoutViewModel
+    val authViewModel: AuthViewModel = viewModel() // Inject LogoutViewModel
 
-    NavHost(navController = navController, startDestination = FoodiesScreens.FoodiesLoginScreen.name) {
+    NavHost(navController = navController, startDestination = if(authViewModel.user.value == null){FoodiesScreens.FoodiesLoginScreen.name} else{FoodiesScreens.FoodiesHomeScreen.name}) {
 
         composable(FoodiesScreens.FoodiesLoginScreen.name){
             FoodiesLoginScreen(navController = navController)
@@ -31,7 +34,7 @@ fun FoodiesNavigation(){
         }
 
         composable(FoodiesScreens.FoodiesProfileScreen.name) {
-            FoodiesProfileScreen(navController = navController, logoutViewModel = logoutViewModel)
+            FoodiesProfileScreen(navController = navController, authViewModel = authViewModel, shoppingViewModel = shoppingViewModel)
         }
     }
 }
