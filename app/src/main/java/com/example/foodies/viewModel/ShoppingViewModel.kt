@@ -97,8 +97,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
         _cart.value = Cart()
         loadCartItems()
-
-
+        loadItemSavedIcon()
     }
 
     private fun saveItemToCart(item: Item){
@@ -143,23 +142,22 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+
     private fun saveItemSavedIcon() {
         val editor = sharedPreferences.edit()
-
         _items.value?.forEachIndexed { index, item ->
-            // Guardar el estado booleano directamente
             editor.putBoolean("item${index + 1}_isAdded", item.isAdded)
-            //editor.putBoolean("item${index + 1}_isAdded", true)
+            Log.d("SharedPreferences", "Guardando item${index + 1}_isAdded = ${item.isAdded}")
         }
-
-        editor.apply() // Aplicar los cambios
+        editor.apply()
     }
 
-    override fun onCleared() {
-        super.onCleared()
+
+    //override fun onCleared() {
+      //  super.onCleared()
         // Guardar el estado de los ítems en SharedPreferences cuando el ViewModel es destruido
-        saveItemSavedIcon()
-    }
+        //saveItemSavedIcon()
+    //}
 
     fun resetCart(){
         viewModelScope.launch {
@@ -178,6 +176,30 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    private fun resetViewModelData() {
+        _cart.postValue(Cart())               // Reinicia el carrito a uno vacío
+        _totalAmount.postValue(0)             // Reinicia el total del carrito a cero
+        _items.postValue(emptyList())         // Limpia la lista de ítems
+        _isLoaded.postValue(false)            // Marca los datos como no cargados
+        _orderSuccess.postValue(false)        // Reinicia el estado de la orden
+        _userLocation.postValue("")           // Limpia la dirección del usuario
+    }
+
+    private fun clearCartDatabase() {
+        viewModelScope.launch {
+            cartDao.deleteAllItems()  // Asegúrate de que exista un método en `cartDao` para eliminar todos los ítems
+        }
+    }
+
+    fun logout() {
+        clearSharedPreferences()   // Limpia SharedPreferences
+        resetViewModelData()       // Restablece todos los LiveData
+        clearCartDatabase()        // Limpia la base de datos del carrito
+    }
+
+
+
+
 
     private fun loadItemSavedIcon() {
         _items.value?.let { itemList ->
@@ -193,6 +215,13 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             _items.postValue(updatedItems)
         }
     }
+
+    private fun clearSharedPreferences() {
+        val editor = sharedPreferences.edit()
+        editor.clear()  // Elimina todos los valores guardados
+        editor.apply()  // Aplica los cambios
+    }
+
 
     // Método para solicitar la actualización de la ubicación
     fun requestLocationUpdate(context: Context) {
@@ -297,38 +326,32 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _items.postValue(updatedList)
     }
 
-    // Función para cambiar el valor de isAdded y republicar la lista
+
     fun addItemToCart(itemId: String?) {
         val updatedList = _items.value?.map { item ->
             if (item.id == itemId) {
-                // Cambiar el estado de isAdded
                 val updatedItem = item.copy(isAdded = !item.isAdded)
-                // Agregar el item al carrito si está marcado como añadido
                 if (updatedItem.isAdded) {
                     addItem(updatedItem, 1)
                     updateTotal()
                     val itemDB = item.copy(cart_quantity = 1)
                     saveItemToCart(itemDB)
-                    if (updatedItem.id == _msitem.value?.id) {
-                        _msitem.postValue(updatedItem)
-                    }
                 } else {
                     removeItem(updatedItem)
                     updateTotal()
                     removeItemFromCartId(itemId)
-                    if (updatedItem.id == _msitem.value?.id) {
-                        _msitem.postValue(updatedItem)
-                    }
                 }
                 updatedItem
             } else {
                 item
             }
         } ?: emptyList()
-
-        // Publicar la lista actualizada
         _items.postValue(updatedList)
+        _items.value = updatedList
+        saveItemSavedIcon() // Agregar aquí para actualizar el estado en SharedPreferences
+
     }
+
 
     // Función para agregar un item al carrito
     private fun addItem(item: Item, q: Int) {

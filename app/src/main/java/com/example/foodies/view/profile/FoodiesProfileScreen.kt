@@ -201,6 +201,7 @@ fun FoodiesProfileScreen(
                     .padding(16.dp)
                     .clickable {
                         shoppingViewModel.resetCart()
+                        shoppingViewModel.logout()
                         authViewModel.signOut() // Use LogoutViewModel for signing out
                         navController.navigate(FoodiesScreens.FoodiesLoginScreen.name) {
                             popUpTo(FoodiesScreens.FoodiesHomeScreen.name) {
