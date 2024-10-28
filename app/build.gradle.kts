@@ -93,8 +93,6 @@ dependencies {
 
     implementation(libs.gson)
 
-    val roomVersion = "2.6.1"
-
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
 
@@ -119,6 +117,9 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation(libs.androidx.room.paging)
+
+    implementation(libs.glide)
+    ksp(libs.compiler)
 
 }
 
