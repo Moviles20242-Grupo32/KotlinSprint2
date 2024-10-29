@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import android.widget.ImageView
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -65,10 +66,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.bumptech.glide.Glide
+import com.example.foodies.R
 import com.example.foodies.model.Item
 import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
@@ -336,11 +340,17 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
             .padding(8.dp)
     ) {
         // Columna 1: Imagen del item
-        AsyncImage(
-            model = item.item_image,
+        //AsyncImage(
+          //  model = item.item_image,
+            //contentDescription = "Imagen de ${item.item_name}",
+            //modifier = Modifier
+              //  .size(100.dp)
+        //)
+
+        GlideImage(
+            imageUrl = item.item_image,
             contentDescription = "Imagen de ${item.item_name}",
-            modifier = Modifier
-                .size(100.dp)
+            modifier = Modifier.size(100.dp)
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -428,6 +438,27 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
             )
         }
     }
+}
+
+@Composable
+fun GlideImage(
+    imageUrl: String,
+    contentDescription: String?,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    AndroidView(
+        factory = { ImageView(context) },
+        modifier = modifier,
+        update = { imageView ->
+            Glide.with(context)
+                .load(imageUrl)
+                .into(imageView)
+
+            imageView.contentDescription = contentDescription
+        }
+    )
 }
 
 //Skelon effect
