@@ -1,4 +1,5 @@
 package com.example.foodies.view.profile
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,8 +46,9 @@ fun FoodiesProfileScreen(
     authViewModel: AuthViewModel = viewModel(), // Inject LogoutViewModel
     shoppingViewModel: ShoppingViewModel
 ) {
-    val user by authViewModel.user.observeAsState() // Observe the current user
-    val username by authViewModel.userName.observeAsState("NA")
+
+    val nombre = LocalContext.current.getSharedPreferences("user_info", Context.MODE_PRIVATE).getString("name", "NA")
+    val email = LocalContext.current.getSharedPreferences("user_info", Context.MODE_PRIVATE).getString("email", "Email not avaiable")
 
     // If the user is null (after logging out), navigate to the login screen
     LaunchedEffect(Unit) {
@@ -102,33 +105,40 @@ fun FoodiesProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
 
-                        authViewModel.getUserById(user?.uid.toString())
-                        val initials = username.split(" ")
-                            .mapNotNull { it.firstOrNull()?.uppercaseChar() } // Tomar la primera letra y convertirla a mayúscula
-                            .joinToString("") // Unir todas las iniciales sin espacios
+                        //authViewModel.getUserById(user?.uid.toString())
+                        val initials = nombre?.split(" ")
+                            ?.mapNotNull { it.firstOrNull()?.uppercaseChar() } // Tomar la primera letra y convertirla a mayúscula
+                            ?.joinToString("") // Unir todas las iniciales sin espacios
 
-                        Text(
-                            text = initials,
-                            color = Color.White,
-                            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
-                        )
+                        if (initials != null) {
+                            Text(
+                                text = initials,
+                                color = Color.White,
+                                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold)
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Display user's name
-                    Text(
-                        text = username,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                    )
+                    if (nombre != null) {
+                        Text(
+                            text = nombre,
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(4.dp))
 
                     // Display user's email
-                    Text(
-                        text = user?.email ?: "Email not available",
-                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
-                    )
+                    if (email != null) {
+                        Text(
+                            //text = user?.email ?: "Email not available",
+                            text = email,
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+                        )
+                    }
                 }
             }
 
