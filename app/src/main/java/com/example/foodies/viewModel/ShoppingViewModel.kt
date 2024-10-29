@@ -104,7 +104,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _cart.value = Cart()
         loadCartItems()
         loadItemSavedIcon()
-        storeInfo()
     }
 
     private fun saveItemToCart(item: Item){
@@ -481,7 +480,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     }
 
-    private fun storeInfo() {
+    fun storeInfo() {
         val fbUser = serviceAdapter.getCurrentUser()
         fbUser?.let { user ->
             val editor = sharedPreferencesUser.edit()
