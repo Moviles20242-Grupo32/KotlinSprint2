@@ -34,6 +34,7 @@ import com.example.foodies.model.DBProvider
 import com.example.foodies.model.NetworkMonitor
 import com.example.foodies.model.OrderWorker
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import java.io.File
 import com.google.gson.Gson
@@ -45,6 +46,9 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     private val sharedPreferences: SharedPreferences =
       application.getSharedPreferences("shopping_cart", Context.MODE_PRIVATE)
+
+    private val sharedPreferencesUser: SharedPreferences =
+        application.getSharedPreferences("user_info", Context.MODE_PRIVATE)
 
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
@@ -89,6 +93,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     
     private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
 
+
+
     //Inicialización: Cargamos la LocationManager address
     init {
         // Observamos los cambios en la dirección
@@ -98,6 +104,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _cart.value = Cart()
         loadCartItems()
         loadItemSavedIcon()
+        storeInfo()
     }
 
     private fun saveItemToCart(item: Item){
@@ -153,11 +160,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
 
-    //override fun onCleared() {
-      //  super.onCleared()
-        // Guardar el estado de los ítems en SharedPreferences cuando el ViewModel es destruido
-        //saveItemSavedIcon()
-    //}
+    override fun onCleared() {
+        super.onCleared()
+        saveItemSavedIcon() // Guardar el estado al destruir el ViewModel
+    }
+
 
     fun resetCart(){
         viewModelScope.launch {
@@ -204,22 +211,22 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     private fun loadItemSavedIcon() {
         _items.value?.let { itemList ->
             val updatedItems = itemList.mapIndexed { index, item ->
-                // Cargar el estado booleano, si no está guardado, devolver false
                 val isAddedState = sharedPreferences.getBoolean("item${index + 1}_isAdded", false)
-
-                // Retornar el item con el estado actualizado
                 item.copy(isAdded = isAddedState)
             }
-
-            // Publicar la lista de items actualizada
             _items.postValue(updatedItems)
         }
     }
+
 
     private fun clearSharedPreferences() {
         val editor = sharedPreferences.edit()
         editor.clear()  // Elimina todos los valores guardados
         editor.apply()  // Aplica los cambios
+
+        val editor2 = sharedPreferencesUser.edit()
+        editor2.clear()  // Elimina todos los valores guardados
+        editor2.apply()  // Aplica los cambios
     }
 
 
@@ -261,16 +268,16 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     _items.postValue(itemList)
                     Log.d("FoodiesHome-items-items", "$itemList")
                     _isLoaded.postValue(true)
-                    loadItemSavedIcon()
+                    loadItemSavedIcon() // Llamar después de establecer los ítems
                 },
                 onFailure = { exception ->
-                    // Publicar el error si ocurre
                     _error.postValue(exception.message)
                     _isLoaded.postValue(false)
                 }
             )
         }
     }
+
 
     fun fetchUserPreferences(userId: String) {
         serviceAdapter.getUserOrderHistory(
@@ -473,6 +480,31 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         serviceAdapter.registerPriceFB(price)
 
     }
+
+    private fun storeInfo() {
+        val fbUser = serviceAdapter.getCurrentUser()
+        fbUser?.let { user ->
+            val editor = sharedPreferencesUser.edit()
+            editor.putString("email", user.email)  // Establecer el email
+
+            // Obtener y guardar el nombre del usuario
+            serviceAdapter.getUserNameByUid(
+                user.uid,
+                onSuccess = { nombre ->
+                    editor.putString("name", nombre)
+                    editor.apply()  // Guarda email y nombre al obtener ambos correctamente
+                    Log.d("SharedPreferences", "Email y Nombre guardados en SharedPreferences")
+                },
+                onFailure = { error ->
+                    editor.putString("name", "NA")  // Guarda "NA" en caso de error
+                    editor.apply()  // Guarda email y nombre con NA en caso de fallo
+                    Log.e("SharedPreferences", "No se pudo obtener el nombre: ${error.message}")
+                }
+            )
+        }
+    }
+
+
 
 
 
