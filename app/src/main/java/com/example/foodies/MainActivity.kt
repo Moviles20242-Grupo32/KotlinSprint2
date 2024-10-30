@@ -1,11 +1,13 @@
 package com.example.foodies
 
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,12 +26,14 @@ import androidx.work.WorkManager
 import com.example.foodies.model.FoodiesNotificationManager
 import com.example.foodies.model.LocationWorker
 import com.example.foodies.model.NetworkMonitor
+import com.example.foodies.model.OrderWorker
 import com.example.foodies.viewModel.FoodiesNavigation
 import com.example.foodies.ui.theme.FoodiesTheme
 import java.util.concurrent.TimeUnit
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -42,6 +46,7 @@ class MainActivity : ComponentActivity() {
         }
         // Iniciar los Workers al crear la actividad
         locationWorker()
+        orderWorker()
         NetworkMonitor.initialize(this)
     }
 
@@ -49,6 +54,13 @@ class MainActivity : ComponentActivity() {
     private fun locationWorker(){
         val locationWorker = PeriodicWorkRequestBuilder<LocationWorker>(15, TimeUnit.MINUTES).build()
         WorkManager.getInstance(this).enqueue(locationWorker)
+    }
+
+    private fun orderWorker(){
+        val orderWorker = PeriodicWorkRequestBuilder<OrderWorker>(17, TimeUnit.MINUTES)
+            .addTag("order_worker")
+            .build()
+        WorkManager.getInstance(this).enqueue(orderWorker)
     }
 
     //On destroy activity
@@ -60,6 +72,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun FoodiesApp(){
     Surface (modifier = Modifier

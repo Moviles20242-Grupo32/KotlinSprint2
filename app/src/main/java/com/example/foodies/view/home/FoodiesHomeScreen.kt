@@ -1,5 +1,6 @@
 package com.example.foodies.view.home
 
+import android.util.Log
 import android.widget.ImageView
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -90,7 +91,6 @@ fun FoodiesHomeScreen(
         //Incialización de elementos adicionales
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
-        viewModel.initOrderWorker(context)
         viewModel.storeInfo()
     }
 
@@ -117,15 +117,21 @@ fun FoodiesHomeScreen(
                 viewModel.filterItemsByName(query)
             })
 
+            Log.d("Items-v", "$items")
             // Lista de ítems usando la función modularizada
-            if (internetConnected == true) {
+            if (internetConnected == false){
+                ShimmerList("Esperando conexión a internet...")
+            }
+            else if (items.isEmpty()){
+                ShimmerList("Cargando productos disponibles")
+            }
+            else{
                 //Obtener datos
                 FetchItemsData(viewModel, onComplete = {
                     msitem?.let { ItemsList(items,viewModel, it) }
                 })
-            } else {
-                ShimmerList()
             }
+
         }
     }
 }
@@ -134,26 +140,15 @@ fun FoodiesHomeScreen(
 //Función para obtener datos
 @Composable
 fun FetchItemsData(viewModel: ShoppingViewModel, onComplete: @Composable () -> Unit) {
-    // Estado para rastrear si la operación ha terminado
-    var isComplete by remember { mutableStateOf(false) }
-
-    // Ejecutar la lógica suspendida en LaunchedEffect
-    LaunchedEffect(Unit) {
-        //Producto más vendido
-        viewModel.mostSellItem()
-        //Obtiene los items disponibles
-        val userId = Firebase.auth.currentUser?.uid
-        if (userId != null) {
-            viewModel.fetchUserPreferences(userId)
-        }
-        // Marcar como completo una vez finalicen las operaciones
-        isComplete = true
+    //Producto más vendido
+    viewModel.mostSellItem()
+    //Obtiene los items disponibles
+    val userId = Firebase.auth.currentUser?.uid
+    if (userId != null) {
+        //viewModel.fetchUserPreferences(userId)
     }
-
-    // Llamar a onComplete solo cuando se haya terminado
-    if (isComplete) {
-        onComplete()
-    }
+    // Marcar como completo una vez finalicen las operaciones
+    onComplete()
 }
 
 //Botones de acciones
@@ -452,7 +447,7 @@ fun GlideImage(
 
 //Skelon effect
 @Composable
-fun ShimmerList() {
+fun ShimmerList(message: String) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -466,7 +461,7 @@ fun ShimmerList() {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Esperando conexión a internet...",
+                    text = message,
                     color = Color(0.352f, 0.196f, 0.070f, 1.0f),
                     fontWeight = FontWeight.Bold,
                     style = TextStyle(fontSize = 15.sp)

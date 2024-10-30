@@ -39,6 +39,8 @@ import com.google.firebase.auth.auth
 import java.io.File
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -103,7 +105,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
         _cart.value = Cart()
         loadCartItems()
-        loadItemSavedIcon()
+        _isLoaded.postValue(false)
     }
 
     private fun saveItemToCart(item: Item){
@@ -152,8 +154,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     private fun saveItemSavedIcon() {
         val editor = sharedPreferences.edit()
         _items.value?.forEachIndexed { index, item ->
-            editor.putBoolean("item${index + 1}_isAdded", item.isAdded)
-            Log.d("SharedPreferences", "Guardando item${index + 1}_isAdded = ${item.isAdded}")
+            editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
+            Log.d("SharedPreferences", "Guardando item_${item.id}_isAdded = ${item.isAdded}")
         }
         editor.apply()
     }
@@ -203,20 +205,15 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         clearCartDatabase()        // Limpia la base de datos del carrito
     }
 
-
-
-
-
-    private fun loadItemSavedIcon() {
+    private fun loadItemSavedIcon(){
         _items.value?.let { itemList ->
             val updatedItems = itemList.mapIndexed { index, item ->
-                val isAddedState = sharedPreferences.getBoolean("item${index + 1}_isAdded", false)
+                val isAddedState = sharedPreferences.getBoolean("item_${index + 1}_isAdded", false)
                 item.copy(isAdded = isAddedState)
             }
             _items.postValue(updatedItems)
         }
     }
-
 
     private fun clearSharedPreferences() {
         val editor = sharedPreferences.edit()
@@ -239,14 +236,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         textToSpeechManager = TextToSpeechManager(context)
     }
 
-    //Inicalizamos el order worker
-    fun initOrderWorker(context: Context){
-        val orderWorker = PeriodicWorkRequestBuilder<OrderWorker>(17, TimeUnit.MINUTES)
-            .addTag("order_worker")
-            .build()
-        WorkManager.getInstance(context).enqueue(orderWorker)
-    }
-
     //Función para leer lista de productos
     fun readItemList(items: List<Item>, onComplete: () -> Unit) {
         val combinedText = items.joinToString(separator = ". ") { item ->
@@ -260,23 +249,29 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun fetchItems() {
-        if (_isLoaded.value == true) return
         viewModelScope.launch {
-            serviceAdapter.getAllItems(
-                onSuccess = { itemList ->
-                    _items.postValue(itemList)
-                    Log.d("FoodiesHome-items-items", "$itemList")
-                    _isLoaded.postValue(true)
-                    loadItemSavedIcon() // Llamar después de establecer los ítems
-                },
-                onFailure = { exception ->
-                    _error.postValue(exception.message)
-                    _isLoaded.postValue(false)
+            try {
+                // Llamada al servicio en un hilo de I/O
+                val fetchedItems = withContext(Dispatchers.IO) {
+                    serviceAdapter.getAllItems()  // Llamada suspendida
                 }
-            )
+                // Actualiza el LiveData en el hilo principal solo si las listas son diferentes
+                withContext(Dispatchers.Main) {
+                    val updatedItems = fetchedItems.map { item ->
+                        // Usa el ID o una clave más consistente para almacenar el estado en SharedPreferences
+                        val isAddedState = sharedPreferences.getBoolean("item_${item.id}_isAdded", false)
+                        item.copy(isAdded = isAddedState)  // Mantener estado
+                    }
+                    Log.d("Items-sp", "$updatedItems")
+                    // Asignar la lista actualizada
+                    _items.value = updatedItems  // Esto notificará a los observadores
+                }
+            } catch (exception: Exception) {
+                // Maneja cualquier error y publica el mensaje de error
+                _error.postValue(exception.message)
+            }
         }
     }
-
 
     fun fetchUserPreferences(userId: String) {
         serviceAdapter.getUserOrderHistory(
@@ -308,14 +303,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     //Función para obtener el producto más vendido
     fun mostSellItem(){
         viewModelScope.launch {
-            serviceAdapter.mostSellItem(
-                onSuccess = { item ->
-                    _msitem.postValue(item)
-                },
-                onFailure = { exception ->
-                    _error.postValue(exception.message)
-                }
-            )
+           val item =  serviceAdapter.mostSellItem()
+            _msitem.postValue(item)
         }
     }
 
@@ -355,7 +344,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _items.postValue(updatedList)
         _items.value = updatedList
         saveItemSavedIcon() // Agregar aquí para actualizar el estado en SharedPreferences
-
     }
 
 
