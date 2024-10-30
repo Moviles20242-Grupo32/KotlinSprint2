@@ -26,7 +26,7 @@ fun itemsAvailability(shoppingViewModel: ShoppingViewModel) {
             shoppingViewModel.fetchItems()  // Llamar al método del ViewModel
 
             // Esperar 2 minutos antes de la siguiente ejecución
-            delay(1 * 60 * 1000L)  // 2 minutos en milisegundos
+            delay(10 * 60 * 1000L)  // 2 minutos en milisegundos
         }
     }
 }

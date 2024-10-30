@@ -205,16 +205,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         clearCartDatabase()        // Limpia la base de datos del carrito
     }
 
-    private fun loadItemSavedIcon(){
-        _items.value?.let { itemList ->
-            val updatedItems = itemList.mapIndexed { index, item ->
-                val isAddedState = sharedPreferences.getBoolean("item_${index + 1}_isAdded", false)
-                item.copy(isAdded = isAddedState)
-            }
-            _items.postValue(updatedItems)
-        }
-    }
-
     private fun clearSharedPreferences() {
         val editor = sharedPreferences.edit()
         editor.clear()  // Elimina todos los valores guardados
@@ -253,21 +243,19 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             try {
                 // Llamada al servicio en un hilo de I/O
                 val fetchedItems = withContext(Dispatchers.IO) {
-                    serviceAdapter.getAllItems()  // Llamada suspendida
+                    serviceAdapter.getAllItems()
                 }
                 // Actualiza el LiveData en el hilo principal solo si las listas son diferentes
-                withContext(Dispatchers.Main) {
-                    val updatedItems = fetchedItems.map { item ->
-                        // Usa el ID o una clave más consistente para almacenar el estado en SharedPreferences
-                        val isAddedState = sharedPreferences.getBoolean("item_${item.id}_isAdded", false)
-                        item.copy(isAdded = isAddedState)  // Mantener estado
-                    }
-                    Log.d("Items-sp", "$updatedItems")
-                    // Asignar la lista actualizada
-                    _items.value = updatedItems  // Esto notificará a los observadores
+                val updatedItems = fetchedItems.map { item ->
+                    // Usa el ID o una clave más consistente para almacenar el estado en SharedPreferences
+                    val isAddedState = sharedPreferences.getBoolean("item_${item.id}_isAdded", false)
+                    item.copy(isAdded = isAddedState)  // Mantener estado
                 }
+                Log.d("Items-sp", "$updatedItems")
+                // Asignar la lista actualizada
+                _items.value = updatedItems
             } catch (exception: Exception) {
-                // Maneja cualquier error y publica el mensaje de error
+                // Maneja cualquier error y publica el mensaje de errorzhy7
                 _error.postValue(exception.message)
             }
         }
@@ -341,7 +329,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 item
             }
         } ?: emptyList()
-        _items.postValue(updatedList)
         _items.value = updatedList
         saveItemSavedIcon() // Agregar aquí para actualizar el estado en SharedPreferences
     }
@@ -368,7 +355,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             }
         } ?: emptyList()
 
-        _items.postValue(updatedList)
+        _items.value = updatedList
         _cart.postValue(currentCart)
         updateTotal() // Actualiza el total después de eliminar el item
     }
@@ -453,13 +440,20 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             }
         } ?: emptyList()
 
-        // Publica los cambios en la lista de items y el carrito
-        _items.postValue(updatedList)
-        _cart.postValue(currentCart)  // Actualiza el estado del carrito
-        updateTotal() // Actualiza el total después de eliminar el item
 
+        // Publica los cambios en la lista de items y el carrito
+        Log.d("SharedPreferences-list", "$updatedList")
+        _items.postValue(updatedList)
+        //Modificar estado en shared preferences
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("item_${item.id}_isAdded", false)
+        editor.commit()
+        // Actualiza el estado del carrito
+        _cart.postValue(currentCart)
+        updateTotal()
         removeItemFromCartId(item.id)
     }
+
 
     fun registerPrice(){
         val totalAmountCalc = _cart.value?.getTotalCost() ?: 0
