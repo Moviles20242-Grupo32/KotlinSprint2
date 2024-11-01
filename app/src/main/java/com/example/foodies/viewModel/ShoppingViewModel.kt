@@ -265,7 +265,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         serviceAdapter.getUserOrderHistory(
             userId = userId,
             onSuccess = { itemQuantityMap ->
-                fetchItems()
                 Log.d("FoodiesHome-items-p", "$itemQuantityMap")
                 // Si los items aún no están inicializados, usa una lista por defecto
                 val currentItems = _items.value ?: emptyList()
