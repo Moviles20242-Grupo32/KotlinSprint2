@@ -30,6 +30,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
@@ -83,7 +84,8 @@ fun FoodiesHomeScreen(
     val context = LocalContext.current
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
     val internetConnected by viewModel.internetConnected.observeAsState()
-
+    //Remembers
+    var sort by rememberSaveable { mutableStateOf(false) }
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
         //Obtener productos iniciales
@@ -115,6 +117,9 @@ fun FoodiesHomeScreen(
             // Fila 3: Barra de búsqueda
             FilterBar(onFilter = { query ->
                 viewModel.filterItemsByName(query)
+            }, sort = {
+                viewModel.sortByCheaperItems()
+                sort = !sort
             })
 
             Log.d("Items-v", "$items")
@@ -127,9 +132,13 @@ fun FoodiesHomeScreen(
             }
             else{
                 //Obtener datos
-                FetchItemsData(viewModel, onComplete = {
+                if (!sort){
+                    FetchItemsData(viewModel, onComplete = {
+                        msitem?.let { ItemsList(items,viewModel, it) }
+                    })
+                }else{
                     msitem?.let { ItemsList(items,viewModel, it) }
-                })
+                }
             }
 
         }
@@ -243,40 +252,66 @@ fun Location(ubi: String) {
 
 
 @Composable
-fun FilterBar(onFilter: (String) -> Unit) {
-    // Definir el estado localmente dentro de la función
+fun FilterBar(onFilter: (String) -> Unit,sort: () -> Unit) {
     var searchText by rememberSaveable { mutableStateOf("") }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(19.dp))
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(19.dp))
-            .background(Color(0.952f, 0.952f, 0.949f, 1.0f))
-            .padding(8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Buscar",
-                tint = Color.Gray, // Color de la lupa
+            // Row interno para el icono de búsqueda y el campo de texto
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 8.dp)
-            )
+                    .weight(1f)
+                    .clip(RoundedCornerShape(19.dp))
+                    .shadow(elevation = 2.dp, shape = RoundedCornerShape(19.dp))
+                    .background(Color(0.952f, 0.952f, 0.949f, 1.0f))
+                    .padding(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Buscar",
+                    tint = Color.Gray,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .padding(end = 8.dp)
+                )
 
-            BasicTextField(
-                value = searchText,
-                onValueChange = { newText ->
-                    searchText = newText
-                    onFilter(newText) // Llama al método de filtrado en el ViewModel
-                },
+                BasicTextField(
+                    value = searchText,
+                    onValueChange = { newText ->
+                        searchText = newText
+                        onFilter(newText)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = TextStyle(color = Color.Black)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            // Ícono de dinero
+            Icon(
+                imageVector = Icons.Filled.AttachMoney, // Icono de dinero
+                contentDescription = "Dinero",
+                tint = Color.White,
                 modifier = Modifier
-                    .fillMaxWidth(),
-                textStyle = TextStyle(color = Color.Black) // Estilo de texto
+                    .size(45.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color = Color(0.968f, 0.588f, 0.066f, 1.0f),
+                        shape = CircleShape
+                    )
+                    .padding(3.dp)
+                    .clickable {
+                        sort()
+                    }
             )
         }
     }

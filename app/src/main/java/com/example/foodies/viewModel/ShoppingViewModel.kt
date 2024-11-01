@@ -285,7 +285,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         )
     }
 
-
+    //Función que ordena por precio del producto
+    fun sortByCheaperItems(){
+        _items.value = _items.value?.sortedBy { it.item_cost }
+    }
 
     //Función para obtener el producto más vendido
     fun mostSellItem(){
