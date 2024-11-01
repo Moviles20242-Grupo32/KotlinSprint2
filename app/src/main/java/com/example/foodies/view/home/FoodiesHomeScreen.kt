@@ -145,7 +145,7 @@ fun FetchItemsData(viewModel: ShoppingViewModel, onComplete: @Composable () -> U
     //Obtiene los items disponibles
     val userId = Firebase.auth.currentUser?.uid
     if (userId != null) {
-        //viewModel.fetchUserPreferences(userId)
+        viewModel.fetchUserPreferences(userId)
     }
     // Marcar como completo una vez finalicen las operaciones
     onComplete()
