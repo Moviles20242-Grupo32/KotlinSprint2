@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 
 class ServiceAdapter {
     // FireStore Data Base
@@ -103,46 +104,38 @@ class ServiceAdapter {
 
     //SHOPPING SERVICES:
     // Función para obtener todos los documentos de la colección "Items" y mapearlos a objetos Item
-    fun getAllItems(onSuccess: (List<Item>) -> Unit, onFailure: (Exception) -> Unit) {
-        firestore.collection("Items")
-            .get()  // Solicitar todos los documentos
-            .addOnSuccessListener { documents ->
-                // Lista para almacenar los ítems
-                val itemsList = mutableListOf<Item>()
-                for (document in documents) {
-                    val id = document.id
-                    // Mapear cada documento a un objeto Item y agregar el ID
-                    val item = document.toObject(Item::class.java).copy(id = id)
-                    itemsList.add(item)
-                }
-                Log.d("ServiceAdapter", "Items obtenidos correctamente")
-                // Retornar los datos
-                onSuccess(itemsList)
+    suspend fun getAllItems(): List<Item> {
+        return try {
+            val documents = firestore.collection("Items").get().await()  // Usa await para la llamada asíncrona
+            val itemsList = documents.map { document ->
+                val id = document.id
+                document.toObject(Item::class.java).copy(id = id)  // Mapea cada documento a Item
             }
-            .addOnFailureListener { exception ->
-                Log.d("ServiceAdapter", "Error obteniendo los Items", exception)
-                // Manejar el error
-                onFailure(exception)
-            }
+            Log.d("ServiceAdapter", "Items obtenidos correctamente")
+            itemsList  // Devuelve la lista de items
+        } catch (e: Exception) {
+            Log.e("ServiceAdapter", "Error obteniendo los Items", e)
+            throw e  // Lanza la excepción para manejarla en el ViewModel
+        }
     }
 
     // Función para obtener el producto más vendido
-    fun mostSellItem(onSuccess: (Item) -> Unit, onFailure: (Exception) -> Unit) {
-        getAllItems(
-            onSuccess = { itemsList ->
-                // Encontrar el ítem con el mayor valor en times_ordered
-                val mostSoldItem = itemsList.maxByOrNull { it.times_ordered }
-                if (mostSoldItem != null) {
-                    onSuccess(mostSoldItem)
-                } else {
-                    onFailure(Exception("No items found"))
-                }
-            },
-            onFailure = { exception ->
-                onFailure(exception)
-            }
-        )
+    suspend fun mostSellItem(): Item {
+        return try {
+            // Llamada suspendida para obtener todos los ítems
+            val itemsList = getAllItems()
+
+            // Encontrar el ítem con mayor valor en times_ordered
+            itemsList.maxByOrNull { it.times_ordered }
+                ?: throw Exception("No items found")  // Lanza excepción si no hay ítems
+
+        } catch (e: Exception) {
+            Log.e("ServiceAdapter", "Error obteniendo el ítem más vendido", e)
+            throw e  // Lanza la excepción para manejarla en el ViewModel o donde se invoque
+        }
     }
+
+
 
     fun createOrder(cart: Cart, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val userId = auth.currentUser?.uid
