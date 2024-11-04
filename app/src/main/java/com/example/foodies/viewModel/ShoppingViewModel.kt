@@ -245,6 +245,16 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 val fetchedItems = withContext(Dispatchers.IO) {
                     serviceAdapter.getAllItems()
                 }
+
+                // Encuentra los elementos que ya no están en la lista actualizada y remuévelos
+                val itemsToRemove = _items.value?.filter { currentItem ->
+                    fetchedItems.none { it.id == currentItem.id }
+                } ?: emptyList()
+
+                for (element in itemsToRemove) {
+                    removeItem(element)
+                }
+
                 // Actualiza el LiveData en el hilo principal solo si las listas son diferentes
                 val updatedItems = fetchedItems.map { item ->
                     // Usa el ID o una clave más consistente para almacenar el estado en SharedPreferences
@@ -253,7 +263,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 }
                 Log.d("Items-sp", "$updatedItems")
                 // Asignar la lista actualizada
-                _items.value = updatedItems
+                _items.postValue(updatedItems)
             } catch (exception: Exception) {
                 // Maneja cualquier error y publica el mensaje de errorzhy7
                 _error.postValue(exception.message)
@@ -346,9 +356,9 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     // Función para eliminar un item del carrito
     private fun removeItem(item: Item) {
         val currentCart = _cart.value ?: Cart()
-        currentCart.removeItem(item)
+        currentCart.removeItem(item) // Remueve el item del carrito
 
-        // Actualizar el estado de isAdded a false para el item eliminado
+        // Actualiza el estado de isAdded del item a false
         val updatedList = _items.value?.map { itemList ->
             if (itemList.id == item.id) {
                 itemList.copy(isAdded = false)
@@ -357,9 +367,17 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             }
         } ?: emptyList()
 
-        _items.value = updatedList
+        // Publica los cambios en la lista de items y el carrito
+        Log.d("SharedPreferences-list", "$updatedList")
+        _items.postValue(updatedList)
+        // Remover la preferencia
+        val editor = sharedPreferences.edit()
+        editor.remove("item_${item.id}_isAdded")
+        editor.commit()
+        // Actualiza el estado del carrito
         _cart.postValue(currentCart)
-        updateTotal() // Actualiza el total después de eliminar el item
+        updateTotal()
+        removeItemFromCartId(item.id)
     }
 
 
