@@ -434,6 +434,9 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
         // Publicar la lista de items actualizada
         _items.postValue(updatedItems)
+
+        clearCartDatabase()
+        clearSharedPreferences()
     }
 
 

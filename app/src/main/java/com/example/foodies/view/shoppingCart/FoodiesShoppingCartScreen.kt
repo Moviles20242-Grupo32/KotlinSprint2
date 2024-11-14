@@ -73,7 +73,7 @@ fun FoodiesShoppingCartScreen(
 
     // Si la orden se guardó con éxito, mostrar el diálogo
     if (orderSuccess == true && !showDialog) {
-        showDialog = true // Activar el diálogo cuando la orden es exitosa
+        //showDialog = true // Activar el diálogo cuando la orden es exitosa
     }
 
     // Mostrar el diálogo de carrito vacío si hay un error de carrito vacío
