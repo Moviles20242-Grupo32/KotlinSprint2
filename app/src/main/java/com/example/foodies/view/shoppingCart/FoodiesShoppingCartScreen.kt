@@ -262,6 +262,7 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                             // Solo limpiar el carrito, no navegar automáticamente
                             viewModel.registerPrice()
                             viewModel.clearCart()
+                            navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
                         },
                         onFailure = { exception ->
                             // Manejo de errores, por ejemplo, mostrar un diálogo

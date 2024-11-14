@@ -1,10 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.android)
 
     id("com.google.gms.google-services")
 
     id("com.google.devtools.ksp")
+
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -120,6 +122,16 @@ dependencies {
 
     implementation(libs.glide)
     ksp(libs.compiler)
+
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.maps.compose)
+
+    implementation(libs.maps.compose.v2110)
+    implementation(libs.play.services.maps.v1802)
+    implementation(libs.android.maps.utils)
+
+    implementation(libs.play.services.location)
+    implementation(libs.maps.compose.v2112)
 
 }
 
