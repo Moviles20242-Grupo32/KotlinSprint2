@@ -150,6 +150,37 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    // Función para guardar el carrito en caché
+    fun saveCartCache() {
+
+        val cartJson = _cart.value?.toJson()
+
+        // Log para ver el JSON que se guarda en el caché
+        Log.d("lastOrder", "Guardando JSON en caché: $cartJson")
+
+        lruCache.lruCashing.put("lastOrder", cartJson)
+
+
+    }
+
+    // Función para cargar el último carrito guardado en caché
+    fun loadLastOrder() {
+        val cartJson = lruCache.lruCashing.get("lastOrder")
+
+        // Log para ver el JSON que se recupera del caché
+        Log.d("lastOrder", "Recuperando JSON del caché: $cartJson")
+
+        if (cartJson != null && cartJson.isNotEmpty()) {
+            val carrito = Cart.fromJson(cartJson)
+            if (carrito != null) {
+                _cart.postValue(carrito)
+            } else {
+                Log.e("lastOrder", "Error al cargar el carrito desde JSON.")
+            }
+        } else {
+            Log.e("lastOrder", "No se encontró un carrito en caché.")
+        }
+    }
 
     private fun saveItemSavedIcon() {
         val editor = sharedPreferences.edit()
@@ -183,6 +214,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             editor.apply()
         }
     }
+
+
 
     private fun resetViewModelData() {
         _cart.postValue(Cart())               // Reinicia el carrito a uno vacío
