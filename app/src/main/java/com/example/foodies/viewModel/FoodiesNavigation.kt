@@ -34,27 +34,29 @@ fun itemsAvailability(shoppingViewModel: ShoppingViewModel) {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun FoodiesNavigation(){
+fun FoodiesNavigation() {
     val navController = rememberNavController()
-    val shoppingViewModel: ShoppingViewModel = viewModel() // Inject ShoppingViewModel
-    val authViewModel: AuthViewModel = viewModel() // Inject LogoutViewModel
+    val shoppingViewModel: ShoppingViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
     val viewModel: ProductDetailViewModel = viewModel()
 
-    // Inicializar tareas periódicas y otros workers
     itemsAvailability(shoppingViewModel)
 
-    // Configuración del NavHost
-    NavHost(navController = navController, startDestination = if(authViewModel.user.value == null){FoodiesScreens.FoodiesLoginScreen.name} else{FoodiesScreens.FoodiesHomeScreen.name}) {
+    NavHost(navController = navController, startDestination = if (authViewModel.user.value == null) {
+        FoodiesScreens.FoodiesLoginScreen.name
+    } else {
+        FoodiesScreens.FoodiesHomeScreen.name
+    }) {
 
-        composable(FoodiesScreens.FoodiesLoginScreen.name){
+        composable(FoodiesScreens.FoodiesLoginScreen.name) {
             FoodiesLoginScreen(navController = navController)
         }
 
-        composable(FoodiesScreens.FoodiesHomeScreen.name){
+        composable(FoodiesScreens.FoodiesHomeScreen.name) {
             FoodiesHomeScreen(navController = navController, viewModel = shoppingViewModel)
         }
 
-        composable(FoodiesScreens.FoodiesShoppingCartScreen.name){
+        composable(FoodiesScreens.FoodiesShoppingCartScreen.name) {
             FoodiesShoppingCartScreen(navController = navController, viewModel = shoppingViewModel)
         }
 
@@ -62,8 +64,11 @@ fun FoodiesNavigation(){
             FoodiesProfileScreen(navController = navController, authViewModel = authViewModel, shoppingViewModel = shoppingViewModel)
         }
 
-        composable(FoodiesScreens.FoodiesProductDetailScreen.name) {
-            FoodiesProductDetailScreen(navController = navController, viewModel = viewModel)
+        // Update route to accept productId
+        composable("productDetail/{productId}") { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId") ?: ""
+            FoodiesProductDetailScreen(navController = navController, viewModel = viewModel, productId = productId)
         }
     }
 }
+

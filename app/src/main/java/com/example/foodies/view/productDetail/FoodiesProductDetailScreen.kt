@@ -20,43 +20,29 @@ import com.example.foodies.viewModel.ProductDetailViewModel
 @Composable
 fun FoodiesProductDetailScreen(
     navController: NavController,
-    viewModel: ProductDetailViewModel = viewModel()
+    viewModel: ProductDetailViewModel,
+    productId: String // Accept the productId as a parameter
 ) {
-    val productId = navController.previousBackStackEntry?.arguments?.getString("productId")
-    Log.d("ProductDetail", "ProductId passed: $productId") // Log the productId
-
-    // Check if productId is valid before proceeding
+    // Fetch product details when the screen is loaded
     LaunchedEffect(productId) {
-        if (!productId.isNullOrEmpty()) {
-            viewModel.fetchProductDetails(productId)  // Call the method to fetch product details
+        if (productId.isNotEmpty()) {
+            viewModel.fetchProductDetails(productId)
         }
     }
 
     val product by viewModel.product.observeAsState()
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.White
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            // Flecha de regreso
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+    Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            // Back button
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back",
                     tint = Color(0.945f, 0.600f, 0.216f, 1.0f),
                     modifier = Modifier
                         .size(50.dp)
-                        .clickable {
-                            navController.navigateUp()  // Navigate back
-                        }
+                        .clickable { navController.navigateUp() }
                 )
             }
 
