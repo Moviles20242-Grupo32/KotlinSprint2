@@ -38,6 +38,7 @@ fun FoodiesNavigation(){
     val navController = rememberNavController()
     val shoppingViewModel: ShoppingViewModel = viewModel() // Inject ShoppingViewModel
     val authViewModel: AuthViewModel = viewModel() // Inject LogoutViewModel
+    val viewModel: ProductDetailViewModel = viewModel()
 
     // Inicializar tareas periódicas y otros workers
     itemsAvailability(shoppingViewModel)
@@ -62,7 +63,7 @@ fun FoodiesNavigation(){
         }
 
         composable(FoodiesScreens.FoodiesProductDetailScreen.name) {
-            FoodiesProductDetailScreen(navController = navController)
+            FoodiesProductDetailScreen(navController = navController, viewModel = viewModel)
         }
     }
 }
