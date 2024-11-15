@@ -84,13 +84,14 @@ fun FoodiesHomeScreen(
     val context = LocalContext.current
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
     val internetConnected by viewModel.internetConnected.observeAsState()
-    //Remembers
+    // Remembers
     var sort by rememberSaveable { mutableStateOf(false) }
+
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
-        //Obtener productos iniciales
+        // Obtener productos iniciales
         viewModel.fetchItems()
-        //Incialización de elementos adicionales
+        // Inicialización de elementos adicionales
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
         viewModel.storeInfo()
@@ -109,7 +110,7 @@ fun FoodiesHomeScreen(
             modifier = Modifier.padding(16.dp)
         ) {
             // Fila 1: Texto "Botones"
-            ActionButtons(items,navController,viewModel)
+            ActionButtons(items, navController, viewModel)
 
             // Fila 2: Texto "Locación"
             Location(userLocation)
@@ -124,23 +125,20 @@ fun FoodiesHomeScreen(
 
             Log.d("Items-v", "$items")
             // Lista de ítems usando la función modularizada
-            if (internetConnected == false){
+            if (internetConnected == false) {
                 ShimmerList("Esperando conexión a internet...")
-            }
-            else if (items.isEmpty()){
+            } else if (items.isEmpty()) {
                 ShimmerList("Cargando productos disponibles")
-            }
-            else{
-                //Obtener datos
-                if (!sort){
+            } else {
+                // Obtener datos
+                if (!sort) {
                     FetchItemsData(viewModel, onComplete = {
-                        msitem?.let { ItemsList(items,viewModel, it) }
+                        msitem?.let { ItemsList(items, viewModel, it, navController) }
                     })
-                }else{
-                    msitem?.let { ItemsList(items,viewModel, it) }
+                } else {
+                    msitem?.let { ItemsList(items, viewModel, it, navController) }
                 }
             }
-
         }
     }
 }
@@ -318,7 +316,7 @@ fun FilterBar(onFilter: (String) -> Unit,sort: () -> Unit) {
 }
 
 @Composable
-fun MostSellItem(item: Item, viewModel: ShoppingViewModel){
+fun MostSellItem(item: Item, viewModel: ShoppingViewModel, navController: NavController) {
     Column {
         Text(
             text = "Most Ordered Box",
@@ -330,26 +328,26 @@ fun MostSellItem(item: Item, viewModel: ShoppingViewModel){
             overflow = TextOverflow.Ellipsis,
             color = Color(0.352f, 0.196f, 0.070f, 1.0f)
         )
-        ItemCard(item,viewModel,item)
+        ItemCard(item, viewModel, item, navController)
     }
 }
 
 
 //LISTA DE ITEMS
 @Composable
-fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel, msitem:Item) {
+fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel, msitem: Item, navController: NavController) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         val filteredItems = items.filter { it.show }
         items(filteredItems) { item ->
-            ItemCard(item,viewModel,msitem)
+            ItemCard(item, viewModel, msitem, navController)
         }
     }
 }
 
 @Composable
-fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
+fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem: Item, navController: NavController) {
     val rating = item.item_ratings.toFloatOrNull() ?: 0f
     Row(
         modifier = Modifier
@@ -358,18 +356,15 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
             .clip(RoundedCornerShape(8.dp))
             .padding(8.dp)
     ) {
-        // Columna 1: Imagen del item
-        //AsyncImage(
-          //  model = item.item_image,
-            //contentDescription = "Imagen de ${item.item_name}",
-            //modifier = Modifier
-              //  .size(100.dp)
-        //)
-
+        // Imagen del producto con clic para navegar a FoodiesProductDetailScreen
         GlideImage(
             imageUrl = item.item_image,
             contentDescription = "Imagen de ${item.item_name}",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier
+                .size(100.dp)
+                .clickable {
+                    navController.navigate(FoodiesScreens.FoodiesProductDetailScreen.name)
+                }
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -381,12 +376,11 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
                 .align(Alignment.CenterVertically),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-
             Text(
                 text = item.item_name,
                 style = TextStyle(
-                    fontSize = 20.sp, // Tamaño de fuente fijo
-                    fontWeight = FontWeight.Bold // Negrita
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -397,15 +391,15 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
                 Box(
                     modifier = Modifier
                         .background(
-                            color = Color(0.925f, 0.925f, 0.922f, 1.0f), // Color de fondo
-                            shape = RoundedCornerShape(16.dp) // Esquinas redondeadas
+                            color = Color(0.925f, 0.925f, 0.922f, 1.0f),
+                            shape = RoundedCornerShape(16.dp)
                         )
-                        .padding(horizontal = 5.dp, vertical = 2.dp) // Padding interno del texto
+                        .padding(horizontal = 5.dp, vertical = 2.dp)
                 ) {
                     Text(
                         text = "Favorita del público",
-                        color = Color(0.352f, 0.196f, 0.070f, 1.0f), // Color del texto
-                        style = MaterialTheme.typography.bodySmall // Estilo del texto
+                        color = Color(0.352f, 0.196f, 0.070f, 1.0f),
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -423,37 +417,38 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
                     Icon(
                         imageVector = if (index < rating) Icons.Default.Star else Icons.Default.StarBorder,
                         contentDescription = null,
-                        tint = Color(0.968f, 0.588f, 0.066f, 1.0f), // Color de la estrella
+                        tint = Color(0.968f, 0.588f, 0.066f, 1.0f),
                         modifier = Modifier.size(24.dp)
                     )
                 }
             }
         }
+
         Spacer(modifier = Modifier.width(20.dp))
 
-        //Columna 3: Agregar a carrito
+        // Columna 3: Agregar a carrito
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .size(40.dp) // Tamaño total del Box
-                .clip(CircleShape) // Aplica el recorte circular al Box
+                .size(40.dp)
+                .clip(CircleShape)
                 .background(
-                    if (item.isAdded) Color(0.192f, 0.262f, 0.254f) else Color(0.968f, 0.588f,0.066f, 1.0f)
+                    if (item.isAdded) Color(0.192f, 0.262f, 0.254f) else Color(0.968f, 0.588f, 0.066f, 1.0f)
                 )
                 .border(
-                    width = 1.dp, // Ancho del borde
-                    color = Color.Transparent, // Color del borde
-                    shape = CircleShape // Esquinas redondeadas completamente
+                    width = 1.dp,
+                    color = Color.Transparent,
+                    shape = CircleShape
                 )
-                .clickable {viewModel.addItemToCart(item.id)}
+                .clickable { viewModel.addItemToCart(item.id) }
         ) {
             Icon(
                 imageVector = if (item.isAdded) Icons.Filled.Check else Icons.Filled.Add,
                 contentDescription = "Agregar al carrito",
                 tint = Color.White,
                 modifier = Modifier
-                    .align(Alignment.Center) // Centra el Icon dentro del Box
-                    .size(30.dp) // Tamaño del Icono
+                    .align(Alignment.Center)
+                    .size(30.dp)
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.example.foodies.viewModel
 
+import FoodiesProductDetailScreen
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -58,6 +59,10 @@ fun FoodiesNavigation(){
 
         composable(FoodiesScreens.FoodiesProfileScreen.name) {
             FoodiesProfileScreen(navController = navController, authViewModel = authViewModel, shoppingViewModel = shoppingViewModel)
+        }
+
+        composable(FoodiesScreens.FoodiesProductDetailScreen.name) {
+            FoodiesProductDetailScreen(navController = navController)
         }
     }
 }
