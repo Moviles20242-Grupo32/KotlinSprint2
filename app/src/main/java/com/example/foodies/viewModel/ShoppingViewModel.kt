@@ -323,17 +323,22 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
 
     fun addItemToCart(itemId: String?) {
+        // Actualizar la lista de items basada en el ID
         val updatedList = _items.value?.map { item ->
             if (item.id == itemId) {
-                val updatedItem = item.copy(isAdded = !item.isAdded)
+                val updatedItem = item.copy(isAdded = !item.isAdded) // Cambiar estado de isAdded
                 if (updatedItem.isAdded) {
+                    // Agregar el item al carrito
                     addItem(updatedItem, 1)
                     updateTotal()
+                    // Guardar item con cantidad 1 en la base de datos
                     val itemDB = item.copy(cart_quantity = 1)
                     saveItemToCart(itemDB)
                 } else {
+                    // Eliminar el item del carrito
                     removeItem(updatedItem)
                     updateTotal()
+                    // Remover el item del carrito en la base de datos
                     removeItemFromCartId(itemId)
                 }
                 updatedItem
@@ -341,8 +346,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 item
             }
         } ?: emptyList()
+
+        // Actualizar la lista de items para reflejar cambios
         _items.value = updatedList
-        saveItemSavedIcon() // Agregar aquí para actualizar el estado en SharedPreferences
+        // Guardar el estado actualizado en SharedPreferences
+        saveItemSavedIcon()
     }
 
 

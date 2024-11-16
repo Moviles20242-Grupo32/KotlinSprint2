@@ -67,7 +67,13 @@ fun FoodiesNavigation() {
         // Update route to accept productId
         composable("productDetail/{productId}") { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId") ?: ""
-            FoodiesProductDetailScreen(navController = navController, viewModel = viewModel, productId = productId)
+            FoodiesProductDetailScreen(
+                navController = navController,
+                viewModel = viewModel,
+                shoppingViewModel = shoppingViewModel,
+                productId = productId
+            )
+
         }
     }
 }

@@ -11,27 +11,21 @@ import com.example.foodies.model.ServiceAdapter
 import kotlinx.coroutines.launch
 
 class ProductDetailViewModel(application: Application) : AndroidViewModel(application) {
-
     private val serviceAdapter = ServiceAdapter()
 
-    // LiveData para almacenar el producto seleccionado
+    // LiveData for product details
     private val _product = MutableLiveData<Item>()
     val product: LiveData<Item> get() = _product
 
-    // Función para obtener los detalles del producto por su ID
+    // Fetch product details
     fun fetchProductDetails(productId: String) {
         viewModelScope.launch {
             try {
-                // Fetch product details using the productId
                 val item = serviceAdapter.getProductById(productId)
-                Log.d("ProductDetailViewModel", "Fetched product: $item")  // Log the fetched product
-
-                // Update LiveData with the fetched product
                 _product.postValue(item)
             } catch (e: Exception) {
                 Log.e("ProductDetailViewModel", "Error fetching product details: ${e.message}")
             }
         }
     }
-
 }

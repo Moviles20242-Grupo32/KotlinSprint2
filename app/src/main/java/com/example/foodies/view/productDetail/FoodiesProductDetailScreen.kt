@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.runtime.Composable
@@ -31,13 +32,14 @@ import coil.compose.rememberImagePainter
 import com.example.foodies.viewModel.ProductDetailViewModel
 import com.example.foodies.model.Item
 import com.example.foodies.view.home.GlideImage
-
+import com.example.foodies.viewModel.ShoppingViewModel
 
 
 @Composable
 fun FoodiesProductDetailScreen(
     navController: NavController,
     viewModel: ProductDetailViewModel,
+    shoppingViewModel: ShoppingViewModel,
     productId: String
 ) {
     val product by viewModel.product.observeAsState()
@@ -209,12 +211,17 @@ fun FoodiesProductDetailScreen(
                     .size(60.dp)
                     .clip(CircleShape)
                     .background(
-                        if (product?.isAdded == true) Color(0.192f, 0.262f, 0.254f) else Color(0.968f, 0.588f, 0.066f, 1.0f) // Updated orange color
+                        if (product?.isAdded == true) Color(0.192f, 0.262f, 0.254f) // Blue when added
+                        else Color(0.968f, 0.588f, 0.066f) // Orange when not added
                     )
-                    .clickable { /* Action for button */ }
+                    .clickable {
+                        product?.id?.let {
+                            shoppingViewModel.addItemToCart(it) // Add the item to the cart
+                        }
+                    }
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Add,
+                    imageVector = if (product?.isAdded == true) Icons.Filled.Check else Icons.Filled.Add,
                     contentDescription = "Agregar al carrito",
                     tint = Color.White,
                     modifier = Modifier
@@ -225,5 +232,3 @@ fun FoodiesProductDetailScreen(
         }
     }
 }
-
-
