@@ -70,9 +70,16 @@ data class Cart(
         for (item in items) {
             val itemJson = JSONObject()
             itemJson.put("id", item.id)
-            itemJson.put("name", item.item_name)
-            itemJson.put("cart_quantity", item.cart_quantity)
             itemJson.put("item_cost", item.item_cost)
+            itemJson.put("item_details", item.item_details)
+            itemJson.put("item_image", item.item_image)
+            itemJson.put("name", item.item_name)
+            itemJson.put("item_rating", item.item_ratings)
+            itemJson.put("times_ordered", item.times_ordered)
+            itemJson.put("cart_quantity", item.cart_quantity)
+            itemJson.put("show", item.show)
+            itemJson.put("isAdded", item.isAdded)
+
             jsonArray.put(itemJson)
         }
 
@@ -91,11 +98,19 @@ data class Cart(
                 val itemJson = jsonArray.getJSONObject(i)
                 val item = Item(
                     id = itemJson.getString("id"),
+                    item_cost = itemJson.getInt("item_cost"),
+                    item_details = itemJson.getString("item_details"),
+                    item_image = itemJson.getString("item_image"),
                     item_name = itemJson.getString("name"),
+                    item_ratings = itemJson.getString("item_rating"),
+                    times_ordered = itemJson.getInt("times_ordered"),
                     cart_quantity = itemJson.getInt("cart_quantity"),
-                    item_cost = itemJson.getInt("item_cost")
+                    show = itemJson.getBoolean("show"),
+                    isAdded = itemJson.getBoolean("isAdded"),
+
+
                 )
-                cart.addItem(item,1)
+                cart.addItem(item,itemJson.getInt("cart_quantity"))
             }
 
             return cart

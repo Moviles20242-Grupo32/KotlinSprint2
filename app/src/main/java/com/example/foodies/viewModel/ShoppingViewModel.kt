@@ -163,7 +163,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     }
 
-    // Función para cargar el último carrito guardado en caché
     fun loadLastOrder() {
         val cartJson = lruCache.lruCashing.get("lastOrder")
 
@@ -173,7 +172,30 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         if (cartJson != null && cartJson.isNotEmpty()) {
             val carrito = Cart.fromJson(cartJson)
             if (carrito != null) {
+                // Crear una nueva lista combinada con los elementos actuales
+                val currentItems = _items.value ?: emptyList() // Elementos actuales
+                val updatedItems = carrito.getItems() // Elementos cargados del carrito
+
+                // Actualizar los elementos combinando
+                val mergedItems = currentItems.map { currentItem ->
+                    updatedItems.find { it.id == currentItem.id } ?: currentItem
+                } + updatedItems.filter { newItem ->
+                    currentItems.none { it.id == newItem.id }
+                }
+
+                // Publicar los cambios combinados
                 _cart.postValue(carrito)
+                _items.postValue(mergedItems)
+
+                // Actualizar SharedPreferences
+                val editor = sharedPreferences.edit()
+                mergedItems.forEach { item ->
+                    editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
+                    if (item.isAdded) {
+                        saveItemToCart(item)
+                    }
+                }
+                editor.apply()
             } else {
                 Log.e("lastOrder", "Error al cargar el carrito desde JSON.")
             }
@@ -181,6 +203,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             Log.e("lastOrder", "No se encontró un carrito en caché.")
         }
     }
+
 
     private fun saveItemSavedIcon() {
         val editor = sharedPreferences.edit()
