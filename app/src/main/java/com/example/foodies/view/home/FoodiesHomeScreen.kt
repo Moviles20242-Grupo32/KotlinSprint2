@@ -38,6 +38,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -84,6 +86,7 @@ fun FoodiesHomeScreen(
     val context = LocalContext.current
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
     val internetConnected by viewModel.internetConnected.observeAsState()
+    val hasActiveOrder by viewModel.hasActiveOrder.observeAsState(false)
     //Remembers
     var sort by rememberSaveable { mutableStateOf(false) }
     // Llamar a la función para obtener los datos al entrar en la pantalla
@@ -122,6 +125,71 @@ fun FoodiesHomeScreen(
                 sort = !sort
             })
 
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth() // Ocupa el ancho total del contenedor
+                    .padding(vertical = 16.dp) // Espaciado opcional
+            ) {
+                Button(
+                    onClick = { viewModel.loadLastOrder()
+                                viewModel.registerUseOfTrack()
+                              },
+                    modifier = Modifier.align(Alignment.Center), // Centra el botón horizontalmente en el Box
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(241, 153, 55)
+                    )
+                ) {
+                    Text(
+                        text = "Realizar pedido anterior",
+                        modifier = Modifier.padding(5.dp)
+                    )
+                }
+            }
+            viewModel.getOrderStatus()
+
+            if (hasActiveOrder) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .background(Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp))
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Tienes una orden activa",
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+
+                        Button(
+                            onClick = {
+                                navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(241, 153, 55)
+                            ),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text(text = "Seguir tu orden")
+                        }
+                    }
+                }
+            }
+
+
+
+
+
             Log.d("Items-v", "$items")
             // Lista de ítems usando la función modularizada
             if (internetConnected == false){
@@ -140,6 +208,8 @@ fun FoodiesHomeScreen(
                     msitem?.let { ItemsList(items,viewModel, it) }
                 }
             }
+
+
 
         }
     }

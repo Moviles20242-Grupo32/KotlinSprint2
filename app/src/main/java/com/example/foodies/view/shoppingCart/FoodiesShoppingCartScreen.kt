@@ -258,6 +258,7 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                     viewModel.saveOrder(
                         onSuccess = {
                             // Solo limpiar el carrito, no navegar automáticamente
+                            viewModel.saveCartCache()
                             viewModel.registerPrice()
                             viewModel.clearCart()
                             navController.navigate(FoodiesScreens.ConfirmOrderScreen.name)
