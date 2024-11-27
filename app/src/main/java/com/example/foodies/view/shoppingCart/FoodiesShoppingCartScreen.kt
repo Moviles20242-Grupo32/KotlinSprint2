@@ -264,6 +264,7 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                             viewModel.registerPrice()
                             viewModel.clearCart()
                             navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
+                            viewModel.saveOrderStatus(true)
                         },
                         onFailure = { exception ->
                             // Manejo de errores, por ejemplo, mostrar un diálogo

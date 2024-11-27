@@ -52,6 +52,9 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     private val sharedPreferencesUser: SharedPreferences =
         application.getSharedPreferences("user_info", Context.MODE_PRIVATE)
 
+    private val sharedPreferencesOrder: SharedPreferences =
+        application.getSharedPreferences("order", Context.MODE_PRIVATE)
+
     private val serviceAdapter = ServiceAdapter()
     private var textToSpeechManager: TextToSpeechManager? = null
     private var location = LocationManager
@@ -95,7 +98,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     
     private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
 
-
+    private val _hasActiveOrder = MutableLiveData<Boolean>()
+    val hasActiveOrder: LiveData<Boolean> get() = _hasActiveOrder
 
     //Inicialización: Cargamos la LocationManager address
     init {
@@ -212,6 +216,18 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             Log.d("SharedPreferences", "Guardando item_${item.id}_isAdded = ${item.isAdded}")
         }
         editor.apply()
+    }
+
+    fun saveOrderStatus(orden: Boolean) {
+        val editor = sharedPreferencesOrder.edit()
+        editor.putBoolean("active_order", orden)
+        editor.apply()
+        _hasActiveOrder.postValue(orden) // Actualizar el estado observable
+    }
+
+    fun getOrderStatus() {
+        val status = sharedPreferencesOrder.getBoolean("active_order", false)
+        _hasActiveOrder.postValue(status) // Sincronizar el estado con SharedPreferences
     }
 
 
