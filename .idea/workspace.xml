@@ -9,41 +9,11 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="Implementation of cache to store last order and creation of new button to order previous order">
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-18888c23-5d14-4255-bd52-8e34dd43f045/metadata.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-18888c23-5d14-4255-bd52-8e34dd43f045/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-18888c23-5d14-4255-bd52-8e34dd43f045/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-460df92a-bd38-4840-9116-e50e785a39da/metadata.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-460df92a-bd38-4840-9116-e50e785a39da/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-460df92a-bd38-4840-9116-e50e785a39da/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-46abd60a-95e7-4ea2-a3df-96cd5b4cbe05/metadata.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-46abd60a-95e7-4ea2-a3df-96cd5b4cbe05/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-46abd60a-95e7-4ea2-a3df-96cd5b4cbe05/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-fa243f0d-0a5e-4acd-8d5d-930890330dbf/metadata.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-fa243f0d-0a5e-4acd-8d5d-930890330dbf/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40-fa243f0d-0a5e-4acd-8d5d-930890330dbf/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40/metadata.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/16e116b6cd7cf890042b02ca96a924930a9e0e40/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/ce70755f8169169e215e1d483fe0d83cb52b9717-3b04db77-5041-4dd7-96ca-96e72cc2eded/metadata.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/ce70755f8169169e215e1d483fe0d83cb52b9717-3b04db77-5041-4dd7-96ca-96e72cc2eded/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/ce70755f8169169e215e1d483fe0d83cb52b9717-3b04db77-5041-4dd7-96ca-96e72cc2eded/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/ce70755f8169169e215e1d483fe0d83cb52b9717-8605cfe7-02d9-46c2-8c46-6545b1d41368/metadata.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/ce70755f8169169e215e1d483fe0d83cb52b9717-8605cfe7-02d9-46c2-8c46-6545b1d41368/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/ce70755f8169169e215e1d483fe0d83cb52b9717-8605cfe7-02d9-46c2-8c46-6545b1d41368/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/e8e3c465ff044df306db3b53cf685ddbb28aadd8/metadata.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/e8e3c465ff044df306db3b53cf685ddbb28aadd8/sources/org/gradle/accessors/dm/LibrariesForLibs.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/dependencies-accessors/e8e3c465ff044df306db3b53cf685ddbb28aadd8/sources/org/gradle/accessors/dm/LibrariesForLibsInPluginsBlock.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/resourceHashesCache.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deploymentTargetSelector.xml" afterDir="false" />
+    <list default="true" id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="Fix login page, manage properyl the auth errors and rotation of the screen">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/login/FoodiesLoginScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/login/FoodiesLoginScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/ServiceAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/ServiceAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/home/FoodiesHomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/home/FoodiesHomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/ShoppingViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/ShoppingViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +84,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feature/local-storage-active-ordder-83" />
+        <entry key="$PROJECT_DIR$" value="fix/login-page-issues-85" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -145,24 +115,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Android App.app.executor&quot;: &quot;Run&quot;,
-    &quot;PROJECT_TRUSTED_KEY&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;fix/login-page-issues-85&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/villo/Documents/App/KotlinSprint2/app/src/main/java/com/example/foodies/view/shoppingCart&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Android App.app.executor": "Run",
+    "PROJECT_TRUSTED_KEY": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "feature/bq7-#87",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/villo/Documents/App/KotlinSprint2/app/src/main/java/com/example/foodies/view/shoppingCart"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;kotlin-gradle-user-dirs&quot;: [
-      &quot;C:\\Users\\villo\\.gradle&quot;
+  "keyToStringList": {
+    "kotlin-gradle-user-dirs": [
+      "C:\\Users\\villo\\.gradle"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\villo\Documents\App\KotlinSprint2\app\src\main\java\com\example\foodies\view\shoppingCart" />
@@ -337,7 +307,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731638788841</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Fix login page, manage properyl the auth errors and rotation of the screen">
+      <option name="closed" value="true" />
+      <created>1732670386935</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1732670386935</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -365,6 +343,7 @@
     <MESSAGE value="Improve version of the track the order screen" />
     <MESSAGE value="Implementation of cache to store last order and creation of new button to order previous order and storing locally in the DB and shared preferences" />
     <MESSAGE value="Implementation of cache to store last order and creation of new button to order previous order" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implementation of cache to store last order and creation of new button to order previous order" />
+    <MESSAGE value="Fix login page, manage properyl the auth errors and rotation of the screen" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix login page, manage properyl the auth errors and rotation of the screen" />
   </component>
 </project>

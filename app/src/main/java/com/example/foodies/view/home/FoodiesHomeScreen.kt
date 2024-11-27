@@ -132,7 +132,9 @@ fun FoodiesHomeScreen(
                     .padding(vertical = 16.dp) // Espaciado opcional
             ) {
                 Button(
-                    onClick = { viewModel.loadLastOrder() },
+                    onClick = { viewModel.loadLastOrder()
+                                viewModel.registerUseOfTrack()
+                              },
                     modifier = Modifier.align(Alignment.Center), // Centra el botón horizontalmente en el Box
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
