@@ -580,6 +580,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun registerUseOfTrack(){
+        serviceAdapter.registerTrack()
+    }
+
 
 
 
