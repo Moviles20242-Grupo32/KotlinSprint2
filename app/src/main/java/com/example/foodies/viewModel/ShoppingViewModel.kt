@@ -150,6 +150,60 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    // Función para guardar el carrito en caché
+    fun saveCartCache() {
+
+        val cartJson = _cart.value?.toJson()
+
+        // Log para ver el JSON que se guarda en el caché
+        Log.d("lastOrder", "Guardando JSON en caché: $cartJson")
+
+        lruCache.lruCashing.put("lastOrder", cartJson)
+
+
+    }
+
+    fun loadLastOrder() {
+        val cartJson = lruCache.lruCashing.get("lastOrder")
+
+        // Log para ver el JSON que se recupera del caché
+        Log.d("lastOrder", "Recuperando JSON del caché: $cartJson")
+
+        if (cartJson != null && cartJson.isNotEmpty()) {
+            val carrito = Cart.fromJson(cartJson)
+            if (carrito != null) {
+                // Crear una nueva lista combinada con los elementos actuales
+                val currentItems = _items.value ?: emptyList() // Elementos actuales
+                val updatedItems = carrito.getItems() // Elementos cargados del carrito
+
+                // Actualizar los elementos combinando
+                val mergedItems = currentItems.map { currentItem ->
+                    updatedItems.find { it.id == currentItem.id } ?: currentItem
+                } + updatedItems.filter { newItem ->
+                    currentItems.none { it.id == newItem.id }
+                }
+
+                // Publicar los cambios combinados
+                _cart.postValue(carrito)
+                _items.postValue(mergedItems)
+
+                // Actualizar SharedPreferences
+                val editor = sharedPreferences.edit()
+                mergedItems.forEach { item ->
+                    editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
+                    if (item.isAdded) {
+                        saveItemToCart(item)
+                    }
+                }
+                editor.apply()
+            } else {
+                Log.e("lastOrder", "Error al cargar el carrito desde JSON.")
+            }
+        } else {
+            Log.e("lastOrder", "No se encontró un carrito en caché.")
+        }
+    }
+
 
     private fun saveItemSavedIcon() {
         val editor = sharedPreferences.edit()
@@ -183,6 +237,8 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             editor.apply()
         }
     }
+
+
 
     private fun resetViewModelData() {
         _cart.postValue(Cart())               // Reinicia el carrito a uno vacío
