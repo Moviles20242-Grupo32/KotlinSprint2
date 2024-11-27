@@ -14,6 +14,7 @@ import com.example.foodies.view.home.FoodiesHomeScreen
 import com.example.foodies.view.login.FoodiesLoginScreen
 import com.example.foodies.view.profile.FoodiesProfileScreen
 import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
+import com.example.foodies.view.shoppingCart.TrackOrderScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -58,6 +59,10 @@ fun FoodiesNavigation(){
 
         composable(FoodiesScreens.FoodiesProfileScreen.name) {
             FoodiesProfileScreen(navController = navController, authViewModel = authViewModel, shoppingViewModel = shoppingViewModel)
+        }
+
+        composable(FoodiesScreens.FoodiesTrackScreen.name) {
+            TrackOrderScreen(navController = navController)
         }
     }
 }

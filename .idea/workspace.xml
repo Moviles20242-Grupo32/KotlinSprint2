@@ -9,11 +9,12 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="Implementation of firebase to store session and integration of viewmodels, fix bugs and update profile screen">
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+    <list default="true" id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="Improve version of the track the order screen">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/shoppingCart/FoodiesShoppingCartScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/shoppingCart/FoodiesShoppingCartScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/shoppingCart/TrackOrderScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/shoppingCart/TrackOrderScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/ShoppingViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/ShoppingViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +24,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=RF8N80B7Y9A)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\villo\.android\avd\Celu.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -84,7 +85,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feature/caching-fbSession-#1" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -123,17 +124,19 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "feature/item-available-update",
-    "kotlin-language-version-configured": "true"
+    "git-widget-placeholder": "#78 on view/track-order-77",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/villo/Documents/App/KotlinSprint2/app/src/main/java/com/example/foodies/view/shoppingCart"
   },
   "keyToStringList": {
     "kotlin-gradle-user-dirs": [
-      "/Users/sandrilla/.gradle"
+      "C:\\Users\\villo\\.gradle"
     ]
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\villo\Documents\App\KotlinSprint2\app\src\main\java\com\example\foodies\view\shoppingCart" />
       <recent name="$PROJECT_DIR$/app/src/main/res/drawable-nodpi" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -281,7 +284,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729964961661</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Creation of track the order view using Google API to show user and restaurant location and the status of the order">
+      <option name="closed" value="true" />
+      <created>1731549593659</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1731549593659</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -305,6 +316,8 @@
     <MESSAGE value="Implementation of firebase analytics for BQ" />
     <MESSAGE value="Implementation of shared preferences for local storage to save the items saved in the cart and show the saved icon" />
     <MESSAGE value="Implementation of firebase to store session and integration of viewmodels, fix bugs and update profile screen" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implementation of firebase to store session and integration of viewmodels, fix bugs and update profile screen" />
+    <MESSAGE value="Creation of track the order view using Google API to show user and restaurant location and the status of the order" />
+    <MESSAGE value="Improve version of the track the order screen" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improve version of the track the order screen" />
   </component>
 </project>
