@@ -86,6 +86,7 @@ fun FoodiesHomeScreen(
     val context = LocalContext.current
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
     val internetConnected by viewModel.internetConnected.observeAsState()
+    val hasActiveOrder by viewModel.hasActiveOrder.observeAsState(false)
     //Remembers
     var sort by rememberSaveable { mutableStateOf(false) }
     // Llamar a la función para obtener los datos al entrar en la pantalla
@@ -147,6 +148,45 @@ fun FoodiesHomeScreen(
                     )
                 }
             }
+            viewModel.getOrderStatus()
+
+            if (hasActiveOrder) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .background(Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp))
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Tienes una orden activa",
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+
+                        Button(
+                            onClick = {
+                                navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(241, 153, 55)
+                            ),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text(text = "Seguir tu orden")
+                        }
+                    }
+                }
+            }
+
+
 
 
 

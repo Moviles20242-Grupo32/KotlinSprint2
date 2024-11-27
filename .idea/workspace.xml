@@ -9,10 +9,17 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="Fix login page, manage properyl the auth errors and rotation of the screen">
+    <list default="true" id="cfd1dd34-89e8-442d-b45f-3a5c6ef8d5c3" name="Changes" comment="Implementation of cache to store last order and creation of new button to order previous order and storing locally in the DB and shared preferences">
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.7/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.7/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/ServiceAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/model/ServiceAdapter.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/home/FoodiesHomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/home/FoodiesHomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/shoppingCart/FoodiesShoppingCartScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/view/shoppingCart/FoodiesShoppingCartScreen.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/ShoppingViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/foodies/viewModel/ShoppingViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -84,7 +91,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="fix/login-page-issues-85" />
+        <entry key="$PROJECT_DIR$" value="feature/local-storage-previous-order-80" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -102,7 +109,7 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$USER_HOME$/Library/Caches/Google/AndroidStudio2024.1/device-explorer/Small Phone API 35/_/data/data/com.example.foodies/shared_prefs/shopping_cart.xml" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/AppData/Local/Google/AndroidStudio2024.1/device-explorer/Celu/_/data/data/com.example.foodies/shared_prefs/order.xml" root0="SKIP_INSPECTION" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -123,7 +130,7 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "feature/bq7-#87",
+    "git-widget-placeholder": "feature/local-storage-active-ordder-83",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/villo/Documents/App/KotlinSprint2/app/src/main/java/com/example/foodies/view/shoppingCart"
   },
@@ -307,13 +314,13 @@
       <option name="project" value="LOCAL" />
       <updated>1731638788841</updated>
     </task>
-    <task id="LOCAL-00011" summary="Fix login page, manage properyl the auth errors and rotation of the screen">
+    <task id="LOCAL-00011" summary="Implementation of cache to store last order and creation of new button to order previous order and storing locally in the DB and shared preferences">
       <option name="closed" value="true" />
-      <created>1732670386935</created>
+      <created>1731867429816</created>
       <option name="number" value="00011" />
       <option name="presentableId" value="LOCAL-00011" />
       <option name="project" value="LOCAL" />
-      <updated>1732670386935</updated>
+      <updated>1731867429816</updated>
     </task>
     <option name="localTasksCounter" value="12" />
     <servers />
@@ -341,9 +348,8 @@
     <MESSAGE value="Implementation of firebase to store session and integration of viewmodels, fix bugs and update profile screen" />
     <MESSAGE value="Creation of track the order view using Google API to show user and restaurant location and the status of the order" />
     <MESSAGE value="Improve version of the track the order screen" />
-    <MESSAGE value="Implementation of cache to store last order and creation of new button to order previous order and storing locally in the DB and shared preferences" />
     <MESSAGE value="Implementation of cache to store last order and creation of new button to order previous order" />
-    <MESSAGE value="Fix login page, manage properyl the auth errors and rotation of the screen" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix login page, manage properyl the auth errors and rotation of the screen" />
+    <MESSAGE value="Implementation of cache to store last order and creation of new button to order previous order and storing locally in the DB and shared preferences" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implementation of cache to store last order and creation of new button to order previous order and storing locally in the DB and shared preferences" />
   </component>
 </project>
