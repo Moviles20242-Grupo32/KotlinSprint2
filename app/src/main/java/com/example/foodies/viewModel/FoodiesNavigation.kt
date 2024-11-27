@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodies.view.home.FoodiesHomeScreen
 import com.example.foodies.view.login.FoodiesLoginScreen
 import com.example.foodies.view.profile.FoodiesProfileScreen
+import com.example.foodies.view.shoppingCart.ConfirmOrderScreen
 import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
 import com.example.foodies.view.shoppingCart.TrackOrderScreen
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +64,10 @@ fun FoodiesNavigation(){
 
         composable(FoodiesScreens.FoodiesTrackScreen.name) {
             TrackOrderScreen(navController = navController)
+        }
+
+        composable(FoodiesScreens.ConfirmOrderScreen.name){
+            ConfirmOrderScreen(navController = navController)
         }
     }
 }
