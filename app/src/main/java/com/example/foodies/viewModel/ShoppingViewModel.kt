@@ -393,6 +393,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _items.postValue(updatedList)
     }
 
+    fun processFilteredWords(filteredWords: List<String>) {
+        // Paso 4: Llamar al Service Adapter para registrar las palabras
+        serviceAdapter.registerSearchedWords(filteredWords)
+    }
+
 
     fun addItemToCart(itemId: String?) {
         val updatedList = _items.value?.map { item ->

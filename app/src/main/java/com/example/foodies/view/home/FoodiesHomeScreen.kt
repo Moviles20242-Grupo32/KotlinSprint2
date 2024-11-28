@@ -119,6 +119,16 @@ fun FoodiesHomeScreen(
 
             // Fila 3: Barra de búsqueda
             FilterBar(onFilter = { query ->
+                // Paso 1: Dividir query por espacios
+                val words = query.split(" ")
+
+                // Paso 2: Filtrar palabras de al menos 4 caracteres
+                val filteredWords = words.filter { it.length >= 4 }
+
+                // Paso 3: Pasar las palabras filtradas al ViewModel
+                viewModel.processFilteredWords(filteredWords)
+
+                // Filtrar los ítems (funcionalidad existente)
                 viewModel.filterItemsByName(query)
             }, sort = {
                 viewModel.sortByCheaperItems()
