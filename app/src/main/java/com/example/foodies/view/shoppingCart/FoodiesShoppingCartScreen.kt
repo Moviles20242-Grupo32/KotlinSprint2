@@ -73,7 +73,7 @@ fun FoodiesShoppingCartScreen(
 
     // Si la orden se guardó con éxito, mostrar el diálogo
     if (orderSuccess == true && !showDialog) {
-        showDialog = true // Activar el diálogo cuando la orden es exitosa
+        //showDialog = true // Activar el diálogo cuando la orden es exitosa
     }
 
     // Mostrar el diálogo de carrito vacío si hay un error de carrito vacío
@@ -204,13 +204,11 @@ fun FoodiesShoppingCartScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección de total y botón de Check Out en la parte inferior
-            totalAmount?.let {
-                CheckoutSection(
-                    total = it,
-                    viewModel = viewModel,
-                    navController = navController
-                )
-            }
+            CheckoutSection(
+                total = totalAmount,
+                viewModel = viewModel,
+                navController = navController
+            )
 
         }
     }
@@ -260,8 +258,11 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                     viewModel.saveOrder(
                         onSuccess = {
                             // Solo limpiar el carrito, no navegar automáticamente
+                            viewModel.saveCartCache()
                             viewModel.registerPrice()
                             viewModel.clearCart()
+                            navController.navigate(FoodiesScreens.ConfirmOrderScreen.name)
+                            viewModel.saveOrderStatus(true)
                         },
                         onFailure = { exception ->
                             // Manejo de errores, por ejemplo, mostrar un diálogo

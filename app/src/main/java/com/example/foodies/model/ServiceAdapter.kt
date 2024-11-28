@@ -2,6 +2,7 @@ package com.example.foodies.model
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.Timestamp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.logEvent
@@ -11,6 +12,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class ServiceAdapter {
     // FireStore Data Base
@@ -266,6 +268,17 @@ class ServiceAdapter {
     // Function to sign out the user
     fun signOut() {
         auth.signOut()
+    }
+
+    fun registerTrack(){
+        //val doc = firestore.collection("track").document(UUID.randomUUID().toString())
+        val newId = UUID.randomUUID().toString()
+        val data = mapOf(
+            "id" to newId,
+            "timestamp" to Timestamp.now()
+        )
+
+        firestore.collection("track").add(data)
     }
 
 

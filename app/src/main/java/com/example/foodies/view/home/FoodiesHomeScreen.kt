@@ -38,6 +38,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -84,14 +86,15 @@ fun FoodiesHomeScreen(
     val context = LocalContext.current
     val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
     val internetConnected by viewModel.internetConnected.observeAsState()
-    // Remembers
+    val hasActiveOrder by viewModel.hasActiveOrder.observeAsState(false)
+    //Remembers
     var sort by rememberSaveable { mutableStateOf(false) }
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
-        // Obtener productos iniciales
+        //Obtener productos iniciales
         viewModel.fetchItems()
-        // Inicialización de elementos adicionales
+        //Incialización de elementos adicionales
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
         viewModel.storeInfo()
@@ -110,7 +113,7 @@ fun FoodiesHomeScreen(
             modifier = Modifier.padding(16.dp)
         ) {
             // Fila 1: Texto "Botones"
-            ActionButtons(items, navController, viewModel)
+            ActionButtons(items,navController,viewModel)
 
             // Fila 2: Texto "Locación"
             Location(userLocation)
@@ -122,6 +125,71 @@ fun FoodiesHomeScreen(
                 viewModel.sortByCheaperItems()
                 sort = !sort
             })
+
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth() // Ocupa el ancho total del contenedor
+                    .padding(vertical = 16.dp) // Espaciado opcional
+            ) {
+                Button(
+                    onClick = { viewModel.loadLastOrder()
+                                viewModel.registerUseOfTrack()
+                              },
+                    modifier = Modifier.align(Alignment.Center), // Centra el botón horizontalmente en el Box
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(241, 153, 55)
+                    )
+                ) {
+                    Text(
+                        text = "Realizar pedido anterior",
+                        modifier = Modifier.padding(5.dp)
+                    )
+                }
+            }
+            viewModel.getOrderStatus()
+
+            if (hasActiveOrder) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .background(Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp))
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Tienes una orden activa",
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+
+                        Button(
+                            onClick = {
+                                navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(241, 153, 55)
+                            ),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text(text = "Seguir tu orden")
+                        }
+                    }
+                }
+            }
+
+
+
+
 
             Log.d("Items-v", "$items")
             // Lista de ítems usando la función modularizada
@@ -139,6 +207,7 @@ fun FoodiesHomeScreen(
                     msitem?.let { ItemsList(items, viewModel, it, navController) }
                 }
             }
+
         }
     }
 }
@@ -378,11 +447,12 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem: Item, navControll
                 .align(Alignment.CenterVertically),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+
             Text(
                 text = item.item_name,
                 style = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 20.sp, // Tamaño de fuente fijo
+                    fontWeight = FontWeight.Bold // Negrita
                 ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -393,15 +463,15 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem: Item, navControll
                 Box(
                     modifier = Modifier
                         .background(
-                            color = Color(0.925f, 0.925f, 0.922f, 1.0f),
-                            shape = RoundedCornerShape(16.dp)
+                            color = Color(0.925f, 0.925f, 0.922f, 1.0f), // Color de fondo
+                            shape = RoundedCornerShape(16.dp) // Esquinas redondeadas
                         )
-                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                        .padding(horizontal = 5.dp, vertical = 2.dp) // Padding interno del texto
                 ) {
                     Text(
                         text = "Favorita del público",
-                        color = Color(0.352f, 0.196f, 0.070f, 1.0f),
-                        style = MaterialTheme.typography.bodySmall
+                        color = Color(0.352f, 0.196f, 0.070f, 1.0f), // Color del texto
+                        style = MaterialTheme.typography.bodySmall // Estilo del texto
                     )
                 }
             }
@@ -419,28 +489,27 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem: Item, navControll
                     Icon(
                         imageVector = if (index < rating) Icons.Default.Star else Icons.Default.StarBorder,
                         contentDescription = null,
-                        tint = Color(0.968f, 0.588f, 0.066f, 1.0f),
+                        tint = Color(0.968f, 0.588f, 0.066f, 1.0f), // Color de la estrella
                         modifier = Modifier.size(24.dp)
                     )
                 }
             }
         }
-
         Spacer(modifier = Modifier.width(20.dp))
 
         // Columna 3: Agregar a carrito
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .size(40.dp)
-                .clip(CircleShape)
+                .size(40.dp) // Tamaño total del Box
+                .clip(CircleShape) // Aplica el recorte circular al Box
                 .background(
-                    if (item.isAdded) Color(0.192f, 0.262f, 0.254f) else Color(0.968f, 0.588f, 0.066f, 1.0f)
+                    if (item.isAdded) Color(0.192f, 0.262f, 0.254f) else Color(0.968f, 0.588f,0.066f, 1.0f)
                 )
                 .border(
-                    width = 1.dp,
-                    color = Color.Transparent,
-                    shape = CircleShape
+                    width = 1.dp, // Ancho del borde
+                    color = Color.Transparent, // Color del borde
+                    shape = CircleShape // Esquinas redondeadas completamente
                 )
                 .clickable { viewModel.addItemToCart(item.id) }
         ) {

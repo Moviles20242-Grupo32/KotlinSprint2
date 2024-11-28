@@ -14,7 +14,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodies.view.home.FoodiesHomeScreen
 import com.example.foodies.view.login.FoodiesLoginScreen
 import com.example.foodies.view.profile.FoodiesProfileScreen
+import com.example.foodies.view.shoppingCart.ConfirmOrderScreen
 import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
+import com.example.foodies.view.shoppingCart.TrackOrderScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ fun FoodiesNavigation() {
     val shoppingViewModel: ShoppingViewModel = viewModel()
     val authViewModel: AuthViewModel = viewModel()
 
+    // Inicializar tareas periódicas y otros workers
     itemsAvailability(shoppingViewModel)
 
     NavHost(navController = navController, startDestination = if (authViewModel.user.value == null) {
@@ -47,15 +50,15 @@ fun FoodiesNavigation() {
         FoodiesScreens.FoodiesHomeScreen.name
     }) {
 
-        composable(FoodiesScreens.FoodiesLoginScreen.name) {
+        composable(FoodiesScreens.FoodiesLoginScreen.name){
             FoodiesLoginScreen(navController = navController)
         }
 
-        composable(FoodiesScreens.FoodiesHomeScreen.name) {
+        composable(FoodiesScreens.FoodiesHomeScreen.name){
             FoodiesHomeScreen(navController = navController, viewModel = shoppingViewModel)
         }
 
-        composable(FoodiesScreens.FoodiesShoppingCartScreen.name) {
+        composable(FoodiesScreens.FoodiesShoppingCartScreen.name){
             FoodiesShoppingCartScreen(navController = navController, viewModel = shoppingViewModel)
         }
 
@@ -71,6 +74,13 @@ fun FoodiesNavigation() {
                 shoppingViewModel = shoppingViewModel
             )
         }
+
+        composable(FoodiesScreens.FoodiesTrackScreen.name) {
+            TrackOrderScreen(navController = navController)
+        }
+
+        composable(FoodiesScreens.ConfirmOrderScreen.name){
+            ConfirmOrderScreen(navController = navController)
+        }
     }
 }
-
