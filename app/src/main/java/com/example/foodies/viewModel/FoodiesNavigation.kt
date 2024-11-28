@@ -38,7 +38,6 @@ fun FoodiesNavigation() {
     val navController = rememberNavController()
     val shoppingViewModel: ShoppingViewModel = viewModel()
     val authViewModel: AuthViewModel = viewModel()
-    val viewModel: ProductDetailViewModel = viewModel()
 
     itemsAvailability(shoppingViewModel)
 
@@ -69,11 +68,8 @@ fun FoodiesNavigation() {
             val productId = backStackEntry.arguments?.getString("productId") ?: ""
             FoodiesProductDetailScreen(
                 navController = navController,
-                viewModel = viewModel,
-                shoppingViewModel = shoppingViewModel,
-                productId = productId
+                shoppingViewModel = shoppingViewModel
             )
-
         }
     }
 }

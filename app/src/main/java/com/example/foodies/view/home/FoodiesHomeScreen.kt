@@ -363,6 +363,7 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem: Item, navControll
             modifier = Modifier
                 .size(100.dp)
                 .clickable {
+                    viewModel.detailProduct(item.id)
                     // Pasa el productId al navegar
                     navController.navigate("productDetail/${item.id}")
                 }

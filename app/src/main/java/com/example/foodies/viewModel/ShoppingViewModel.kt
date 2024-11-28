@@ -92,6 +92,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     //LiveData para atender el estado de conexión de internet
     private val _internetConnected = MutableLiveData<Boolean>()
     val internetConnected: LiveData<Boolean> get() = _internetConnected
+
+    // LiveData for product details
+    private val _product = MutableLiveData<Item?>()
+    val product: MutableLiveData<Item?> get() = _product
     
     private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
 
@@ -321,6 +325,20 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _items.postValue(updatedList)
     }
 
+    //función para el detalle
+    fun detailProduct(itemId: String?){
+        _items.value?.map { item ->
+            if(item.id == itemId){
+                _product.postValue(item)
+            }
+        }
+    }
+
+    //funcion para agregar producto detalle al carrito
+    fun addDetailToCart(){
+        val item = _product.value?.copy(isAdded = !_product.value!!.isAdded)
+        _product.postValue(item)
+    }
 
     fun addItemToCart(itemId: String?) {
         // Actualizar la lista de items basada en el ID

@@ -29,7 +29,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
-import com.example.foodies.viewModel.ProductDetailViewModel
 import com.example.foodies.model.Item
 import com.example.foodies.view.home.GlideImage
 import com.example.foodies.viewModel.ShoppingViewModel
@@ -38,17 +37,9 @@ import com.example.foodies.viewModel.ShoppingViewModel
 @Composable
 fun FoodiesProductDetailScreen(
     navController: NavController,
-    viewModel: ProductDetailViewModel,
     shoppingViewModel: ShoppingViewModel,
-    productId: String
 ) {
-    val product by viewModel.product.observeAsState()
-
-    LaunchedEffect(productId) {
-        if (productId.isNotEmpty()) {
-            viewModel.fetchProductDetails(productId) // Fetch product details based on productId
-        }
-    }
+    val product by shoppingViewModel.product.observeAsState()
 
     Surface(
         modifier = Modifier
@@ -215,6 +206,7 @@ fun FoodiesProductDetailScreen(
                         else Color(0.968f, 0.588f, 0.066f) // Orange when not added
                     )
                     .clickable {
+                        shoppingViewModel.addDetailToCart()
                         product?.id?.let {
                             shoppingViewModel.addItemToCart(it) // Add the item to the cart
                         }
