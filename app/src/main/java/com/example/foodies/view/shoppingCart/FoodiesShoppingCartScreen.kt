@@ -204,13 +204,11 @@ fun FoodiesShoppingCartScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección de total y botón de Check Out en la parte inferior
-            totalAmount?.let {
-                CheckoutSection(
-                    total = it,
-                    viewModel = viewModel,
-                    navController = navController
-                )
-            }
+            CheckoutSection(
+                total = totalAmount,
+                viewModel = viewModel,
+                navController = navController
+            )
 
         }
     }
@@ -263,7 +261,7 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                             viewModel.saveCartCache()
                             viewModel.registerPrice()
                             viewModel.clearCart()
-                            navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
+                            navController.navigate(FoodiesScreens.ConfirmOrderScreen.name)
                             viewModel.saveOrderStatus(true)
                         },
                         onFailure = { exception ->
