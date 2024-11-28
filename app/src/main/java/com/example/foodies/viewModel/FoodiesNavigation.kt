@@ -1,5 +1,6 @@
 package com.example.foodies.viewModel
 
+import FoodiesProductDetailScreen
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -35,16 +36,19 @@ fun itemsAvailability(shoppingViewModel: ShoppingViewModel) {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun FoodiesNavigation(){
+fun FoodiesNavigation() {
     val navController = rememberNavController()
-    val shoppingViewModel: ShoppingViewModel = viewModel() // Inject ShoppingViewModel
-    val authViewModel: AuthViewModel = viewModel() // Inject LogoutViewModel
+    val shoppingViewModel: ShoppingViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
 
     // Inicializar tareas periódicas y otros workers
     itemsAvailability(shoppingViewModel)
 
-    // Configuración del NavHost
-    NavHost(navController = navController, startDestination = if(authViewModel.user.value == null){FoodiesScreens.FoodiesLoginScreen.name} else{FoodiesScreens.FoodiesHomeScreen.name}) {
+    NavHost(navController = navController, startDestination = if (authViewModel.user.value == null) {
+        FoodiesScreens.FoodiesLoginScreen.name
+    } else {
+        FoodiesScreens.FoodiesHomeScreen.name
+    }) {
 
         composable(FoodiesScreens.FoodiesLoginScreen.name){
             FoodiesLoginScreen(navController = navController)
@@ -60,6 +64,15 @@ fun FoodiesNavigation(){
 
         composable(FoodiesScreens.FoodiesProfileScreen.name) {
             FoodiesProfileScreen(navController = navController, authViewModel = authViewModel, shoppingViewModel = shoppingViewModel)
+        }
+
+        // Update route to accept productId
+        composable("productDetail/{productId}") { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId") ?: ""
+            FoodiesProductDetailScreen(
+                navController = navController,
+                shoppingViewModel = shoppingViewModel
+            )
         }
 
         composable(FoodiesScreens.FoodiesTrackScreen.name) {
