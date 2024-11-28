@@ -175,7 +175,7 @@ fun FoodiesProductDetailScreen(
 
             // Placeholder text for ingredients section
             Text(
-                text = "Pendiente", // Placeholder text for now
+                text = product?.item_ingredients?:"Pendiente",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp), // Increased font size
                 color = Color(0.560f, 0.470f, 0.435f, 1.0f),
                 modifier = Modifier.fillMaxWidth() // Align to the left
@@ -196,7 +196,7 @@ fun FoodiesProductDetailScreen(
 
             // Placeholder text for featured products section
             Text(
-                text = "Pendiente", // Placeholder text for now
+                product?.item_starProducts?: "Pendiente",
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp), // Increased font size
                 color = Color(0.560f, 0.470f, 0.435f, 1.0f),
                 modifier = Modifier.fillMaxWidth()
