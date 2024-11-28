@@ -121,14 +121,13 @@ fun FoodiesHomeScreen(
             FilterBar(onFilter = { query ->
                 val words = query.split(" ")
                     .map { it.lowercase() } // Convertir a minúsculas
-                    .map { it.trimEnd('s') } // Eliminar sufijos de plural ('s')
-                    .filter { it.length >= 4 } // Filtrar palabras de al menos 4 caracteres
+                    .filter { it.length >= 3 } // Filtrar palabras de al menos 4 caracteres
                     .toSet() // Eliminar duplicados
 
-                // Pasar las palabras filtradas al ViewModel con debounce
+                // Pasar las palabras completas al ViewModel
                 viewModel.processFilteredWordsDebounced(words.toList())
 
-                // Filtrar los ítems (funcionalidad existente)
+                // Filtrar ítems existentes
                 viewModel.filterItemsByName(query)
             }, sort = {
                 viewModel.sortByCheaperItems()
