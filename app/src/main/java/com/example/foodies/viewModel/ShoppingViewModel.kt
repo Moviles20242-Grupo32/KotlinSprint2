@@ -43,6 +43,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.lifecycle.viewModelScope
+
 
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -393,9 +398,17 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _items.postValue(updatedList)
     }
 
-    fun processFilteredWords(filteredWords: List<String>) {
-        // Paso 4: Llamar al Service Adapter para registrar las palabras
-        serviceAdapter.registerSearchedWords(filteredWords)
+    private var searchDebounceJob: Job? = null
+
+    fun processFilteredWordsDebounced(filteredWords: List<String>) {
+        // Cancelar cualquier trabajo en curso
+        searchDebounceJob?.cancel()
+
+        // Crear un nuevo trabajo con un retraso
+        searchDebounceJob = viewModelScope.launch {
+            delay(800) // Esperar 800ms antes de procesar
+            serviceAdapter.registerSearchedWords(filteredWords)
+        }
     }
 
 
