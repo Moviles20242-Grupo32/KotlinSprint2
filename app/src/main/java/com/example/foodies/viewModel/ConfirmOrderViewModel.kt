@@ -20,7 +20,7 @@ class ConfirmOrderViewModel(application: Application) : AndroidViewModel(applica
     //Función para cargar carrito
     fun loadCart(){
         //Obtener vehículo
-        val cartJson = lruCache.lruCashing.get("cartKey")
+        val cartJson = lruCache.lruCashing.get("lastOrder")
         val cartObj = cartJson?.let { Cart.fromJson(it) }
         Log.d("ConfirmOrder", cartJson)
         //Publicar carrito

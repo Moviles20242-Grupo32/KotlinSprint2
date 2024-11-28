@@ -87,7 +87,7 @@ fun ConfirmOrderScreen(
             Spacer(modifier = Modifier.height(16.dp))
             // Lista de items ocupando el espacio restante
             LazyColumn(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 cart?.let {
                     items(it.getItems()) { item ->
@@ -98,6 +98,8 @@ fun ConfirmOrderScreen(
             Spacer(modifier = Modifier.height(16.dp))
             //Total de la cuenta
             cart?.getTotalCost()?.let { total -> TotalSection(total) }
+            //Navegar a track order
+            NavigateTrackOrder(navController)
         }
     }
 }
@@ -157,7 +159,7 @@ fun ItemOrder(item: Item, viewModel: ConfirmOrderViewModel) {
             // Fila para precio y cantidad
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "$${itemTotalPrice}",
@@ -171,7 +173,11 @@ fun ItemOrder(item: Item, viewModel: ConfirmOrderViewModel) {
                 )
                 // Mostrar cantidad actual
                 Text(
-                    text = itemCartQuantity.toString(),
+                    text = "$itemCartQuantity ${if (itemCartQuantity > 1) "unds" else "und"}",
+                    style = TextStyle(
+                        fontSize = 20.sp, // Tamaño de fuente fijo
+                        fontWeight = FontWeight.Bold // Negrita
+                    ),
                     color = Color(0.560f, 0.470f, 0.435f, 1.0f),
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -187,8 +193,7 @@ fun TotalSection(total: Int) {
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -209,3 +214,35 @@ fun TotalSection(total: Int) {
         }
     }
 }
+
+@Composable
+fun NavigateTrackOrder(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Bottom, // Alinea los elementos al fondo
+        horizontalAlignment = Alignment.CenterHorizontally // Centra horizontalmente
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(
+                    color = Color(0.192f, 0.263f, 0.255f, 1.0f),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .clickable {
+                    navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Rastrear Orden",
+                color = Color.White,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+            )
+        }
+    }
+}
+
