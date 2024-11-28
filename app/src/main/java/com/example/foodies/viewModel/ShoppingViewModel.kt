@@ -133,17 +133,12 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             // Cargar los items del carrito desde la base de datos
             val itemsInCart = cartDao.getAllItems()
-
             // Crear un carrito temporal para añadir los items del carrito
             val carrito = Cart()
-
             itemsInCart.forEach {
                 carrito.addItem(it, it.cart_quantity)
-
             }
-
             _cart.postValue(carrito)
-
             //Observamos los cambios en la red
             NetworkMonitor.isConnected.observeForever { connection ->
                 _internetConnected.postValue(connection)
@@ -160,62 +155,53 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     // Función para guardar el carrito en caché
     fun saveCartCache() {
-
         val cartJson = _cart.value?.toJson()
-
         // Log para ver el JSON que se guarda en el caché
         Log.d("lastOrder", "Guardando JSON en caché: $cartJson")
-
         lruCache.lruCashing.put("lastOrder", cartJson)
-
-
     }
 
     fun loadLastOrder() {
         val cartJson = lruCache.lruCashing.get("lastOrder")
-
         // Log para ver el JSON que se recupera del caché
         Log.d("lastOrder", "Recuperando JSON del caché: $cartJson")
-
         if (cartJson != null && cartJson.isNotEmpty()) {
             val carrito = Cart.fromJson(cartJson)
-            if (carrito != null) {
-                // Crear una nueva lista combinada con los elementos actuales
-                val currentItems = _items.value ?: emptyList() // Elementos actuales
-                val updatedItems = carrito.getItems() // Elementos cargados del carrito
-
-                // Actualizar los elementos combinando
-                val mergedItems = currentItems.map { currentItem ->
-                    updatedItems.find { it.id == currentItem.id } ?: currentItem
-                } + updatedItems.filter { newItem ->
-                    currentItems.none { it.id == newItem.id }
-                }
-
-                // Publicar los cambios combinados
-                _cart.postValue(carrito)
-                _items.postValue(mergedItems)
-
-                // Actualizar SharedPreferences
-                val editor = sharedPreferences.edit()
-                mergedItems.forEach { item ->
-                    editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
-                    if (item.isAdded) {
-                        saveItemToCart(item)
-                    }
-                }
-                editor.apply()
-            } else {
-                Log.e("lastOrder", "Error al cargar el carrito desde JSON.")
+            // Crear una nueva lista combinada con los elementos actuales
+            val currentItems = _items.value ?: emptyList() // Elementos actuales
+            val updatedItems = carrito.getItems() // Elementos cargados del carrito
+            //combinar listas
+            val mergedItems = currentItems.map { currentItem ->
+                updatedItems.find { it.id == currentItem.id } ?: currentItem
+            } + updatedItems.filter { newItem ->
+                currentItems.none { it.id == newItem.id }
             }
+
+            // Publicar los cambios combinados
+            _cart.postValue(carrito)
+            _items.postValue(mergedItems)
+
+            // Actualizar SharedPreferences
+            val editor = sharedPreferences.edit()
+            mergedItems.forEach { item ->
+                editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
+                if (item.isAdded) {
+                    saveItemToCart(item)
+                }
+            }
+            editor.apply()
         } else {
             Log.e("lastOrder", "No se encontró un carrito en caché.")
         }
     }
 
-
     private fun saveItemSavedIcon() {
         val editor = sharedPreferences.edit()
-        _items.value?.forEachIndexed { index, item ->
+        val itemsList = _items.value ?: emptyList()
+
+        var item: Item
+        for (i in itemsList.indices) {
+            item = itemsList[i]
             editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
             Log.d("SharedPreferences", "Guardando item_${item.id}_isAdded = ${item.isAdded}")
         }
@@ -241,44 +227,44 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
 
-    fun resetCart(){
+    fun resetCart() {
         viewModelScope.launch {
+            //almacenamiento
             cartDao.deleteAllItems()
             lruCache.lruCashing.remove("cartKey")
-
+            //Preferencias
             val editor = sharedPreferences.edit()
-
-            _items.value?.forEachIndexed { index, item ->
-                // Guardar el estado booleano directamente
-                editor.putBoolean("item${index + 1}_isAdded", false)
-                //editor.putBoolean("item${index + 1}_isAdded", true)
+            val itemsList = _items.value ?: emptyList() // Guardamos la lista de items
+            //Recorrer los items
+            var item: Item
+            for (i in itemsList.indices) {
+                item = itemsList[i]  // Reasignamos la referencia en cada iteración
+                editor.putBoolean("item${item.id}_isAdded", false)
             }
-
             editor.apply()
         }
     }
 
-
-
     private fun resetViewModelData() {
-        _cart.postValue(Cart())               // Reinicia el carrito a uno vacío
-        _totalAmount.postValue(0)             // Reinicia el total del carrito a cero
-        _items.postValue(emptyList())         // Limpia la lista de ítems
-        _isLoaded.postValue(false)            // Marca los datos como no cargados
-        _orderSuccess.postValue(false)        // Reinicia el estado de la orden
-        _userLocation.postValue("")           // Limpia la dirección del usuario
+        _cart.postValue(Cart())
+        _totalAmount.postValue(0)
+        _items.postValue(emptyList())
+        _isLoaded.postValue(false)
+        _orderSuccess.postValue(false)
+        _userLocation.postValue("")
     }
 
     private fun clearCartDatabase() {
         viewModelScope.launch {
-            cartDao.deleteAllItems()  // Asegúrate de que exista un método en `cartDao` para eliminar todos los ítems
+            // Asegúrate de que exista un método en `cartDao` para eliminar todos los ítems
+            cartDao.deleteAllItems()
         }
     }
 
     fun logout() {
-        clearSharedPreferences()   // Limpia SharedPreferences
-        resetViewModelData()       // Restablece todos los LiveData
-        clearCartDatabase()        // Limpia la base de datos del carrito
+        clearSharedPreferences()
+        resetViewModelData()
+        clearCartDatabase()
     }
 
     private fun clearSharedPreferences() {
