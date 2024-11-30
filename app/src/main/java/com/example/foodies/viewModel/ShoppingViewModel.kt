@@ -307,21 +307,40 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 val fetchedItems = withContext(Dispatchers.IO) {
                     serviceAdapter.getAllItems()
                 }
-
                 // Encuentra los elementos que ya no están en la lista actualizada y remuévelos
-                val itemsToRemove = _items.value?.filter { currentItem ->
-                    fetchedItems.none { it.id == currentItem.id }
-                } ?: emptyList()
-
-                for (element in itemsToRemove) {
-                    removeItem(element)
+                val currentItems = _items.value ?: emptyList()
+                val itemsToRemove = mutableListOf<Item>()
+                var currentItem: Item? = null
+                var fetchedItem: Item? = null
+                var found: Boolean
+                //Iterar los elementos
+                for (i in currentItems.indices) {
+                    currentItem = currentItems[i]
+                    found = false
+                    for (j in fetchedItems.indices) {
+                        fetchedItem = fetchedItems[j]
+                        if (fetchedItem.id == currentItem.id) {
+                            found = true
+                            break
+                        }
+                    }
+                    if (!found) {
+                        itemsToRemove.add(currentItem)
+                    }
                 }
-
+                //Eliminar items no existentes
+                for (i in itemsToRemove.indices) {
+                    removeItem(itemsToRemove[i])
+                }
                 // Actualiza el LiveData en el hilo principal solo si las listas son diferentes
-                val updatedItems = fetchedItems.map { item ->
-                    // Usa el ID o una clave más consistente para almacenar el estado en SharedPreferences
-                    val isAddedState = sharedPreferences.getBoolean("item_${item.id}_isAdded", false)
-                    item.copy(isAdded = isAddedState)  // Mantener estado
+                val updatedItems = mutableListOf<Item>()
+                var item: Item
+                var isAddedState: Boolean
+
+                for (i in fetchedItems.indices) {
+                    item = fetchedItems[i]
+                    isAddedState = sharedPreferences.getBoolean("item_${item.id}_isAdded", false)
+                    updatedItems.add(item.copy(isAdded = isAddedState))
                 }
                 Log.d("Items-sp", "$updatedItems")
                 // Asignar la lista actualizada
@@ -347,7 +366,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     Log.d("FoodiesHome-item-p", "$item")
                     itemQuantityMap[item.item_name] ?: 0
                 }
-
                 // Update LiveData with the sorted items
                 _items.postValue(sortedItems)
             },
@@ -373,12 +391,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     // Función para filtrar los items por el nombre
     fun filterItemsByName(query: String) {
         val itemList = _items.value ?: emptyList()
-
-        // Filtrar y actualizar el valor de `show` según el nombre que contenga `query`
-        val updatedList = itemList.map { item ->
-            item.copy(show = item.item_name.contains(query, ignoreCase = true))
+        val updatedList = mutableListOf<Item>()
+        for (i in itemList.indices) {
+            updatedList.add(itemList[i].copy(show = itemList[i].item_name.contains(query, ignoreCase = true)))
         }
-
         // Publicar la lista actualizada con el atributo `show` modificado
         _items.postValue(updatedList)
     }
@@ -399,16 +415,24 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun addItemToCart(itemId: String?) {
-        // Actualizar la lista de items basada en el ID
-        val updatedList = _items.value?.map { item ->
+        // Obtener la lista de items actual
+        val itemList = _items.value ?: emptyList()
+        val updatedList = mutableListOf<Item>()
+        //Referencias recicladas
+        var item: Item
+        var updatedItem: Item
+        // Recorrer la lista de items por índices
+        for (i in itemList.indices) {
+            item = itemList[i]
             if (item.id == itemId) {
-                val updatedItem = item.copy(isAdded = !item.isAdded) // Cambiar estado de isAdded
+                // Crear una copia del item para modificar su estado
+                updatedItem = item.copy(isAdded = !item.isAdded) // Cambiar estado de isAdded
                 if (updatedItem.isAdded) {
                     // Agregar el item al carrito
                     addItem(updatedItem, 1)
                     updateTotal()
                     // Guardar item con cantidad 1 en la base de datos
-                    val itemDB = item.copy(cart_quantity = 1)
+                    val itemDB = updatedItem.copy(cart_quantity = 1)
                     saveItemToCart(itemDB)
                 } else {
                     // Eliminar el item del carrito
@@ -417,12 +441,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     // Remover el item del carrito en la base de datos
                     removeItemFromCartId(itemId)
                 }
-                updatedItem
+                updatedList.add(updatedItem)
             } else {
-                item
+                updatedList.add(item)
             }
-        } ?: emptyList()
-
+        }
         // Actualizar la lista de items para reflejar cambios
         _items.value = updatedList
         // Guardar el estado actualizado en SharedPreferences
@@ -442,14 +465,20 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         val currentCart = _cart.value ?: Cart()
         currentCart.removeItem(item) // Remueve el item del carrito
 
-        // Actualiza el estado de isAdded del item a false
-        val updatedList = _items.value?.map { itemList ->
-            if (itemList.id == item.id) {
-                itemList.copy(isAdded = false)
+        // Obtener la lista de items actual
+        val itemList = _items.value ?: emptyList()
+        val updatedList = mutableListOf<Item>()
+        // Recorrer la lista de items por índices
+        for (i in itemList.indices) {
+            val currentItem = itemList[i]
+            if (currentItem.id == item.id) {
+                // Crear una copia del item con isAdded = false
+                val updatedItem = currentItem.copy(isAdded = false)
+                updatedList.add(updatedItem)
             } else {
-                itemList
+                updatedList.add(currentItem)
             }
-        } ?: emptyList()
+        }
 
         // Publica los cambios en la lista de items y el carrito
         Log.d("SharedPreferences-list", "$updatedList")
@@ -511,10 +540,14 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _cart.postValue(emptyCart) // Publica el carrito vacío en LiveData
         _totalAmount.postValue(0)  // Resetear el total a 0
 
-        // Recorrer los items y marcar isAdded como false
-        val updatedItems = _items.value?.map { item ->
-            item.copy(isAdded = false)
-        } ?: emptyList()
+        // Obtener la lista de items actual
+        val itemList = _items.value ?: emptyList()
+        val updatedItems = mutableListOf<Item>()
+
+        // Recorrer la lista de items por índices
+        for (i in itemList.indices) {
+            updatedItems.add(itemList[i].copy(isAdded = false))
+        }
 
         // Publicar la lista de items actualizada
         _items.postValue(updatedItems)
@@ -537,17 +570,23 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     fun removeItemFromCart(item: Item) {
         val currentCart = _cart.value ?: Cart()
         currentCart.removeItem(item) // Remueve el item del carrito
-
-        // Actualiza el estado de isAdded del item a false
-        val updatedList = _items.value?.map { itemList ->
-            if (itemList.id == item.id) {
-                itemList.copy(isAdded = false)
+        // Obtener la lista de items actual
+        val itemList = _items.value ?: emptyList()
+        val updatedList = mutableListOf<Item>()
+        //Referencias recicladas
+        var currentItem: Item
+        var updatedItem: Item
+        // Recorrer la lista de items por índices
+        for (i in itemList.indices) {
+            currentItem = itemList[i]
+            if (currentItem.id == item.id) {
+                // Crear una copia del item con isAdded = false
+                updatedItem = currentItem.copy(isAdded = false)
+                updatedList.add(updatedItem)
             } else {
-                itemList
+                updatedList.add(currentItem)
             }
-        } ?: emptyList()
-
-
+        }
         // Publica los cambios en la lista de items y el carrito
         Log.d("SharedPreferences-list", "$updatedList")
         _items.postValue(updatedList)
