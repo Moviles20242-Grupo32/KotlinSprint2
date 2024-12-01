@@ -3,7 +3,6 @@ package com.example.foodies.viewModel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.foodies.model.Cart
 import com.example.foodies.model.LruCashingManager

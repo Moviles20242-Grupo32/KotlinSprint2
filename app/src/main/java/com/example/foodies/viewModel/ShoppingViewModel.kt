@@ -3,14 +3,9 @@ package com.example.foodies.viewModel
 import LocationManager
 import TextToSpeechManager
 import android.content.Context
-import android.Manifest
-import android.app.Activity
 import android.app.Application
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
@@ -18,31 +13,13 @@ import androidx.lifecycle.MutableLiveData
 import com.example.foodies.model.Cart
 import com.example.foodies.model.Item
 import com.example.foodies.model.ServiceAdapter
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import com.google.android.gms.location.LocationServices
-import android.location.Geocoder
-import android.location.Location
-import android.util.LruCache
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.example.foodies.model.LocationWorker
 import com.example.foodies.model.LruCashingManager
 import androidx.lifecycle.AndroidViewModel
 import com.example.foodies.model.CartDao
 import com.example.foodies.model.DBProvider
 import com.example.foodies.model.NetworkMonitor
-import com.example.foodies.model.OrderWorker
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
-import java.io.File
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
 

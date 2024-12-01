@@ -1,16 +1,11 @@
 package com.example.foodies.viewModel
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.foodies.model.CartDao
-import com.example.foodies.model.DBProvider
-import com.example.foodies.model.LruCashingManager
 import com.example.foodies.model.NetworkMonitor
 import com.example.foodies.model.ServiceAdapter
 import com.google.firebase.auth.FirebaseUser

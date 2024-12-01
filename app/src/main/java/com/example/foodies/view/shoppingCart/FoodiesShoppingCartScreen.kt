@@ -1,6 +1,5 @@
 package com.example.foodies.view.shoppingCart
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +47,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
 import androidx.compose.material3.Surface
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
