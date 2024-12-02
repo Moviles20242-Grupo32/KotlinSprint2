@@ -119,11 +119,22 @@ fun FoodiesHomeScreen(
 
             // Fila 3: Barra de búsqueda
             FilterBar(onFilter = { query ->
+                val words = query.split(" ")
+                    .map { it.lowercase() } // Convertir a minúsculas
+                    .filter { it.length >= 3 } // Filtrar palabras de al menos 4 caracteres
+                    .toSet() // Eliminar duplicados
+
+                // Pasar las palabras completas al ViewModel
+                viewModel.processFilteredWordsDebounced(words.toList())
+
+                // Filtrar ítems existentes
                 viewModel.filterItemsByName(query)
             }, sort = {
                 viewModel.sortByCheaperItems()
                 sort = !sort
             })
+
+
 
 
 

@@ -281,5 +281,35 @@ class ServiceAdapter {
         firestore.collection("track").add(data)
     }
 
+    fun registerSearchedWords(words: List<String>) {
+        if (words.isEmpty()) return
+
+        // Obtener el User ID una sola vez
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "unknown"
+
+        // Iniciar una transacción en batch
+        val batch = firestore.batch()
+        val collection = firestore.collection("searchUse")
+
+        for (word in words) {
+            val data = mapOf(
+                "finalValue" to word,
+                "timestamp" to Timestamp.now(),
+                "userId" to userId // Usar el ID del usuario
+            )
+            val docRef = collection.document() // Crear documento con ID automático
+            batch.set(docRef, data)
+        }
+
+        // Ejecutar el batch y manejar respuestas
+        batch.commit()
+            .addOnSuccessListener {
+                Log.d("Firebase", "Words successfully registered.")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firebase", "Error registering words: ${e.message}")
+            }
+    }
+
 
 }

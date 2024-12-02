@@ -20,6 +20,9 @@ import com.example.foodies.model.DBProvider
 import com.example.foodies.model.NetworkMonitor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+
 
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -124,29 +127,34 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         Log.d("lastOrder", "Recuperando JSON del caché: $cartJson")
         if (cartJson != null && cartJson.isNotEmpty()) {
             val carrito = Cart.fromJson(cartJson)
-            // Crear una nueva lista combinada con los elementos actuales
-            val currentItems = _items.value ?: emptyList() // Elementos actuales
-            val updatedItems = carrito.getItems() // Elementos cargados del carrito
-            //combinar listas
-            val mergedItems = currentItems.map { currentItem ->
-                updatedItems.find { it.id == currentItem.id } ?: currentItem
-            } + updatedItems.filter { newItem ->
-                currentItems.none { it.id == newItem.id }
-            }
+            if (carrito != null) {
+                // Crear una nueva lista combinada con los elementos actuales
+                val currentItems = _items.value ?: emptyList() // Elementos actuales
+                val updatedItems = carrito.getItems() // Elementos cargados del carrito
 
-            // Publicar los cambios combinados
-            _cart.postValue(carrito)
-            _items.postValue(mergedItems)
-
-            // Actualizar SharedPreferences
-            val editor = sharedPreferences.edit()
-            mergedItems.forEach { item ->
-                editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
-                if (item.isAdded) {
-                    saveItemToCart(item)
+                // Actualizar los elementos combinando
+                val mergedItems = currentItems.map { currentItem ->
+                    updatedItems.find { it.id == currentItem.id } ?: currentItem
+                } + updatedItems.filter { newItem ->
+                    currentItems.none { it.id == newItem.id }
                 }
+
+                // Publicar los cambios combinados
+                _cart.postValue(carrito)
+                _items.postValue(mergedItems)
+
+                // Actualizar SharedPreferences
+                val editor = sharedPreferences.edit()
+                mergedItems.forEach { item ->
+                    editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
+                    if (item.isAdded) {
+                        saveItemToCart(item)
+                    }
+                }
+                editor.apply()
+            } else {
+                Log.e("lastOrder", "Error al cargar el carrito desde JSON.")
             }
-            editor.apply()
         } else {
             Log.e("lastOrder", "No se encontró un carrito en caché.")
         }
@@ -184,7 +192,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
 
-    fun resetCart() {
+    fun resetCart(){
         viewModelScope.launch {
             //almacenamiento
             cartDao.deleteAllItems()
@@ -354,6 +362,19 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
         // Publicar la lista actualizada con el atributo `show` modificado
         _items.postValue(updatedList)
+    }
+
+    private var searchDebounceJob: Job? = null
+
+    fun processFilteredWordsDebounced(filteredWords: List<String>) {
+        // Cancelar cualquier trabajo en curso
+        searchDebounceJob?.cancel()
+
+        // Crear un nuevo trabajo con un retraso
+        searchDebounceJob = viewModelScope.launch {
+            delay(800) // Esperar 800ms antes de procesar
+            serviceAdapter.registerSearchedWords(filteredWords)
+        }
     }
 
     //función para el detalle
