@@ -121,6 +121,21 @@ class ServiceAdapter {
         }
     }
 
+    // Función para obtener las promociones
+    fun getPromotions(onResult: (List<String>) -> Unit) {
+        firestore.collection("item_promotion").get()
+            .addOnSuccessListener { documents ->
+                val promotions = documents.mapNotNull { document ->
+                    document.getString("contenido") // Extraemos el campo "promotion" si existe
+                }
+                onResult(promotions) // Devolvemos la lista de promociones a través del callback
+            }
+            .addOnFailureListener {
+                // En caso de error, devolvemos una lista vacía
+                onResult(emptyList())
+            }
+    }
+
     // Función para obtener el producto más vendido
     suspend fun mostSellItem(): Item {
         return try {
