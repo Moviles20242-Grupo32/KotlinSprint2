@@ -3,7 +3,6 @@ package com.example.foodies.viewModel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.foodies.model.Cart
 import com.example.foodies.model.LruCashingManager
@@ -11,8 +10,7 @@ import com.example.foodies.model.LruCashingManager
 class ConfirmOrderViewModel(application: Application) : AndroidViewModel(application) {
 
     // LiveData para el carrito de compras
-    private val _cart = MutableLiveData<Cart?>()
-    val cart: MutableLiveData<Cart?> get() = _cart
+    val _cart = MutableLiveData<Cart?>()
 
     //Caching
     val lruCache = LruCashingManager

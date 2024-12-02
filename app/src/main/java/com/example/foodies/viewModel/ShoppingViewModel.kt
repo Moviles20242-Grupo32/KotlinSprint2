@@ -3,14 +3,9 @@ package com.example.foodies.viewModel
 import LocationManager
 import TextToSpeechManager
 import android.content.Context
-import android.Manifest
-import android.app.Activity
 import android.app.Application
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.lifecycle.LiveData
@@ -18,31 +13,13 @@ import androidx.lifecycle.MutableLiveData
 import com.example.foodies.model.Cart
 import com.example.foodies.model.Item
 import com.example.foodies.model.ServiceAdapter
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import com.google.android.gms.location.LocationServices
-import android.location.Geocoder
-import android.location.Location
-import android.util.LruCache
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.example.foodies.model.LocationWorker
 import com.example.foodies.model.LruCashingManager
 import androidx.lifecycle.AndroidViewModel
 import com.example.foodies.model.CartDao
 import com.example.foodies.model.DBProvider
 import com.example.foodies.model.NetworkMonitor
-import com.example.foodies.model.OrderWorker
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
-import java.io.File
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -61,47 +38,27 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     val lruCache = LruCashingManager
 
     // LiveData para la lista de Items
-    private val _items = MutableLiveData<List<Item>>()
-    val items: LiveData<List<Item>> get() = _items
-
+    val _items = MutableLiveData<List<Item>>()
     // LiveData para item más vendido
-    private val _msitem = MutableLiveData<Item>()
-    val msitem: LiveData<Item> get() = _msitem
-
+    val _msitem = MutableLiveData<Item>()
     // LiveData para el carrito de compras
-    private val _cart = MutableLiveData<Cart>()
-    val cart: LiveData<Cart> get() = _cart
-
+    val _cart = MutableLiveData<Cart>()
     // LiveData para el total Amount
-    private val _totalAmount = MutableLiveData<Int>()
-    val totalAmount: LiveData<Int> get() = _totalAmount
-
+    val _totalAmount = MutableLiveData<Int>()
     // Live Data para saber si los datos ya fueron cargados
-    private val _isLoaded = MutableLiveData<Boolean>()
-    val isLoaded: LiveData<Boolean> get() = _isLoaded
-
+    val _isLoaded = MutableLiveData<Boolean>()
     // LiveData para manejar errores
-    private val _error = MutableLiveData<String?>()
-    val error: MutableLiveData<String?> get() = _error
-
+    val _error = MutableLiveData<String?>()
     // LiveData para manejar el estado de la orden (éxito o error)
-    private val _orderSuccess = MutableLiveData<Boolean>()
-    val orderSuccess: LiveData<Boolean> get() = _orderSuccess
-
+    val _orderSuccess = MutableLiveData<Boolean>()
     // LiveData para mantener la dirección del usuario
-    private val _userLocation = MutableLiveData<String>()
-    val userLocation: LiveData<String> get() = _userLocation
-
+    val _userLocation = MutableLiveData<String>()
     //LiveData para atender el estado de conexión de internet
-    private val _internetConnected = MutableLiveData<Boolean>()
-    val internetConnected: LiveData<Boolean> get() = _internetConnected
-
+    val _internetConnected = MutableLiveData<Boolean>()
     // LiveData for product details
-    private val _product = MutableLiveData<Item?>()
-    val product: MutableLiveData<Item?> get() = _product
-    
-    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
+    val _product = MutableLiveData<Item?>()
 
+    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
     private val _hasActiveOrder = MutableLiveData<Boolean>()
     val hasActiveOrder: LiveData<Boolean> get() = _hasActiveOrder
 
@@ -133,17 +90,12 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             // Cargar los items del carrito desde la base de datos
             val itemsInCart = cartDao.getAllItems()
-
             // Crear un carrito temporal para añadir los items del carrito
             val carrito = Cart()
-
             itemsInCart.forEach {
                 carrito.addItem(it, it.cart_quantity)
-
             }
-
             _cart.postValue(carrito)
-
             //Observamos los cambios en la red
             NetworkMonitor.isConnected.observeForever { connection ->
                 _internetConnected.postValue(connection)
@@ -160,62 +112,53 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
 
     // Función para guardar el carrito en caché
     fun saveCartCache() {
-
         val cartJson = _cart.value?.toJson()
-
         // Log para ver el JSON que se guarda en el caché
         Log.d("lastOrder", "Guardando JSON en caché: $cartJson")
-
         lruCache.lruCashing.put("lastOrder", cartJson)
-
-
     }
 
     fun loadLastOrder() {
         val cartJson = lruCache.lruCashing.get("lastOrder")
-
         // Log para ver el JSON que se recupera del caché
         Log.d("lastOrder", "Recuperando JSON del caché: $cartJson")
-
         if (cartJson != null && cartJson.isNotEmpty()) {
             val carrito = Cart.fromJson(cartJson)
-            if (carrito != null) {
-                // Crear una nueva lista combinada con los elementos actuales
-                val currentItems = _items.value ?: emptyList() // Elementos actuales
-                val updatedItems = carrito.getItems() // Elementos cargados del carrito
-
-                // Actualizar los elementos combinando
-                val mergedItems = currentItems.map { currentItem ->
-                    updatedItems.find { it.id == currentItem.id } ?: currentItem
-                } + updatedItems.filter { newItem ->
-                    currentItems.none { it.id == newItem.id }
-                }
-
-                // Publicar los cambios combinados
-                _cart.postValue(carrito)
-                _items.postValue(mergedItems)
-
-                // Actualizar SharedPreferences
-                val editor = sharedPreferences.edit()
-                mergedItems.forEach { item ->
-                    editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
-                    if (item.isAdded) {
-                        saveItemToCart(item)
-                    }
-                }
-                editor.apply()
-            } else {
-                Log.e("lastOrder", "Error al cargar el carrito desde JSON.")
+            // Crear una nueva lista combinada con los elementos actuales
+            val currentItems = _items.value ?: emptyList() // Elementos actuales
+            val updatedItems = carrito.getItems() // Elementos cargados del carrito
+            //combinar listas
+            val mergedItems = currentItems.map { currentItem ->
+                updatedItems.find { it.id == currentItem.id } ?: currentItem
+            } + updatedItems.filter { newItem ->
+                currentItems.none { it.id == newItem.id }
             }
+
+            // Publicar los cambios combinados
+            _cart.postValue(carrito)
+            _items.postValue(mergedItems)
+
+            // Actualizar SharedPreferences
+            val editor = sharedPreferences.edit()
+            mergedItems.forEach { item ->
+                editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
+                if (item.isAdded) {
+                    saveItemToCart(item)
+                }
+            }
+            editor.apply()
         } else {
             Log.e("lastOrder", "No se encontró un carrito en caché.")
         }
     }
 
-
     private fun saveItemSavedIcon() {
         val editor = sharedPreferences.edit()
-        _items.value?.forEachIndexed { index, item ->
+        val itemsList = _items.value ?: emptyList()
+
+        var item: Item
+        for (i in itemsList.indices) {
+            item = itemsList[i]
             editor.putBoolean("item_${item.id}_isAdded", item.isAdded)
             Log.d("SharedPreferences", "Guardando item_${item.id}_isAdded = ${item.isAdded}")
         }
@@ -241,44 +184,44 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
 
-    fun resetCart(){
+    fun resetCart() {
         viewModelScope.launch {
+            //almacenamiento
             cartDao.deleteAllItems()
             lruCache.lruCashing.remove("cartKey")
-
+            //Preferencias
             val editor = sharedPreferences.edit()
-
-            _items.value?.forEachIndexed { index, item ->
-                // Guardar el estado booleano directamente
-                editor.putBoolean("item${index + 1}_isAdded", false)
-                //editor.putBoolean("item${index + 1}_isAdded", true)
+            val itemsList = _items.value ?: emptyList() // Guardamos la lista de items
+            //Recorrer los items
+            var item: Item
+            for (i in itemsList.indices) {
+                item = itemsList[i]  // Reasignamos la referencia en cada iteración
+                editor.putBoolean("item${item.id}_isAdded", false)
             }
-
             editor.apply()
         }
     }
 
-
-
     private fun resetViewModelData() {
-        _cart.postValue(Cart())               // Reinicia el carrito a uno vacío
-        _totalAmount.postValue(0)             // Reinicia el total del carrito a cero
-        _items.postValue(emptyList())         // Limpia la lista de ítems
-        _isLoaded.postValue(false)            // Marca los datos como no cargados
-        _orderSuccess.postValue(false)        // Reinicia el estado de la orden
-        _userLocation.postValue("")           // Limpia la dirección del usuario
+        _cart.postValue(Cart())
+        _totalAmount.postValue(0)
+        _items.postValue(emptyList())
+        _isLoaded.postValue(false)
+        _orderSuccess.postValue(false)
+        _userLocation.postValue("")
     }
 
     private fun clearCartDatabase() {
         viewModelScope.launch {
-            cartDao.deleteAllItems()  // Asegúrate de que exista un método en `cartDao` para eliminar todos los ítems
+            // Asegúrate de que exista un método en `cartDao` para eliminar todos los ítems
+            cartDao.deleteAllItems()
         }
     }
 
     fun logout() {
-        clearSharedPreferences()   // Limpia SharedPreferences
-        resetViewModelData()       // Restablece todos los LiveData
-        clearCartDatabase()        // Limpia la base de datos del carrito
+        clearSharedPreferences()
+        resetViewModelData()
+        clearCartDatabase()
     }
 
     private fun clearSharedPreferences() {
@@ -321,21 +264,40 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 val fetchedItems = withContext(Dispatchers.IO) {
                     serviceAdapter.getAllItems()
                 }
-
                 // Encuentra los elementos que ya no están en la lista actualizada y remuévelos
-                val itemsToRemove = _items.value?.filter { currentItem ->
-                    fetchedItems.none { it.id == currentItem.id }
-                } ?: emptyList()
-
-                for (element in itemsToRemove) {
-                    removeItem(element)
+                val currentItems = _items.value ?: emptyList()
+                val itemsToRemove = mutableListOf<Item>()
+                var currentItem: Item? = null
+                var fetchedItem: Item? = null
+                var found: Boolean
+                //Iterar los elementos
+                for (i in currentItems.indices) {
+                    currentItem = currentItems[i]
+                    found = false
+                    for (j in fetchedItems.indices) {
+                        fetchedItem = fetchedItems[j]
+                        if (fetchedItem.id == currentItem.id) {
+                            found = true
+                            break
+                        }
+                    }
+                    if (!found) {
+                        itemsToRemove.add(currentItem)
+                    }
                 }
-
+                //Eliminar items no existentes
+                for (i in itemsToRemove.indices) {
+                    removeItem(itemsToRemove[i])
+                }
                 // Actualiza el LiveData en el hilo principal solo si las listas son diferentes
-                val updatedItems = fetchedItems.map { item ->
-                    // Usa el ID o una clave más consistente para almacenar el estado en SharedPreferences
-                    val isAddedState = sharedPreferences.getBoolean("item_${item.id}_isAdded", false)
-                    item.copy(isAdded = isAddedState)  // Mantener estado
+                val updatedItems = mutableListOf<Item>()
+                var item: Item
+                var isAddedState: Boolean
+
+                for (i in fetchedItems.indices) {
+                    item = fetchedItems[i]
+                    isAddedState = sharedPreferences.getBoolean("item_${item.id}_isAdded", false)
+                    updatedItems.add(item.copy(isAdded = isAddedState))
                 }
                 Log.d("Items-sp", "$updatedItems")
                 // Asignar la lista actualizada
@@ -361,7 +323,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     Log.d("FoodiesHome-item-p", "$item")
                     itemQuantityMap[item.item_name] ?: 0
                 }
-
                 // Update LiveData with the sorted items
                 _items.postValue(sortedItems)
             },
@@ -387,12 +348,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     // Función para filtrar los items por el nombre
     fun filterItemsByName(query: String) {
         val itemList = _items.value ?: emptyList()
-
-        // Filtrar y actualizar el valor de `show` según el nombre que contenga `query`
-        val updatedList = itemList.map { item ->
-            item.copy(show = item.item_name.contains(query, ignoreCase = true))
+        val updatedList = mutableListOf<Item>()
+        for (i in itemList.indices) {
+            updatedList.add(itemList[i].copy(show = itemList[i].item_name.contains(query, ignoreCase = true)))
         }
-
         // Publicar la lista actualizada con el atributo `show` modificado
         _items.postValue(updatedList)
     }
@@ -413,16 +372,24 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun addItemToCart(itemId: String?) {
-        // Actualizar la lista de items basada en el ID
-        val updatedList = _items.value?.map { item ->
+        // Obtener la lista de items actual
+        val itemList = _items.value ?: emptyList()
+        val updatedList = mutableListOf<Item>()
+        //Referencias recicladas
+        var item: Item
+        var updatedItem: Item
+        // Recorrer la lista de items por índices
+        for (i in itemList.indices) {
+            item = itemList[i]
             if (item.id == itemId) {
-                val updatedItem = item.copy(isAdded = !item.isAdded) // Cambiar estado de isAdded
+                // Crear una copia del item para modificar su estado
+                updatedItem = item.copy(isAdded = !item.isAdded) // Cambiar estado de isAdded
                 if (updatedItem.isAdded) {
                     // Agregar el item al carrito
                     addItem(updatedItem, 1)
                     updateTotal()
                     // Guardar item con cantidad 1 en la base de datos
-                    val itemDB = item.copy(cart_quantity = 1)
+                    val itemDB = updatedItem.copy(cart_quantity = 1)
                     saveItemToCart(itemDB)
                 } else {
                     // Eliminar el item del carrito
@@ -431,12 +398,11 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     // Remover el item del carrito en la base de datos
                     removeItemFromCartId(itemId)
                 }
-                updatedItem
+                updatedList.add(updatedItem)
             } else {
-                item
+                updatedList.add(item)
             }
-        } ?: emptyList()
-
+        }
         // Actualizar la lista de items para reflejar cambios
         _items.value = updatedList
         // Guardar el estado actualizado en SharedPreferences
@@ -456,14 +422,20 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         val currentCart = _cart.value ?: Cart()
         currentCart.removeItem(item) // Remueve el item del carrito
 
-        // Actualiza el estado de isAdded del item a false
-        val updatedList = _items.value?.map { itemList ->
-            if (itemList.id == item.id) {
-                itemList.copy(isAdded = false)
+        // Obtener la lista de items actual
+        val itemList = _items.value ?: emptyList()
+        val updatedList = mutableListOf<Item>()
+        // Recorrer la lista de items por índices
+        for (i in itemList.indices) {
+            val currentItem = itemList[i]
+            if (currentItem.id == item.id) {
+                // Crear una copia del item con isAdded = false
+                val updatedItem = currentItem.copy(isAdded = false)
+                updatedList.add(updatedItem)
             } else {
-                itemList
+                updatedList.add(currentItem)
             }
-        } ?: emptyList()
+        }
 
         // Publica los cambios en la lista de items y el carrito
         Log.d("SharedPreferences-list", "$updatedList")
@@ -525,10 +497,14 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         _cart.postValue(emptyCart) // Publica el carrito vacío en LiveData
         _totalAmount.postValue(0)  // Resetear el total a 0
 
-        // Recorrer los items y marcar isAdded como false
-        val updatedItems = _items.value?.map { item ->
-            item.copy(isAdded = false)
-        } ?: emptyList()
+        // Obtener la lista de items actual
+        val itemList = _items.value ?: emptyList()
+        val updatedItems = mutableListOf<Item>()
+
+        // Recorrer la lista de items por índices
+        for (i in itemList.indices) {
+            updatedItems.add(itemList[i].copy(isAdded = false))
+        }
 
         // Publicar la lista de items actualizada
         _items.postValue(updatedItems)
@@ -551,17 +527,23 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     fun removeItemFromCart(item: Item) {
         val currentCart = _cart.value ?: Cart()
         currentCart.removeItem(item) // Remueve el item del carrito
-
-        // Actualiza el estado de isAdded del item a false
-        val updatedList = _items.value?.map { itemList ->
-            if (itemList.id == item.id) {
-                itemList.copy(isAdded = false)
+        // Obtener la lista de items actual
+        val itemList = _items.value ?: emptyList()
+        val updatedList = mutableListOf<Item>()
+        //Referencias recicladas
+        var currentItem: Item
+        var updatedItem: Item
+        // Recorrer la lista de items por índices
+        for (i in itemList.indices) {
+            currentItem = itemList[i]
+            if (currentItem.id == item.id) {
+                // Crear una copia del item con isAdded = false
+                updatedItem = currentItem.copy(isAdded = false)
+                updatedList.add(updatedItem)
             } else {
-                itemList
+                updatedList.add(currentItem)
             }
-        } ?: emptyList()
-
-
+        }
         // Publica los cambios en la lista de items y el carrito
         Log.d("SharedPreferences-list", "$updatedList")
         _items.postValue(updatedList)

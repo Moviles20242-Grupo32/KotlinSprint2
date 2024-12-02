@@ -5,7 +5,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -44,7 +43,7 @@ fun FoodiesNavigation() {
     // Inicializar tareas periódicas y otros workers
     itemsAvailability(shoppingViewModel)
 
-    NavHost(navController = navController, startDestination = if (authViewModel.user.value == null) {
+    NavHost(navController = navController, startDestination = if (authViewModel._user.value == null) {
         FoodiesScreens.FoodiesLoginScreen.name
     } else {
         FoodiesScreens.FoodiesHomeScreen.name
