@@ -613,6 +613,9 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         serviceAdapter.registerTrack()
     }
 
+    fun registerDetailProduct(product: String){
+        serviceAdapter.registerDetailProduct(product)
+    }
 
 
 
