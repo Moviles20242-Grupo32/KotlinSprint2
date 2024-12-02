@@ -75,7 +75,10 @@ fun FoodiesNavigation() {
         }
 
         composable(FoodiesScreens.FoodiesTrackScreen.name) {
-            TrackOrderScreen(navController = navController)
+            TrackOrderScreen(
+                navController = navController,
+                shoppingViewModel = shoppingViewModel
+            )
         }
 
         composable(FoodiesScreens.ConfirmOrderScreen.name){

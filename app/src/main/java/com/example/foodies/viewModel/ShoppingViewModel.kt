@@ -71,6 +71,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         LocationManager.address.observeForever { newAddress ->
             _userLocation.postValue(newAddress)
         }
+        //Observamos los cambios en la red
+        NetworkMonitor.isConnected.observeForever { connection ->
+            _internetConnected.postValue(connection)
+        }
         _cart.value = Cart()
         loadCartItems()
         _isLoaded.postValue(false)
@@ -99,10 +103,6 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 carrito.addItem(it, it.cart_quantity)
             }
             _cart.postValue(carrito)
-            //Observamos los cambios en la red
-            NetworkMonitor.isConnected.observeForever { connection ->
-                _internetConnected.postValue(connection)
-            }
 
             _cart.observeForever { newCart ->
                 //Volver el cart un JSON
