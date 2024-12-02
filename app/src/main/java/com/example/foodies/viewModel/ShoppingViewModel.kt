@@ -20,12 +20,8 @@ import com.example.foodies.model.DBProvider
 import com.example.foodies.model.NetworkMonitor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import androidx.lifecycle.viewModelScope
 
 
 class ShoppingViewModel(application: Application) : AndroidViewModel(application) {
