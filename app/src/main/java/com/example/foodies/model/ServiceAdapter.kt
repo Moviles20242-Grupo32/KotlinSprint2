@@ -231,6 +231,16 @@ class ServiceAdapter {
 
     }
 
+    suspend fun getProductById(productId: String): Item {
+        return try {
+            val document = firestore.collection("Items").document(productId).get().await()
+            document.toObject(Item::class.java) ?: throw Exception("Product not found")
+        } catch (e: Exception) {
+            throw Exception("Error fetching product: ${e.message}")
+        }
+    }
+
+
     fun getUserOrderHistory(userId: String, onSuccess: (Map<String, Int>) -> Unit, onFailure: (Exception) -> Unit) {
         firestore.collection("Orders")
             .whereEqualTo("user_id", userId)

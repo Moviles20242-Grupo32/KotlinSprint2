@@ -15,7 +15,9 @@ data class Item(
     val times_ordered: Int = 0,
     val cart_quantity: Int = 0,
     val show: Boolean = true,
-    var isAdded: Boolean = false
+    var isAdded: Boolean = false,
+    val item_starProducts: String = "",
+    val item_ingredients: String = ""
 ) {
     fun toMap(): MutableMap<String, Any?> {
         return mutableMapOf(

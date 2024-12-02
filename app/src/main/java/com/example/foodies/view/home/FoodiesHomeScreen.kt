@@ -49,7 +49,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -79,16 +78,17 @@ fun FoodiesHomeScreen(
     viewModel: ShoppingViewModel
 ) {
     // Obtener el estado de los items desde el ViewModel
-    val items by viewModel.items.observeAsState(emptyList())
-    val msitem by viewModel.msitem.observeAsState(null)
-    val isLoaded by viewModel.isLoaded.observeAsState(false)
-    val error by viewModel.error.observeAsState()
+    val items by viewModel._items.observeAsState(emptyList())
+    val msitem by viewModel._msitem.observeAsState(null)
+    val isLoaded by viewModel._isLoaded.observeAsState(false)
+    val error by viewModel._error.observeAsState()
     val context = LocalContext.current
-    val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
-    val internetConnected by viewModel.internetConnected.observeAsState()
+    val userLocation by viewModel._userLocation.observeAsState("Ubicación no disponible")
+    val internetConnected by viewModel._internetConnected.observeAsState()
     val hasActiveOrder by viewModel.hasActiveOrder.observeAsState(false)
     //Remembers
     var sort by rememberSaveable { mutableStateOf(false) }
+
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
         //Obtener productos iniciales
@@ -203,24 +203,20 @@ fun FoodiesHomeScreen(
 
             Log.d("Items-v", "$items")
             // Lista de ítems usando la función modularizada
-            if (internetConnected == false){
+            if (internetConnected == false) {
                 ShimmerList("Esperando conexión a internet...")
-            }
-            else if (items.isEmpty()){
+            } else if (items.isEmpty()) {
                 ShimmerList("Cargando productos disponibles")
-            }
-            else{
-                //Obtener datos
-                if (!sort){
+            } else {
+                // Obtener datos
+                if (!sort) {
                     FetchItemsData(viewModel, onComplete = {
-                        msitem?.let { ItemsList(items,viewModel, it) }
+                        msitem?.let { ItemsList(items, viewModel, it, navController) }
                     })
-                }else{
-                    msitem?.let { ItemsList(items,viewModel, it) }
+                } else {
+                    msitem?.let { ItemsList(items, viewModel, it, navController) }
                 }
             }
-
-
 
         }
     }
@@ -399,7 +395,7 @@ fun FilterBar(onFilter: (String) -> Unit,sort: () -> Unit) {
 }
 
 @Composable
-fun MostSellItem(item: Item, viewModel: ShoppingViewModel){
+fun MostSellItem(item: Item, viewModel: ShoppingViewModel, navController: NavController) {
     Column {
         Text(
             text = "Most Ordered Box",
@@ -411,26 +407,26 @@ fun MostSellItem(item: Item, viewModel: ShoppingViewModel){
             overflow = TextOverflow.Ellipsis,
             color = Color(0.352f, 0.196f, 0.070f, 1.0f)
         )
-        ItemCard(item,viewModel,item)
+        ItemCard(item, viewModel, item, navController)
     }
 }
 
 
 //LISTA DE ITEMS
 @Composable
-fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel, msitem:Item) {
+fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel, msitem: Item, navController: NavController) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         val filteredItems = items.filter { it.show }
         items(filteredItems) { item ->
-            ItemCard(item,viewModel,msitem)
+            ItemCard(item, viewModel, msitem, navController)
         }
     }
 }
 
 @Composable
-fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
+fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem: Item, navController: NavController) {
     val rating = item.item_ratings.toFloatOrNull() ?: 0f
     Row(
         modifier = Modifier
@@ -439,18 +435,17 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
             .clip(RoundedCornerShape(8.dp))
             .padding(8.dp)
     ) {
-        // Columna 1: Imagen del item
-        //AsyncImage(
-          //  model = item.item_image,
-            //contentDescription = "Imagen de ${item.item_name}",
-            //modifier = Modifier
-              //  .size(100.dp)
-        //)
-
+        // Imagen del producto con clic para navegar a FoodiesProductDetailScreen
         GlideImage(
             imageUrl = item.item_image,
             contentDescription = "Imagen de ${item.item_name}",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier
+                .size(100.dp)
+                .clickable {
+                    viewModel.detailProduct(item.id)
+                    // Pasa el productId al navegar
+                    navController.navigate("productDetail/${item.id}")
+                }
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -512,7 +507,7 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
         }
         Spacer(modifier = Modifier.width(20.dp))
 
-        //Columna 3: Agregar a carrito
+        // Columna 3: Agregar a carrito
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
@@ -526,15 +521,15 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem:Item) {
                     color = Color.Transparent, // Color del borde
                     shape = CircleShape // Esquinas redondeadas completamente
                 )
-                .clickable {viewModel.addItemToCart(item.id)}
+                .clickable { viewModel.addItemToCart(item.id) }
         ) {
             Icon(
                 imageVector = if (item.isAdded) Icons.Filled.Check else Icons.Filled.Add,
                 contentDescription = "Agregar al carrito",
                 tint = Color.White,
                 modifier = Modifier
-                    .align(Alignment.Center) // Centra el Icon dentro del Box
-                    .size(30.dp) // Tamaño del Icono
+                    .align(Alignment.Center)
+                    .size(30.dp)
             )
         }
     }

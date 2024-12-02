@@ -1,6 +1,5 @@
 package com.example.foodies.view.shoppingCart
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +47,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import com.example.foodies.viewModel.FoodiesScreens
 import com.example.foodies.viewModel.ShoppingViewModel
 import androidx.compose.material3.Surface
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
@@ -60,11 +58,11 @@ fun FoodiesShoppingCartScreen(
     viewModel: ShoppingViewModel
 ) {
     // Estados
-    val cart by viewModel.cart.observeAsState()
-    val totalAmount by viewModel.totalAmount.observeAsState(0)
-    val orderSuccess by viewModel.orderSuccess.observeAsState() // Observa el éxito de la orden
-    val errorMessage by viewModel.error.observeAsState() // Observa los errores
-    val internetConnected by viewModel.internetConnected.observeAsState()
+    val cart by viewModel._cart.observeAsState()
+    val totalAmount by viewModel._totalAmount.observeAsState(0)
+    val orderSuccess by viewModel._orderSuccess.observeAsState() // Observa el éxito de la orden
+    val errorMessage by viewModel._error.observeAsState() // Observa los errores
+    val internetConnected by viewModel._internetConnected.observeAsState()
 
     // Estado para mostrar o no el diálogo
     var showDialog by remember { mutableStateOf(false) }
@@ -204,13 +202,11 @@ fun FoodiesShoppingCartScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sección de total y botón de Check Out en la parte inferior
-            totalAmount?.let {
-                CheckoutSection(
-                    total = it,
-                    viewModel = viewModel,
-                    navController = navController
-                )
-            }
+            CheckoutSection(
+                total = totalAmount,
+                viewModel = viewModel,
+                navController = navController
+            )
 
         }
     }
@@ -263,7 +259,7 @@ fun CheckoutSection(total: Int, viewModel: ShoppingViewModel, navController: Nav
                             viewModel.saveCartCache()
                             viewModel.registerPrice()
                             viewModel.clearCart()
-                            navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
+                            navController.navigate(FoodiesScreens.ConfirmOrderScreen.name)
                             viewModel.saveOrderStatus(true)
                         },
                         onFailure = { exception ->

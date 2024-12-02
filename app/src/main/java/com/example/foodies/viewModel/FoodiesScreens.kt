@@ -5,5 +5,7 @@ enum class FoodiesScreens {
     FoodiesHomeScreen,
     FoodiesShoppingCartScreen,
     FoodiesProfileScreen,
-    FoodiesTrackScreen
+    FoodiesProductDetailScreen,
+    FoodiesTrackScreen,
+    ConfirmOrderScreen
 }

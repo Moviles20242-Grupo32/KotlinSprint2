@@ -1,16 +1,11 @@
 package com.example.foodies.viewModel
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.foodies.model.CartDao
-import com.example.foodies.model.DBProvider
-import com.example.foodies.model.LruCashingManager
 import com.example.foodies.model.NetworkMonitor
 import com.example.foodies.model.ServiceAdapter
 import com.google.firebase.auth.FirebaseUser
@@ -23,15 +18,9 @@ class AuthViewModel(application: Application): AndroidViewModel(application)  {
     private val _loading = MutableLiveData(false)
 
     //LiveData para atender el estado de conexión de internet
-    private val _internetConnected = MutableLiveData<Boolean>()
-    val internetConnected: LiveData<Boolean> get() = _internetConnected
-
-    private val _user = MutableLiveData<FirebaseUser?>()
-    val user: LiveData<FirebaseUser?> get() = _user
-
-    private val _userName = MutableLiveData<String>()
-    val userName: LiveData<String> get() = _userName
-
+    val _internetConnected = MutableLiveData<Boolean>()
+    val _user = MutableLiveData<FirebaseUser?>()
+    val _userName = MutableLiveData<String>()
 
     //Inicialización: Cargamos la LocationManager address
     init {

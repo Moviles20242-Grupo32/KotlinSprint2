@@ -1,10 +1,10 @@
 package com.example.foodies.viewModel
 
+import FoodiesProductDetailScreen
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.foodies.view.home.FoodiesHomeScreen
 import com.example.foodies.view.login.FoodiesLoginScreen
 import com.example.foodies.view.profile.FoodiesProfileScreen
+import com.example.foodies.view.shoppingCart.ConfirmOrderScreen
 import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
 import com.example.foodies.view.shoppingCart.TrackOrderScreen
 import kotlinx.coroutines.Dispatchers
@@ -34,16 +35,19 @@ fun itemsAvailability(shoppingViewModel: ShoppingViewModel) {
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun FoodiesNavigation(){
+fun FoodiesNavigation() {
     val navController = rememberNavController()
-    val shoppingViewModel: ShoppingViewModel = viewModel() // Inject ShoppingViewModel
-    val authViewModel: AuthViewModel = viewModel() // Inject LogoutViewModel
+    val shoppingViewModel: ShoppingViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
 
     // Inicializar tareas periódicas y otros workers
     itemsAvailability(shoppingViewModel)
 
-    // Configuración del NavHost
-    NavHost(navController = navController, startDestination = if(authViewModel.user.value == null){FoodiesScreens.FoodiesLoginScreen.name} else{FoodiesScreens.FoodiesHomeScreen.name}) {
+    NavHost(navController = navController, startDestination = if (authViewModel._user.value == null) {
+        FoodiesScreens.FoodiesLoginScreen.name
+    } else {
+        FoodiesScreens.FoodiesHomeScreen.name
+    }) {
 
         composable(FoodiesScreens.FoodiesLoginScreen.name){
             FoodiesLoginScreen(navController = navController)
@@ -61,8 +65,21 @@ fun FoodiesNavigation(){
             FoodiesProfileScreen(navController = navController, authViewModel = authViewModel, shoppingViewModel = shoppingViewModel)
         }
 
+        // Update route to accept productId
+        composable("productDetail/{productId}") { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId") ?: ""
+            FoodiesProductDetailScreen(
+                navController = navController,
+                shoppingViewModel = shoppingViewModel
+            )
+        }
+
         composable(FoodiesScreens.FoodiesTrackScreen.name) {
             TrackOrderScreen(navController = navController)
+        }
+
+        composable(FoodiesScreens.ConfirmOrderScreen.name){
+            ConfirmOrderScreen(navController = navController)
         }
     }
 }

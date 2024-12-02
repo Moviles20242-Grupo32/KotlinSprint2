@@ -8,10 +8,5 @@ data class User(val id: String?, val name: String, val email: String){
             "name" to this.name,
             "email" to this.email
         )
-
     }
-
-
-
-
 }
