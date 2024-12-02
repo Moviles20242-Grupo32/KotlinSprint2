@@ -1,6 +1,5 @@
 package com.example.foodies.view.home
 
-import android.util.Log
 import android.widget.ImageView
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -86,14 +85,12 @@ fun FoodiesHomeScreen(
     val userLocation by viewModel._userLocation.observeAsState("Ubicación no disponible")
     val internetConnected by viewModel._internetConnected.observeAsState()
     val hasActiveOrder by viewModel.hasActiveOrder.observeAsState(false)
-    //Remembers
+    // Remembers
     var sort by rememberSaveable { mutableStateOf(false) }
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
-        //Obtener productos iniciales
         viewModel.fetchItems()
-        //Incialización de elementos adicionales
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
         viewModel.storeInfo()
@@ -104,119 +101,132 @@ fun FoodiesHomeScreen(
         Text(text = "Error: $it", style = MaterialTheme.typography.bodyLarge)
     }
 
+    // Surface principal
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.White
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp) // Espacio entre elementos
         ) {
-            // Fila 1: Texto "Botones"
-            ActionButtons(items,navController,viewModel)
+            // Fila 1: Botones
+            item {
+                ActionButtons(items, navController, viewModel)
+            }
 
-            // Fila 2: Texto "Locación"
-            Location(userLocation)
+            // Fila 2: Locación
+            item {
+                Location(userLocation)
+            }
 
             // Fila 3: Barra de búsqueda
-            FilterBar(onFilter = { query ->
-                val words = query.split(" ")
-                    .map { it.lowercase() } // Convertir a minúsculas
-                    .filter { it.length >= 3 } // Filtrar palabras de al menos 4 caracteres
-                    .toSet() // Eliminar duplicados
+            item {
+                FilterBar(
+                    onFilter = { query ->
+                        val words = query.split(" ")
+                            .map { it.lowercase() }
+                            .filter { it.length >= 3 }
+                            .toSet()
 
-                // Pasar las palabras completas al ViewModel
-                viewModel.processFilteredWordsDebounced(words.toList())
-
-                // Filtrar ítems existentes
-                viewModel.filterItemsByName(query)
-            }, sort = {
-                viewModel.sortByCheaperItems()
-                sort = !sort
-            })
-
-
-
-
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth() // Ocupa el ancho total del contenedor
-                    .padding(vertical = 16.dp) // Espaciado opcional
-            ) {
-                Button(
-                    onClick = { viewModel.loadLastOrder()
-                                viewModel.registerUseOfTrack()
-                              },
-                    modifier = Modifier.align(Alignment.Center), // Centra el botón horizontalmente en el Box
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(241, 153, 55)
-                    )
-                ) {
-                    Text(
-                        text = "Realizar pedido anterior",
-                        modifier = Modifier.padding(5.dp)
-                    )
-                }
+                        viewModel.processFilteredWordsDebounced(words.toList())
+                        viewModel.filterItemsByName(query)
+                    },
+                    sort = {
+                        viewModel.sortByCheaperItems()
+                        sort = !sort
+                    }
+                )
             }
-            viewModel.getOrderStatus()
 
-            if (hasActiveOrder) {
+            // Fila 4: Botón de pedido anterior
+            item {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .background(Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp))
-                        .padding(16.dp)
+                        .padding(vertical = 16.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
+                    Button(
+                        onClick = {
+                            viewModel.loadLastOrder()
+                            viewModel.registerUseOfTrack()
+                        },
+                        modifier = Modifier.align(Alignment.Center),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(241, 153, 55))
                     ) {
-                        Text(
-                            text = "Tienes una orden activa",
-                            modifier = Modifier.weight(1f),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
+                        Text(text = "Realizar pedido anterior", modifier = Modifier.padding(5.dp))
+                    }
+                }
+            }
 
-                        Button(
-                            onClick = {
-                                navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(241, 153, 55)
-                            ),
-                            modifier = Modifier.padding(start = 8.dp)
+            // Fila 5: Estado de la orden activa
+            if (hasActiveOrder) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .background(Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp))
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(text = "Seguir tu orden")
+                            Text(
+                                text = "Tienes una orden activa",
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+
+                            Button(
+                                onClick = {
+                                    navController.navigate(FoodiesScreens.FoodiesTrackScreen.name)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(241, 153, 55)),
+                                modifier = Modifier.padding(start = 8.dp)
+                            ) {
+                                Text(text = "Seguir tu orden")
+                            }
                         }
                     }
                 }
             }
 
-            // Lista de ítems usando la función modularizada
+            // Cargar lista de ítems o efectos de carga
             if (internetConnected == false) {
-                ShimmerList("Esperando conexión a internet...")
+                item {
+                    ShimmerTittle("Esperando conexión a internet...")
+                }
+                // Placeholder de shimmer
+                items(3) {
+                    ShimmerEffect()
+                }
             } else if (items.isEmpty()) {
-                ShimmerList("Cargando productos disponibles")
+                item {
+                    ShimmerTittle("Cargando productos disponibles...")
+                }
+                // Placeholder de shimmer
+                items(3) {
+                    ShimmerEffect()
+                }
             } else {
-                // Obtener datos
-                if (!sort) {
-                    FetchItemsData(viewModel, onComplete = {
-                        msitem?.let { ItemsList(items, viewModel, it, navController) }
-                    })
-                } else {
-                    msitem?.let { ItemsList(items, viewModel, it, navController) }
+                viewModel.mostSellItem()
+                msitem?.let{
+                    val filteredItems = items.filter { it.show }
+                    items(filteredItems) { item ->
+                        ItemCard(item, viewModel, it, navController)
+                    }
                 }
             }
-
         }
     }
 }
-
 
 //Función para obtener datos
 @Composable
@@ -536,31 +546,18 @@ fun GlideImage(
 
 //Skelon effect
 @Composable
-fun ShimmerList(message: String) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp) // Espacio entre los items
+fun ShimmerTittle(message: String) {
+    // Texto informativo
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
     ) {
-        // Texto informativo
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = message,
-                    color = Color(0.352f, 0.196f, 0.070f, 1.0f),
-                    fontWeight = FontWeight.Bold,
-                    style = TextStyle(fontSize = 15.sp)
-                )
-            }
-        }
-        // Placeholder de shimmer
-        items(3) {
-            ShimmerEffect()
-        }
+        Text(
+            text = message,
+            color = Color(0.352f, 0.196f, 0.070f, 1.0f),
+            fontWeight = FontWeight.Bold,
+            style = TextStyle(fontSize = 15.sp)
+        )
     }
 }
 
