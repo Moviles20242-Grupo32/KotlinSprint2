@@ -58,11 +58,11 @@ fun FoodiesShoppingCartScreen(
     viewModel: ShoppingViewModel
 ) {
     // Estados
-    val cart by viewModel.cart.observeAsState()
-    val totalAmount by viewModel.totalAmount.observeAsState(0)
-    val orderSuccess by viewModel.orderSuccess.observeAsState() // Observa el éxito de la orden
-    val errorMessage by viewModel.error.observeAsState() // Observa los errores
-    val internetConnected by viewModel.internetConnected.observeAsState()
+    val cart by viewModel._cart.observeAsState()
+    val totalAmount by viewModel._totalAmount.observeAsState(0)
+    val orderSuccess by viewModel._orderSuccess.observeAsState() // Observa el éxito de la orden
+    val errorMessage by viewModel._error.observeAsState() // Observa los errores
+    val internetConnected by viewModel._internetConnected.observeAsState()
 
     // Estado para mostrar o no el diálogo
     var showDialog by remember { mutableStateOf(false) }

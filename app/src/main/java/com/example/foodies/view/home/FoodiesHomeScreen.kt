@@ -49,7 +49,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -79,13 +78,13 @@ fun FoodiesHomeScreen(
     viewModel: ShoppingViewModel
 ) {
     // Obtener el estado de los items desde el ViewModel
-    val items by viewModel.items.observeAsState(emptyList())
-    val msitem by viewModel.msitem.observeAsState(null)
-    val isLoaded by viewModel.isLoaded.observeAsState(false)
-    val error by viewModel.error.observeAsState()
+    val items by viewModel._items.observeAsState(emptyList())
+    val msitem by viewModel._msitem.observeAsState(null)
+    val isLoaded by viewModel._isLoaded.observeAsState(false)
+    val error by viewModel._error.observeAsState()
     val context = LocalContext.current
-    val userLocation by viewModel.userLocation.observeAsState("Ubicación no disponible")
-    val internetConnected by viewModel.internetConnected.observeAsState()
+    val userLocation by viewModel._userLocation.observeAsState("Ubicación no disponible")
+    val internetConnected by viewModel._internetConnected.observeAsState()
     val hasActiveOrder by viewModel.hasActiveOrder.observeAsState(false)
     //Remembers
     var sort by rememberSaveable { mutableStateOf(false) }

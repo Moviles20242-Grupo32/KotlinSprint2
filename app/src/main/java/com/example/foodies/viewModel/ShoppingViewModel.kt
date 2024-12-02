@@ -38,47 +38,27 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
     val lruCache = LruCashingManager
 
     // LiveData para la lista de Items
-    private val _items = MutableLiveData<List<Item>>()
-    val items: LiveData<List<Item>> get() = _items
-
+    val _items = MutableLiveData<List<Item>>()
     // LiveData para item más vendido
-    private val _msitem = MutableLiveData<Item>()
-    val msitem: LiveData<Item> get() = _msitem
-
+    val _msitem = MutableLiveData<Item>()
     // LiveData para el carrito de compras
-    private val _cart = MutableLiveData<Cart>()
-    val cart: LiveData<Cart> get() = _cart
-
+    val _cart = MutableLiveData<Cart>()
     // LiveData para el total Amount
-    private val _totalAmount = MutableLiveData<Int>()
-    val totalAmount: LiveData<Int> get() = _totalAmount
-
+    val _totalAmount = MutableLiveData<Int>()
     // Live Data para saber si los datos ya fueron cargados
-    private val _isLoaded = MutableLiveData<Boolean>()
-    val isLoaded: LiveData<Boolean> get() = _isLoaded
-
+    val _isLoaded = MutableLiveData<Boolean>()
     // LiveData para manejar errores
-    private val _error = MutableLiveData<String?>()
-    val error: MutableLiveData<String?> get() = _error
-
+    val _error = MutableLiveData<String?>()
     // LiveData para manejar el estado de la orden (éxito o error)
-    private val _orderSuccess = MutableLiveData<Boolean>()
-    val orderSuccess: LiveData<Boolean> get() = _orderSuccess
-
+    val _orderSuccess = MutableLiveData<Boolean>()
     // LiveData para mantener la dirección del usuario
-    private val _userLocation = MutableLiveData<String>()
-    val userLocation: LiveData<String> get() = _userLocation
-
+    val _userLocation = MutableLiveData<String>()
     //LiveData para atender el estado de conexión de internet
-    private val _internetConnected = MutableLiveData<Boolean>()
-    val internetConnected: LiveData<Boolean> get() = _internetConnected
-
+    val _internetConnected = MutableLiveData<Boolean>()
     // LiveData for product details
-    private val _product = MutableLiveData<Item?>()
-    val product: MutableLiveData<Item?> get() = _product
-    
-    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
+    val _product = MutableLiveData<Item?>()
 
+    private val cartDao: CartDao = DBProvider.getDatabase(application).cartDao()
     private val _hasActiveOrder = MutableLiveData<Boolean>()
     val hasActiveOrder: LiveData<Boolean> get() = _hasActiveOrder
 

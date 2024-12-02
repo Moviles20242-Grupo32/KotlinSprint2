@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -67,7 +66,7 @@ fun FoodiesLoginScreen(
     viewModel: AuthViewModel = viewModel(),
 ) {
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
-    val internetConnected by viewModel.internetConnected.observeAsState()
+    val internetConnected by viewModel._internetConnected.observeAsState()
     val errorMessage = remember { mutableStateOf("") }
     val context = LocalContext.current
 

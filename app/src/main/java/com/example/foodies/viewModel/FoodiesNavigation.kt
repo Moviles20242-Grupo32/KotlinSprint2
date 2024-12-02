@@ -43,7 +43,7 @@ fun FoodiesNavigation() {
     // Inicializar tareas periódicas y otros workers
     itemsAvailability(shoppingViewModel)
 
-    NavHost(navController = navController, startDestination = if (authViewModel.user.value == null) {
+    NavHost(navController = navController, startDestination = if (authViewModel._user.value == null) {
         FoodiesScreens.FoodiesLoginScreen.name
     } else {
         FoodiesScreens.FoodiesHomeScreen.name

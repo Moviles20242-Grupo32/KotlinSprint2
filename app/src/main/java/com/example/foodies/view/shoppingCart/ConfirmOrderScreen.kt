@@ -52,7 +52,7 @@ fun ConfirmOrderScreen(
     viewModel: ConfirmOrderViewModel = viewModel()
 ){
     // Estados
-    val cart by viewModel.cart.observeAsState()
+    val cart by viewModel._cart.observeAsState()
     viewModel.loadCart()
     // Surface con fondo blanco
     Surface(

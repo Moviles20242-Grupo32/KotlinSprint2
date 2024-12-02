@@ -32,7 +32,7 @@ fun FoodiesProductDetailScreen(
     navController: NavController,
     shoppingViewModel: ShoppingViewModel,
 ) {
-    val product by shoppingViewModel.product.observeAsState()
+    val product by shoppingViewModel._product.observeAsState()
 
     Surface(
         modifier = Modifier

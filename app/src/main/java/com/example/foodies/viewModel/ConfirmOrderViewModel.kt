@@ -10,8 +10,7 @@ import com.example.foodies.model.LruCashingManager
 class ConfirmOrderViewModel(application: Application) : AndroidViewModel(application) {
 
     // LiveData para el carrito de compras
-    private val _cart = MutableLiveData<Cart?>()
-    val cart: MutableLiveData<Cart?> get() = _cart
+    val _cart = MutableLiveData<Cart?>()
 
     //Caching
     val lruCache = LruCashingManager

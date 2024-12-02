@@ -18,15 +18,9 @@ class AuthViewModel(application: Application): AndroidViewModel(application)  {
     private val _loading = MutableLiveData(false)
 
     //LiveData para atender el estado de conexión de internet
-    private val _internetConnected = MutableLiveData<Boolean>()
-    val internetConnected: LiveData<Boolean> get() = _internetConnected
-
-    private val _user = MutableLiveData<FirebaseUser?>()
-    val user: LiveData<FirebaseUser?> get() = _user
-
-    private val _userName = MutableLiveData<String>()
-    val userName: LiveData<String> get() = _userName
-
+    val _internetConnected = MutableLiveData<Boolean>()
+    val _user = MutableLiveData<FirebaseUser?>()
+    val _userName = MutableLiveData<String>()
 
     //Inicialización: Cargamos la LocationManager address
     init {
