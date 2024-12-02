@@ -281,6 +281,16 @@ class ServiceAdapter {
         firestore.collection("track").add(data)
     }
 
+    fun registerDetailProduct(product:String){
+        val userId = auth.currentUser?.uid
+        val data = mapOf(
+            "id" to userId,
+            "product" to product,
+            "timestamp" to Timestamp.now()
+        )
+        firestore.collection("item_details").add(data)
+    }
+
     fun registerSearchedWords(words: List<String>) {
         if (words.isEmpty()) return
 

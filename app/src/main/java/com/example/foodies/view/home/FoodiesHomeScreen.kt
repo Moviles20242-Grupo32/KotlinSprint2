@@ -197,11 +197,6 @@ fun FoodiesHomeScreen(
                 }
             }
 
-
-
-
-
-            Log.d("Items-v", "$items")
             // Lista de ítems usando la función modularizada
             if (internetConnected == false) {
                 ShimmerList("Esperando conexión a internet...")
@@ -394,24 +389,6 @@ fun FilterBar(onFilter: (String) -> Unit,sort: () -> Unit) {
     }
 }
 
-@Composable
-fun MostSellItem(item: Item, viewModel: ShoppingViewModel, navController: NavController) {
-    Column {
-        Text(
-            text = "Most Ordered Box",
-            style = TextStyle(
-                fontSize = 15.sp, // Tamaño de fuente fijo
-                fontWeight = FontWeight.Bold // Negrita
-            ),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            color = Color(0.352f, 0.196f, 0.070f, 1.0f)
-        )
-        ItemCard(item, viewModel, item, navController)
-    }
-}
-
-
 //LISTA DE ITEMS
 @Composable
 fun ItemsList(items: List<Item>, viewModel: ShoppingViewModel, msitem: Item, navController: NavController) {
@@ -443,6 +420,7 @@ fun ItemCard(item: Item, viewModel: ShoppingViewModel, msitem: Item, navControll
                 .size(100.dp)
                 .clickable {
                     viewModel.detailProduct(item.id)
+                    viewModel.registerDetailProduct(item.item_name)
                     // Pasa el productId al navegar
                     navController.navigate("productDetail/${item.id}")
                 }
