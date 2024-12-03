@@ -90,7 +90,14 @@ fun FoodiesHomeScreen(
 
     // Llamar a la función para obtener los datos al entrar en la pantalla
     LaunchedEffect(Unit) {
-        viewModel.fetchItems()
+        viewModel.fetchItems { updatedItems ->
+            // Al obtener los items, hacemos el fetch de las preferencias del usuario
+            val userId = Firebase.auth.currentUser?.uid
+            if (userId != null) {
+                // Pasamos el userId y la lista de items
+                viewModel.fetchUserPreferences(userId, updatedItems)
+            }
+        }
         viewModel.initTextToSpeech(context)
         viewModel.requestLocationUpdate(context)
         viewModel.storeInfo()
@@ -226,20 +233,6 @@ fun FoodiesHomeScreen(
             }
         }
     }
-}
-
-//Función para obtener datos
-@Composable
-fun FetchItemsData(viewModel: ShoppingViewModel, onComplete: @Composable () -> Unit) {
-    //Producto más vendido
-    viewModel.mostSellItem()
-    //Obtiene los items disponibles
-    val userId = Firebase.auth.currentUser?.uid
-    if (userId != null) {
-        viewModel.fetchUserPreferences(userId)
-    }
-    // Marcar como completo una vez finalicen las operaciones
-    onComplete()
 }
 
 //Botones de acciones

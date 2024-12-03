@@ -16,6 +16,8 @@ import com.example.foodies.view.profile.FoodiesProfileScreen
 import com.example.foodies.view.shoppingCart.ConfirmOrderScreen
 import com.example.foodies.view.shoppingCart.FoodiesShoppingCartScreen
 import com.example.foodies.view.shoppingCart.TrackOrderScreen
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -25,7 +27,16 @@ fun itemsAvailability(shoppingViewModel: ShoppingViewModel) {
     shoppingViewModel.viewModelScope.launch(Dispatchers.Main) {
         while (true) {
             Log.d("Items", "Actualizando")
-            shoppingViewModel.fetchItems()  // Llamar al método del ViewModel
+            shoppingViewModel.fetchItems(){
+                updatedItems ->
+                // Al obtener los items, hacemos el fetch de las preferencias del usuario
+                val userId = Firebase.auth.currentUser?.uid
+                if (userId != null) {
+                    // Pasamos el userId y la lista de items
+                    shoppingViewModel.fetchUserPreferences(userId, updatedItems)
+                }
+
+            }  // Llamar al método del ViewModel
 
             // Esperar 2 minutos antes de la siguiente ejecución
             delay(2 * 60 * 1000L)  // 2 minutos en milisegundos

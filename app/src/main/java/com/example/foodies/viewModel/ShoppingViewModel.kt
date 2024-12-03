@@ -265,7 +265,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun fetchItems() {
+    fun fetchItems(callback: (List<Item>) -> Unit) {
         viewModelScope.launch {
             try {
                 // Llamada al servicio en un hilo de I/O
@@ -278,7 +278,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                 var currentItem: Item? = null
                 var fetchedItem: Item? = null
                 var found: Boolean
-                //Iterar los elementos
+                // Iterar los elementos
                 for (i in currentItems.indices) {
                     currentItem = currentItems[i]
                     found = false
@@ -293,11 +293,12 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                         itemsToRemove.add(currentItem)
                     }
                 }
-                //Eliminar items no existentes
+                // Eliminar items no existentes
                 for (i in itemsToRemove.indices) {
                     removeItem(itemsToRemove[i])
                 }
-                // Actualiza el LiveData en el hilo principal solo si las listas son diferentes
+
+                // Procesar los nuevos items
                 val updatedItems = mutableListOf<Item>()
                 var item: Item
                 var isAddedState: Boolean
@@ -307,31 +308,28 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
                     isAddedState = sharedPreferences.getBoolean("item_${item.id}_isAdded", false)
                     updatedItems.add(item.copy(isAdded = isAddedState))
                 }
-                Log.d("Items-sp", "$updatedItems")
-                // Asignar la lista actualizada
-                _items.postValue(updatedItems)
+                // No hacemos postValue aquí, sino que llamamos al callback
+                callback(updatedItems)
             } catch (exception: Exception) {
-                // Maneja cualquier error y publica el mensaje de errorzhy7
+                // Manejo de errores
                 _error.postValue(exception.message)
             }
         }
     }
 
-    fun fetchUserPreferences(userId: String) {
+    fun fetchUserPreferences(userId: String, items: List<Item>) {
         serviceAdapter.getUserOrderHistory(
             userId = userId,
             onSuccess = { itemQuantityMap ->
-                Log.d("FoodiesHome-items-p", "$itemQuantityMap")
-                // Si los items aún no están inicializados, usa una lista por defecto
-                val currentItems = _items.value ?: emptyList()
-                Log.d("FoodiesHome-items-cp", "$currentItems")
-                Log.d("FoodiesHome-items-v", "${_items.value}")
                 // Ordenar los items según la historia del usuario
-                val sortedItems = currentItems.sortedByDescending { item ->
-                    Log.d("FoodiesHome-item-p", "$item")
-                    itemQuantityMap[item.item_name] ?: 0
+                val sortedItems = if (itemQuantityMap.isNotEmpty()) {
+                    items.sortedByDescending { item ->
+                        itemQuantityMap[item.item_name] ?: 0
+                    }
+                } else {
+                    items // Si no hay preferencias, se mantiene la lista original
                 }
-                // Update LiveData with the sorted items
+                // Actualizar LiveData con los items ordenados
                 _items.postValue(sortedItems)
             },
             onFailure = { exception ->
@@ -339,6 +337,7 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
             }
         )
     }
+
 
     //Función que ordena por precio del producto
     fun sortByCheaperItems(){
