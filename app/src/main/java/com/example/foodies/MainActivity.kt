@@ -22,6 +22,7 @@ import androidx.work.WorkManager
 import com.example.foodies.model.LocationWorker
 import com.example.foodies.model.NetworkMonitor
 import com.example.foodies.model.OrderWorker
+import com.example.foodies.model.PromotionWorker
 import com.example.foodies.viewModel.FoodiesNavigation
 import com.example.foodies.ui.theme.FoodiesTheme
 import java.util.concurrent.TimeUnit
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
         // Iniciar los Workers al crear la actividad
         locationWorker()
         orderWorker()
+        promotionWorker()
         NetworkMonitor.initialize(this)
     }
 
@@ -56,6 +58,13 @@ class MainActivity : ComponentActivity() {
             .addTag("order_worker")
             .build()
         WorkManager.getInstance(this).enqueue(orderWorker)
+    }
+
+    //Promotion Worker
+    private fun promotionWorker(){
+        val promotionWorker = PeriodicWorkRequestBuilder<PromotionWorker>(15, TimeUnit.MINUTES)
+            .build()
+        WorkManager.getInstance(this).enqueue(promotionWorker)
     }
 
     //On destroy activity
