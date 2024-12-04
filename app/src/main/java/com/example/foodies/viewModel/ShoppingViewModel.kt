@@ -240,6 +240,10 @@ class ShoppingViewModel(application: Application) : AndroidViewModel(application
         val editor2 = sharedPreferencesUser.edit()
         editor2.clear()  // Elimina todos los valores guardados
         editor2.apply()  // Aplica los cambios
+
+        val editor3 = sharedPreferencesOrder.edit()
+        editor3.clear()
+        editor3.apply()
     }
 
 
